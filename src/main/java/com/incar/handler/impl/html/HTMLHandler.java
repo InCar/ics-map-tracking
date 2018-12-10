@@ -5,18 +5,14 @@ import com.incar.handler.Handler;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HTMLHandler implements Handler<String>{
+public class HTMLHandler implements Handler<Object>{
     @Override
-    public String request(String param) {
-        Map<String,String> dataMap=new HashMap<>();
-        dataMap.put("text",param);
-        return HTMLTemplateReader.readTemplate("test.html",dataMap);
+    public String request(Object param) {
+        return HTMLTemplateReader.readTemplate("test.html",(Map)param);
     }
 
     @Override
-    public String requestWow(String param) {
-        Map<String,String> dataMap=new HashMap<>();
-        dataMap.put("text",param);
-        return HTMLTemplateReader.readTemplate("wow.html",dataMap);
+    public String requestWow(Object param) {
+        return HTMLTemplateReader.readTemplate("wow.html",(Map)param);
     }
 }
