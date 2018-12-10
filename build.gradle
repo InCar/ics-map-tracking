@@ -1,0 +1,14 @@
+group 'ics-map-tracking'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    maven { url 'https://maven.aliyun.com/repository/central' }
+}
+jar {
+    enabled = true
+}
