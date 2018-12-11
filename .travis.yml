@@ -1,0 +1,23 @@
+language: java
+
+jdk:
+    - oraclejdk8
+
+# only cli branch
+branches:
+    only:
+        - master
+        - dev
+
+cache:
+    directories:
+        - $HOME/.gradle
+
+before_install:
+#    - nvm install 5.6.0
+
+before_script:
+
+
+script:
+    - gradle check -Dspring.profiles.active=travis -x classes
