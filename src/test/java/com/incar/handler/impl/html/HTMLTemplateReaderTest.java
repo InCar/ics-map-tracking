@@ -1,8 +1,14 @@
 package com.incar.handler.impl.html;
 
-import org.junit.Test; 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.Before; 
-import org.junit.After; 
+import org.junit.After;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /** 
 * HTMLTemplateReader Tester. 
@@ -28,7 +34,26 @@ public class HTMLTemplateReaderTest {
     */
     @Test
     public void testReadTemplate() throws Exception {
-    //TODO: Test goes here...
+
+        {
+            Map<String,Object> params = new HashMap<>();
+            params.put("longitude", 111.1);
+            params.put("latitude", 52.1);
+            String s = HTMLTemplateReader.readTemplate("test.html", params);
+            Assert.assertEquals("<html><head></head><body>坐标：经度：111.1  纬度：52.1</body></html>", s);
+        }
+
+
+        {
+            Map<String, Object> params = new HashMap<>();
+            params.put("longitude", 111.1);
+            params.put("latitude", 52.1);
+            try {
+                HTMLTemplateReader.readTemplate("nofound.html", params);
+            } catch (Exception e) {
+                Assert.assertEquals(NullPointerException.class, e.getClass());
+            }
+        }
     }
 
 
