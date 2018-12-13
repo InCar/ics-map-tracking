@@ -1,6 +1,7 @@
 package com.incar.base.config;
 
 
+import com.incar.base.handler.dynamicrequest.json.JsonReader;
 import com.incar.base.log.LoggerFactory;
 
 import java.util.logging.Logger;
@@ -11,10 +12,6 @@ import java.util.logging.Logger;
 public class Config {
     public final static String DEFAULT_MAPPING_PRE="/ics";
     public final static String DEFAULT_ENCODING="UTF-8";
-
-
-    public static boolean ENABLE_FILTER=false;
-    public static Config FILTER_CONFIG;
 
     //匹配request路径前缀
     private String mappingPre;
@@ -29,11 +26,13 @@ public class Config {
     private LogConfig logConfig;
     private Logger logger;
 
+
+
     public Config() {
         this.mappingPre = DEFAULT_MAPPING_PRE;
         this.encoding = DEFAULT_ENCODING;
-        this.enableFilter = ENABLE_FILTER;
-        this.logger= LoggerFactory.getLogger(new LogConfig());
+        this.logConfig=new LogConfig();
+        this.logger= LoggerFactory.getLogger(logConfig);
     }
 
     public String getMappingPre() {
@@ -80,17 +79,5 @@ public class Config {
         this.logConfig = logConfig;
         this.logger=LoggerFactory.getLogger(logConfig);
         return this;
-    }
-
-    /**
-     * 开启过滤器,全局唯一
-     * @see javax.servlet.annotation.WebFilter 过滤器
-     * @see com.incar.business.filter.ICSFilter
-     * @param config
-     */
-    public static void enableFilter(Config config){
-        Config.ENABLE_FILTER=true;
-        Config.FILTER_CONFIG=config;
-
     }
 }
