@@ -26,6 +26,7 @@ repositories {
 
 
 task startWeb(type: JavaExec) {
+    println("start the spring boot web！")
     main = "com.incar.TestApp"
     classpath = sourceSets.test.runtimeClasspath
 }
