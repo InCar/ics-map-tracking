@@ -30,7 +30,6 @@ task startWeb(type: JavaExec) {
 
 
 task excute(){
-        println(enableBootWeb)
         if(!project.hasProperty("enableBootWeb")){
             println("spring boot web disabled")
         }else {
