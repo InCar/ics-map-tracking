@@ -21,5 +21,5 @@ before_script:
 
 script:
     - gradle check -Dspring.profiles.active=travis -x classes
-#    - gradle startWeb
+    - gradle startWeb
 

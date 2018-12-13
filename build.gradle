@@ -24,15 +24,19 @@ repositories {
 }
 
 task startWeb(type: JavaExec) {
-    doLast {
-        if(!project.hasProperty("disableBootWeb")){
-            println("start the spring boot web for test！")
-            main = 'com.incar.TestApp'
-            classpath = sourceSets.test.runtimeClasspath
-        }
-    }
+    main = 'com.incar.TestApp'
+    classpath = sourceSets.test.runtimeClasspath
 }
 
+
+task excute(){
+        println(enableBootWeb)
+        if(!project.hasProperty("enableBootWeb")){
+            println("spring boot web disabled")
+        }else {
+            dependsOn startWeb
+        }
+}
 
 jar {
     enabled = true
