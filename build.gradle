@@ -2,6 +2,7 @@ group 'ics-map-tracking'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+//apply plugin:'application'
 
 sourceCompatibility = 1.8
 
@@ -14,14 +15,22 @@ repositories {
     dependencies{
         testCompile group: 'junit', name: 'junit', version: '4.12'
         testCompile ("com.alibaba:fastjson:1.+")
+        //springboot web支持 仅供单元测试使用
+        testCompile("org.springframework.boot:spring-boot-starter-web:2.+")
 
         // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
         compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
-
     }
 
-
 }
+
+
+task startWeb(type: JavaExec) {
+    main = "com.incar.TestApp"
+    classpath = sourceSets.test.runtimeClasspath
+}
+
+
 jar {
     enabled = true
 }
