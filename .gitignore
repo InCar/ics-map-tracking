@@ -3,6 +3,7 @@
 *.iws
 *.log
 *.log.*
+*.mf
 
 .gradle/
 .idea/
