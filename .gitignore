@@ -14,7 +14,7 @@
 build/
 out/
 **/*-dev.yml
-**/*-test.yml
+**/*-jl.yml
 /gradle.properties
 *.js.map
 **/upload/

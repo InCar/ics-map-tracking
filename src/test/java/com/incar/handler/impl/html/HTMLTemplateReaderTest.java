@@ -39,7 +39,7 @@ public class HTMLTemplateReaderTest {
             Map<String,Object> params = new HashMap<>();
             params.put("longitude", 111.1);
             params.put("latitude", 52.1);
-            String s = HTMLTemplateReader.readTemplate("test.html", params);
+            String s = HTMLTemplateReader.readTemplate("jl.html", params);
             Assert.assertEquals("<html><head></head><body>坐标：经度：111.1  纬度：52.1</body></html>", s);
         }
 

@@ -26,6 +26,12 @@ public class HTMLHandlerTest {
     public void after() throws Exception {
     }
 
+    @Test
+    public void testRequest1() throws Exception {
+        System.out.println(1);
+    }
+
+
     /**
     *
     * Method: request(Object param)

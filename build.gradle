@@ -16,6 +16,7 @@ repositories {
         testCompile ("com.alibaba:fastjson:1.+")
         //springboot web支持 仅供单元测试使用
         testCompile("org.springframework.boot:spring-boot-starter-web:2.+")
+        testCompile("org.springframework.boot:spring-boot-starter-test:2.+")
 
         // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
         compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
@@ -23,13 +24,24 @@ repositories {
 
 }
 
-task startWeb(type: JavaExec) {
-    main = 'com.incar.TestApp'
-    classpath = sourceSets.test.runtimeClasspath
+test{
+    systemProperties System.getProperties()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
 }
 
 
-task excute(){
+task startWeb(type: JavaExec) {
+    main = 'com.incar.TestApp'
+    classpath = sourceSets.test.runtimeClasspath
+
+}
+
+
+task startWithCondition(){
         if(!project.hasProperty("enableBootWeb")){
             println("spring boot web disabled")
         }else {

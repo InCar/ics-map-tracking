@@ -46,9 +46,9 @@ public class JSONHandlerTest {
         }
 
         {
-            Coo c = new Coo("test",10);
+            Coo c = new Coo("jl",10);
             String hello = jh.request(c);
-            Assert.assertEquals("{\"age\":10,\"name\":\"test\"}", hello);
+            Assert.assertEquals("{\"age\":10,\"name\":\"jl\"}", hello);
         }
     }
 
@@ -75,9 +75,9 @@ public class JSONHandlerTest {
         }
 
         {
-            Coo c = new Coo("test",10);
+            Coo c = new Coo("jl",10);
             String hello = jh.requestWow(c);
-            Assert.assertEquals("参数值为：{\"age\":10,\"name\":\"test\"}", hello);
+            Assert.assertEquals("参数值为：{\"age\":10,\"name\":\"jl\"}", hello);
         }
     }
 
