@@ -41,7 +41,7 @@ task startWeb(type: JavaExec) {
 }
 
 
-task startWithCondition(){
+task startWebByCondition(){
         if(!project.hasProperty("enableBootWeb")){
             println("spring boot web disabled")
         }else {
