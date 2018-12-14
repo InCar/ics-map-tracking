@@ -23,63 +23,6 @@ import java.io.IOException;
 @RequestMapping("/api/version")
 public class Version1Controller {
 
-    @RequestMapping(value = "/html", method = RequestMethod.GET)
-    public String info(@RequestParam(value = "value",required = false) String value) {
-        //调用jar接口
-        String res1 = new HTMLHandler().request("小兰");
-
-        return res1;
-    }
-
-    @RequestMapping(value = "/json", method = RequestMethod.GET)
-    public String infoNext(@RequestParam(value = "value",required = false) String value) {
-        //调用jar接口
-        ObjectMapper mapper = new ObjectMapper();
-        String res2 = new JSONHandler(new JSONReader() {
-            @Override
-            public String toJson(Object o) {
-                String value1 = null;
-                try {
-                    value1 = mapper.writeValueAsString(o);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return value1;
-            }
-        }).request("小兰");
-
-        return res2;
-    }
-
-    @RequestMapping(value = "/wowHtml", method = RequestMethod.GET)
-    public String infoHtml(@RequestParam(value = "value",required = false) String value) {
-        //调用jar接口
-        String res1 = new HTMLHandler().requestWow("小兰");
-
-        return res1;
-    }
-
-    @RequestMapping(value = "/wowJson", method = RequestMethod.GET)
-    public String infoJson(@RequestParam(value = "value",required = false) String value) {
-        //调用jar接口
-        ObjectMapper mapper = new ObjectMapper();
-        String res2 = new JSONHandler(new JSONReader() {
-            @Override
-            public String toJson(Object o) {
-                String value1 = null;
-                try {
-                    value1 = mapper.writeValueAsString(o);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return value1;
-            }
-        }).requestWow("小兰");
-
-        return res2;
-    }
-
-
     @RequestMapping(value = "/test/**",method = RequestMethod.GET)
     public void request(HttpServletRequest request, HttpServletResponse response){
         com.incar.base.Dispatcher dispatcher = MapTrackingStarter.getDispatcher();
