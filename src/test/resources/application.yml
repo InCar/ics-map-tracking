@@ -1,2 +1,6 @@
 server:
   port: 8081
+ics:
+  prefix: /ics
+spring.resources.chain.cache: false
+
