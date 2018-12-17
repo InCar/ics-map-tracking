@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 /**
  * 静态资源处理器
- * 只支持 subPath为 /static/ 开头的请求
+ *
  */
 public class StaticResourceHandler extends PathStartWithHandler{
     /**
@@ -29,18 +29,20 @@ public class StaticResourceHandler extends PathStartWithHandler{
     }};
 
     public StaticResourceHandler(Config config) {
-        super(config,"/static/");
+        super(config,config.getRequestStaticMappingPre());
     }
 
     @Override
     public void handle(RequestData requestData) {
         HttpServletResponse response=requestData.getResponse();
         Config config= requestData.getConfig();
-        //1、获取uri,截取子路径
+        //1、获取子路径
         String subPath=requestData.getSubPath();
-        subPath=subPath.startsWith("/")?subPath.substring(1):subPath;
+        //1.1、根据子路径和配置的静态文件请求路径、静态文件存放路径来拼装正确的静态文件相对地址
+        String subFilePath=subPath.substring(config.getRequestStaticMappingPre().length()+1);
+        String filePath=config.getFileStaticMappingPre()+subFilePath;
         //2、读取静态文件内容
-        try(InputStream is=ClassLoader.getSystemResourceAsStream(subPath)){
+        try(InputStream is=ClassLoader.getSystemResourceAsStream(filePath)){
             if(is==null){
                 String msg="StaticResourceHandler dispatch path["+subPath+"] not exists";
                 config.getLogger().log(Level.SEVERE,msg);

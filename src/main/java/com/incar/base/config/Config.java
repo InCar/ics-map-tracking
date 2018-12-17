@@ -1,7 +1,6 @@
 package com.incar.base.config;
 
 
-import com.incar.base.handler.dynamicrequest.json.JsonReader;
 import com.incar.base.log.LoggerFactory;
 
 import java.util.logging.Logger;
@@ -10,13 +9,20 @@ import java.util.logging.Logger;
  * Dispatcher配置类
  */
 public class Config {
-    public final static String DEFAULT_MAPPING_PRE="/ics";
+    public final static String DEFAULT_REQUEST_MAPPING_PRE ="/ics";
+    public final static String DEFAULT_REQUEST_STATIC_MAPPING_PRE="/static/";
+    public final static String DEFAULT_FILE_STATIC_MAPPING_PRE ="/ics/static/";
     public final static String DEFAULT_ENCODING="UTF-8";
 
     //匹配request路径前缀
-    private String mappingPre;
+    private String requestMappingPre;
 
-    //request和response编码
+    //静态资源请求匹配前缀
+    private String requestStaticMappingPre;
+    //静态资源文件路径匹配前缀
+    private String fileStaticMappingPre;
+
+    //response编码
     private String encoding;
 
     //是否启用filter拦截
@@ -29,18 +35,20 @@ public class Config {
 
 
     public Config() {
-        this.mappingPre = DEFAULT_MAPPING_PRE;
+        this.requestMappingPre = DEFAULT_REQUEST_MAPPING_PRE;
         this.encoding = DEFAULT_ENCODING;
+        this.requestStaticMappingPre = DEFAULT_REQUEST_STATIC_MAPPING_PRE;
+        this.fileStaticMappingPre=DEFAULT_FILE_STATIC_MAPPING_PRE;
         this.logConfig=new LogConfig();
         this.logger= LoggerFactory.getLogger(logConfig);
     }
 
-    public String getMappingPre() {
-        return mappingPre;
+    public String getRequestMappingPre() {
+        return requestMappingPre;
     }
 
-    public Config withMappingPre(String mappingPre) {
-        this.mappingPre = mappingPre;
+    public Config withRequestMappingPre(String requestMappingPre) {
+        this.requestMappingPre = requestMappingPre;
         return this;
     }
 
@@ -78,6 +86,24 @@ public class Config {
     public Config withLogConfig(LogConfig logConfig) {
         this.logConfig = logConfig;
         this.logger=LoggerFactory.getLogger(logConfig);
+        return this;
+    }
+
+    public String getRequestStaticMappingPre() {
+        return requestStaticMappingPre;
+    }
+
+    public Config withRequestStaticMappingPre(String requestStaticMappingPre) {
+        this.requestStaticMappingPre = requestStaticMappingPre;
+        return this;
+    }
+
+    public String getFileStaticMappingPre() {
+        return fileStaticMappingPre;
+    }
+
+    public Config withFileStaticMappingPre(String fileStaticMappingPre) {
+        this.fileStaticMappingPre = fileStaticMappingPre;
         return this;
     }
 }
