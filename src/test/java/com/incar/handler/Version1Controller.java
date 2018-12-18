@@ -1,5 +1,8 @@
 package com.incar.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.incar.base.Dispatcher;
 import com.incar.base.exception.NoHandlerException;
 import com.incar.business.MapTrackingStarter;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +19,22 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings(value = "unchecked")
 @Controller
 public class Version1Controller {
+    Dispatcher dispatcher;
 
-    @Value("${ics.prefix}")
-    private String prefix;
+    public Version1Controller(){
+        dispatcher= MapTrackingStarter.getDispatcher();
+        dispatcher.getConfig().withRequestMappingPre("/ics");
+        dispatcher.getDynamicRequestHandler().withJsonReader(obj->{
+            try {
+                return new ObjectMapper().writeValueAsString(obj);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        });
+    }
 
-    @RequestMapping(value = "/**",method = RequestMethod.GET)
+    @RequestMapping(value = "/ics/**",method = RequestMethod.GET)
     public void request(HttpServletRequest request, HttpServletResponse response){
-        com.incar.base.Dispatcher dispatcher = MapTrackingStarter.getDispatcher();
-        dispatcher.getConfig().withRequestMappingPre(prefix);
         try {
             dispatcher.dispatch(request,response);
         } catch (NoHandlerException e) {
