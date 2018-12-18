@@ -1,20 +1,19 @@
 package com.incar.base.handler;
 
 import com.incar.base.config.Config;
-import com.incar.base.handler.dynamicrequest.anno.ICSHttpController;
+import com.incar.base.handler.dynamicrequest.anno.ICSController;
+import com.incar.base.handler.dynamicrequest.context.ICSContext;
 import com.incar.base.handler.dynamicrequest.exception.DefaultExceptionHandler;
 import com.incar.base.handler.dynamicrequest.json.DefaultJsonReader;
 import com.incar.base.handler.dynamicrequest.json.JsonReader;
 import com.incar.base.handler.dynamicrequest.request.DynamicRequest;
-import com.incar.base.handler.dynamicrequest.request.ICSSimpleRequest;
+import com.incar.base.handler.dynamicrequest.request.impl.ICSSimpleRequest;
 import com.incar.base.request.RequestData;
-import com.incar.base.util.ClassUtil;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 动态请求处理器
@@ -96,39 +95,32 @@ public class DynamicRequestHandler implements OrderedHandler{
 
     /**
      * 添加自定义注解
-     * @see ICSHttpController
+     * @see ICSController
      * 的映射类到其中
      */
     private void appendPackagesMappingIfNotExist(){
-        try {
-            List<Class> classList= ClassUtil.getClassesWithAnno(ICSHttpController.class,scanPackages);
-            for (Class clazz : classList) {
-                Object controllerObj;
-                try {
-                    controllerObj=clazz.getConstructor().newInstance();
-                } catch (InstantiationException |IllegalAccessException|InvocationTargetException |NoSuchMethodException e) {
-                    throw new RuntimeException("["+clazz.getName()+"] don't has empty param constructor");
-                }
-                List<ICSSimpleRequest> methodList= ICSSimpleRequest.generateByICSController(controllerObj);
+        //初始化ics环境
+        ICSContext.init(config,scanPackages);
+        //获取所有ICSController注解的对象
+        List<Object> objList=ICSContext.getBeanMap().values().stream().filter(e->e.getClass().getAnnotation(ICSController.class)!=null).collect(Collectors.toList());
+        for (Object controllerObj : objList) {
+            List<ICSSimpleRequest> methodList= ICSSimpleRequest.generateByICSController(controllerObj);
 
-                Map<String,ICSSimpleRequest> pathToMethodMap=new ConcurrentHashMap<>();
-                for (ICSSimpleRequest request : methodList) {
-                    String key=request.getPath();
-                    if(pathToMethodMap.containsKey(key)){
-                        ICSSimpleRequest mapMethod= pathToMethodMap.get(key);
-                        throw new RuntimeException("["+mapMethod.getControllerObj().getClass().getName()+"."+mapMethod.getMethod().getName()+"] requestMapping same as ["+request.getControllerObj().getClass().getName()+"."+request.getMethod().getName()+"]");
-                    }else{
-                        pathToMethodMap.put(key,request);
-                    }
+            Map<String,ICSSimpleRequest> pathToMethodMap=new ConcurrentHashMap<>();
+            for (ICSSimpleRequest request : methodList) {
+                String key=request.getPath();
+                if(pathToMethodMap.containsKey(key)){
+                    ICSSimpleRequest mapMethod= pathToMethodMap.get(key);
+                    throw new RuntimeException("["+mapMethod.getControllerObj().getClass().getName()+"."+mapMethod.getMethod().getName()+"] requestMapping same as ["+request.getControllerObj().getClass().getName()+"."+request.getMethod().getName()+"]");
+                }else{
+                    pathToMethodMap.put(key,request);
                 }
-
-                //如果其中已经存在映射关系的处理器,则忽略默认的处理器,因为可能是用户重写了此处理器
-                pathToMethodMap.forEach((k,v)->{
-                    handlerMap.putIfAbsent(k,v);
-                });
             }
-        } catch (IOException |ClassNotFoundException e) {
-            throw new RuntimeException("dynamicRequestInit failed");
+
+            //如果其中已经存在映射关系的处理器,则忽略默认的处理器,因为可能是用户重写了此处理器
+            pathToMethodMap.forEach((k,v)->{
+                handlerMap.putIfAbsent(k,v);
+            });
         }
     }
 }

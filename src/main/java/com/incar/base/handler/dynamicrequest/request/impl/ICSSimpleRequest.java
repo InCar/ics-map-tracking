@@ -1,26 +1,26 @@
-package com.incar.base.handler.dynamicrequest.request;
+package com.incar.base.handler.dynamicrequest.request.impl;
 
-import com.incar.base.handler.dynamicrequest.anno.ICSHttpRequestMapping;
-import com.incar.base.handler.dynamicrequest.convert.ICSHttpParamConverter;
+import com.incar.base.handler.dynamicrequest.anno.ICSRequestMapping;
+import com.incar.base.handler.dynamicrequest.anno.ICSRequestParam;
 import com.incar.base.handler.dynamicrequest.convert.impl.ArrayParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.DateParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.NumberParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.StringParamConverter;
 import com.incar.base.handler.dynamicrequest.data.ICSHttpRequestParam;
 import com.incar.base.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
+import com.incar.base.handler.dynamicrequest.request.DynamicRequest;
 import com.incar.base.request.RequestData;
 import com.incar.base.util.ClassUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class ICSSimpleRequest implements DynamicRequest{
+public class ICSSimpleRequest implements DynamicRequest {
     private String path;
     private ICSHttpRequestMethodEnum icsHttpRequestMethodEnum;
     private LinkedHashMap<String, ICSHttpRequestParam> paramMap;
@@ -151,20 +151,20 @@ public class ICSSimpleRequest implements DynamicRequest{
     public static List<ICSSimpleRequest> generateByICSController(Object controllerObj){
         Class clazz=controllerObj.getClass();
         String[] pre={""};
-        ICSHttpRequestMapping controllerRequestMapping= (ICSHttpRequestMapping)clazz.getAnnotation(ICSHttpRequestMapping.class);
+        ICSRequestMapping controllerRequestMapping= (ICSRequestMapping)clazz.getAnnotation(ICSRequestMapping.class);
         if(controllerRequestMapping!=null){
             String value=controllerRequestMapping.value();
             pre[0]=value;
         }
-        List<Method> methodList= ClassUtil.getMethodListWithAnno(clazz, ICSHttpRequestMapping.class);
+        List<Method> methodList= ClassUtil.getMethodListWithAnno(clazz, ICSRequestMapping.class);
         return methodList.stream().map(method->{
-            ICSHttpRequestMapping methodRequestMapping= method.getAnnotation(ICSHttpRequestMapping.class);
+            ICSRequestMapping methodRequestMapping= method.getAnnotation(ICSRequestMapping.class);
             String value=methodRequestMapping.value();
             String path=pre[0]+value;
             ICSHttpRequestMethodEnum httpRequestMethodEnum =methodRequestMapping.method();
             LinkedHashMap<String, ICSHttpRequestParam> paramMap=new LinkedHashMap<>();
             for (Parameter parameter : method.getParameters()) {
-                com.incar.base.handler.dynamicrequest.anno.ICSHttpRequestParam requestParam= parameter.getAnnotation(com.incar.base.handler.dynamicrequest.anno.ICSHttpRequestParam.class);
+                ICSRequestParam requestParam= parameter.getAnnotation(ICSRequestParam.class);
                 String name=requestParam.value();
                 paramMap.put(name,new ICSHttpRequestParam(name,parameter.getType(),requestParam.required()));
             }

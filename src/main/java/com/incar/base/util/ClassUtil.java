@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -15,12 +16,58 @@ import java.util.stream.Collectors;
 
 public class ClassUtil {
 
+    /**
+     * 递归扫描, 找出所有此注解及其标注的子注解所标注的所有类, 结果根据注解类型分类
+     * @param annoClass
+     * @param packages
+     * @return
+     */
+    public static Map<String,List<Class>> findWithSub(Class annoClass, String ... packages){
+        try {
+            Map<String,List<Class>> annoNameToClassListmap=new HashMap<>();
+            //1、找出所有带 ICSComponent 注解的类
+            List<Class> classList= ClassUtil.getClassesWithAnno(annoClass,packages);
+            //2、找出其中的 注解,并从集合中移除
+            List<Class> subAnnoList=new ArrayList<>();
+            for (int i=0;i<=classList.size()-1;i++) {
+                Class clazz=classList.get(i);
+                if(clazz.isAnnotation()){
+                    subAnnoList.add(clazz);
+                    classList.remove(i);
+                    i--;
+                }
+            }
+            //3、找出所有子注解的类
+            for (Class subAnno : subAnnoList) {
+                //3.1、将子注解扫描出来的类添加进去
+                Map<String,List<Class>> tempMap= findWithSub(subAnno,packages);
+                annoNameToClassListmap.putAll(tempMap);
+            }
+            //4、返回此注解和其子注解 标注的类
+            annoNameToClassListmap.put(annoClass.getName(),classList);
+            return annoNameToClassListmap;
+        } catch (IOException |ClassNotFoundException e) {
+            throw new RuntimeException("Scan ICSComponent Failed");
+        }
+    }
+
     public static List<Method> getMethodListWithAnno(Class clazz,Class annoClass){
         List<Method> resultList=new ArrayList<>();
         Method[] methods= clazz.getDeclaredMethods();
         for (Method method : methods) {
             if(method.getAnnotation(annoClass)!=null){
                 resultList.add(method);
+            }
+        }
+        return resultList;
+    }
+
+    public static List<Field> getFieldListWithAnno(Class clazz, Class annoClass){
+        List<Field> resultList=new ArrayList<>();
+        Field[] fields= clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if(field.getAnnotation(annoClass)!=null){
+                resultList.add(field);
             }
         }
         return resultList;
