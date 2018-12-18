@@ -2,11 +2,17 @@ package com.incar.business;
 
 import com.incar.base.config.Config;
 import com.incar.base.Dispatcher;
+import com.incar.base.config.MysqlConfig;
 
 
 public class MapTrackingStarter {
     public static Dispatcher getDispatcher(){
-        Config config=new Config();
+        MysqlConfig mysqlConfig=new MysqlConfig(
+                "jdbc:mysql://47.98.211.203:3306/test?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC",
+                "root",
+                "maptracking");
+
+        Config config=new Config(mysqlConfig);
         Dispatcher dispatcher=new Dispatcher(config);
         dispatcher.getStaticResourceHandler();
         return dispatcher;

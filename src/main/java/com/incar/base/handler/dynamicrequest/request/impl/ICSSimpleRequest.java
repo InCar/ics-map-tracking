@@ -1,4 +1,4 @@
-package com.incar.base.handler.dynamicrequest.request;
+package com.incar.base.handler.dynamicrequest.request.impl;
 
 import com.incar.base.handler.dynamicrequest.anno.ICSRequestMapping;
 import com.incar.base.handler.dynamicrequest.anno.ICSRequestParam;
@@ -8,6 +8,7 @@ import com.incar.base.handler.dynamicrequest.convert.impl.NumberParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.StringParamConverter;
 import com.incar.base.handler.dynamicrequest.data.ICSHttpRequestParam;
 import com.incar.base.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
+import com.incar.base.handler.dynamicrequest.request.DynamicRequest;
 import com.incar.base.request.RequestData;
 import com.incar.base.util.ClassUtil;
 
@@ -19,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class ICSSimpleRequest implements DynamicRequest{
+public class ICSSimpleRequest implements DynamicRequest {
     private String path;
     private ICSHttpRequestMethodEnum icsHttpRequestMethodEnum;
     private LinkedHashMap<String, ICSHttpRequestParam> paramMap;

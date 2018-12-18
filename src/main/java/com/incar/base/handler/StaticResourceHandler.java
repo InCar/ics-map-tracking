@@ -39,8 +39,9 @@ public class StaticResourceHandler extends PathStartWithHandler{
         //1、获取子路径
         String subPath=requestData.getSubPath();
         //1.1、根据子路径和配置的静态文件请求路径、静态文件存放路径来拼装正确的静态文件相对地址
-        String subFilePath=subPath.substring(config.getRequestStaticMappingPre().length()+1);
+        String subFilePath=subPath.substring(config.getRequestStaticMappingPre().length());
         String filePath=config.getFileStaticMappingPre()+subFilePath;
+        filePath=filePath.substring(1);
         //2、读取静态文件内容
         try(InputStream is=ClassLoader.getSystemResourceAsStream(filePath)){
             if(is==null){

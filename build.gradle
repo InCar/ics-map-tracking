@@ -1,7 +1,8 @@
-group 'ics-map-tracking'
-version '1.0-SNAPSHOT'
+group 'com.incar'
+version '1.5-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 
@@ -20,6 +21,8 @@ repositories {
 
         // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
         compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+        // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+        compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.13'
     }
 
 }
@@ -51,4 +54,55 @@ task startWebByCondition(){
 
 jar {
     enabled = true
+}
+
+//install {
+//    repositories.mavenInstaller {
+//        pom.version = "$project.version"
+////        pom.artifactId = "$artifactId"
+//        pom.groupId = "$project.group"
+//    }
+//}
+
+//def localMavenRepo = 'file://' + new File('/Users/baichangda').absolutePath
+//
+//uploadArchives {
+//
+//    repositories{
+//        mavenDeployer{
+//            repository(url:localMavenRepo)
+//            //构造项目的Pom文件
+//            pom.project{
+//                name=project.name
+//                packaging='jar'
+//                description='description'
+//            }
+//        }
+//    }
+//}
+
+//发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
+publishing{
+    publications {
+        maven(MavenPublication){
+            from components.java
+        }
+    }
+    repositories {
+        maven{
+            url "${MAVEN_URL_SNAPSHOTS}"
+            credentials {
+                username "${MAVEN_AUTH_USERNAME}"
+                password "${MAVEN_AUTH_PASSWORD}"
+            }
+        }
+    }
+}
+
+ext {
+    MAVEN_URL_PUTLIC = 'https://repository.incarcloud.com/content/groups/public/'
+    MAVEN_URL_RELEASE = 'https://repository.incarcloud.com/content/repositories/releases/'
+    MAVEN_URL_SNAPSHOTS = 'https://repository.incarcloud.com/content/repositories/snapshots/'
+    MAVEN_AUTH_USERNAME = 'deployment'
+    MAVEN_AUTH_PASSWORD = 'deploy123456'
 }

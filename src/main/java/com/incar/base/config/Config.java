@@ -32,15 +32,20 @@ public class Config {
     private LogConfig logConfig;
     private Logger logger;
 
+    //mysql连接配置
+    private MysqlConfig mysqlConfig;
 
 
-    public Config() {
+
+
+    public Config(MysqlConfig mysqlConfig) {
         this.requestMappingPre = DEFAULT_REQUEST_MAPPING_PRE;
         this.encoding = DEFAULT_ENCODING;
         this.requestStaticMappingPre = DEFAULT_REQUEST_STATIC_MAPPING_PRE;
         this.fileStaticMappingPre=DEFAULT_FILE_STATIC_MAPPING_PRE;
         this.logConfig=new LogConfig();
         this.logger= LoggerFactory.getLogger(logConfig);
+        this.mysqlConfig=mysqlConfig;
     }
 
     public String getRequestMappingPre() {
@@ -104,6 +109,15 @@ public class Config {
 
     public Config withFileStaticMappingPre(String fileStaticMappingPre) {
         this.fileStaticMappingPre = fileStaticMappingPre;
+        return this;
+    }
+
+    public MysqlConfig getMysqlConfig() {
+        return mysqlConfig;
+    }
+
+    public Config withMysqlConfig(MysqlConfig mysqlConfig) {
+        this.mysqlConfig = mysqlConfig;
         return this;
     }
 }
