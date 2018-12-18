@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ICSHttpRequestMapping {
+public @interface ICSRequestMapping {
     String value();
     ICSHttpRequestMethodEnum method() default ICSHttpRequestMethodEnum.GET;
 }
