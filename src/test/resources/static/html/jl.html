@@ -7,13 +7,15 @@
 </head>
 <body>
 
-<div id="apiId">
-    <p>hello</p>
+<div id="apiId" style="width:900px;height:400px;">
 </div>
 <script src="/ics/static/js/yb.js">
 </script>
 <script>
-    let track = maptrack.init("apiId")
+    maptrack.init({
+        dom: "apiId",
+        bmap: 'bmap'
+    })
 </script>
 </body>
 </html>
