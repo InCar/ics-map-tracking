@@ -45,8 +45,8 @@ public class RequestData {
      */
     private String getSubPath(HttpServletRequest request){
         String uri=request.getRequestURI();
-        if(uri.startsWith(config.getMappingPre())){
-            return uri.substring(config.getMappingPre().length());
+        if(uri.startsWith(config.getRequestMappingPre())){
+            return uri.substring(config.getRequestMappingPre().length());
         }else{
             return null;
         }
