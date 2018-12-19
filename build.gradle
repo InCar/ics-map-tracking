@@ -56,30 +56,19 @@ jar {
     enabled = true
 }
 
-//install {
-//    repositories.mavenInstaller {
-//        pom.version = "$project.version"
-////        pom.artifactId = "$artifactId"
-//        pom.groupId = "$project.group"
-//    }
-//}
+compileJava{
+    options.encoding = "utf-8"
+    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Werror"
+    options.compilerArgs << "-Xdiags:verbose"
+}
 
-//def localMavenRepo = 'file://' + new File('/Users/baichangda').absolutePath
-//
-//uploadArchives {
-//
-//    repositories{
-//        mavenDeployer{
-//            repository(url:localMavenRepo)
-//            //构造项目的Pom文件
-//            pom.project{
-//                name=project.name
-//                packaging='jar'
-//                description='description'
-//            }
-//        }
-//    }
-//}
+compileTestJava{
+    options.encoding = "utf-8"
+    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Werror"
+    options.compilerArgs << "-Xdiags:verbose"
+}
 
 //发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
 publishing{
@@ -106,3 +95,5 @@ ext {
     MAVEN_AUTH_USERNAME = 'deployment'
     MAVEN_AUTH_PASSWORD = 'deploy123456'
 }
+
+defaultTasks("assemble")
