@@ -28,8 +28,8 @@ public class GpsController extends BaseComponent{
     @ICSRequestMapping(value = "/page",method = ICSHttpRequestMethodEnum.GET)
     public PageResult<GpsSource> page(
             @ICSRequestParam(required = false,value = "gprsCode") String gprsCode,
-            @ICSRequestParam(required = true, value = "pageNum") int pageNum,
-            @ICSRequestParam(required = true, value = "pageSize") int pageSize){
+            @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
+            @ICSRequestParam(required = true, value = "pageSize") Integer pageSize){
         return gpsService.pageByGprscode(gprsCode,new Page(pageNum,pageSize));
     }
 }
