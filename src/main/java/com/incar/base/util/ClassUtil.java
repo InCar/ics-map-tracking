@@ -3,7 +3,6 @@ package com.incar.base.util;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.JarURLConnection;
@@ -14,6 +13,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class ClassUtil {
 
     /**

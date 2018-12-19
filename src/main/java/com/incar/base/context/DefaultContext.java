@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class DefaultContext implements Context,AutoScanner{
     private Config config;
     private RequestHandler requestHandler;
