@@ -29,8 +29,8 @@ public class VehicleController extends BaseComponent {
     @ICSRequestMapping(value = "/page", method = ICSHttpRequestMethodEnum.GET)
     public PageResult<VehicleSource> page(
             @ICSRequestParam(required = false, value = "gprscode") String gprscode,
-            @ICSRequestParam(required = true, value = "pageNum") int pageNum,
-            @ICSRequestParam(required = true, value = "pageSize") int pageSize) {
+            @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
+            @ICSRequestParam(required = true, value = "pageSize") Integer pageSize) {
         return vehicleService.pageByGprscode(gprscode, new Page(pageNum, pageSize));
     }
 }
