@@ -1,5 +1,5 @@
 group 'com.incarcloud.ics'
-version '1.0-SNAPSHOT'
+version '1.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -38,19 +38,13 @@ test{
 
 
 task startWeb(type: JavaExec) {
-    main = 'com.incar.TestApp'
-    classpath = sourceSets.test.runtimeClasspath
-
+    doFirst{
+        main = 'com.incar.TestApp'
+        classpath = sourceSets.test.runtimeClasspath
+    }
 }
 
 
-task startWebByCondition(){
-        if(!project.hasProperty("enableBootWeb")){
-            println("spring boot web disabled")
-        }else {
-            dependsOn startWeb
-        }
-}
 
 jar {
     enabled = true
