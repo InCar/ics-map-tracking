@@ -59,12 +59,14 @@ jar {
 compileJava{
     options.encoding = "utf-8"
     options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Werror"
     options.compilerArgs << "-Xdiags:verbose"
 }
 
 compileTestJava{
     options.encoding = "utf-8"
     options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Werror"
     options.compilerArgs << "-Xdiags:verbose"
 }
 
