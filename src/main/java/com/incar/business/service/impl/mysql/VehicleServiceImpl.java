@@ -1,7 +1,9 @@
-package com.incar.business.service.impl;
+package com.incar.business.service.impl.mysql;
 
+import com.incar.base.config.DataSource;
 import com.incar.base.db.mysql.DBUtil;
 import com.incar.base.handler.dynamicrequest.anno.ICSComponent;
+import com.incar.base.handler.dynamicrequest.anno.ICSDataSource;
 import com.incar.base.handler.dynamicrequest.component.BaseComponent;
 import com.incar.base.page.Page;
 import com.incar.base.page.PageResult;
@@ -14,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+@ICSDataSource(DataSource.MYSQL)
 @ICSComponent
 public class VehicleServiceImpl extends BaseComponent implements VehicleService{
     @Override

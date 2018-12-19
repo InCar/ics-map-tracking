@@ -33,19 +33,19 @@ public class Config {
     private Logger logger;
 
     //mysql连接配置
+    private DataSource dataSource;
     private MysqlConfig mysqlConfig;
+    private HBaseConfig hBaseConfig;
 
 
-
-
-    public Config(MysqlConfig mysqlConfig) {
+    public Config() {
         this.requestMappingPre = DEFAULT_REQUEST_MAPPING_PRE;
         this.encoding = DEFAULT_ENCODING;
         this.requestStaticMappingPre = DEFAULT_REQUEST_STATIC_MAPPING_PRE;
         this.fileStaticMappingPre=DEFAULT_FILE_STATIC_MAPPING_PRE;
         this.logConfig=new LogConfig();
         this.logger= LoggerFactory.getLogger(logConfig);
-        this.mysqlConfig=mysqlConfig;
+        this.dataSource=DataSource.Other;
     }
 
     public String getRequestMappingPre() {
@@ -118,6 +118,26 @@ public class Config {
 
     public Config withMysqlConfig(MysqlConfig mysqlConfig) {
         this.mysqlConfig = mysqlConfig;
+        dataSource=DataSource.MYSQL;
+        return this;
+    }
+
+    public HBaseConfig gethBaseConfig() {
+        return hBaseConfig;
+    }
+
+    public Config withhBaseConfig(HBaseConfig hBaseConfig) {
+        this.hBaseConfig = hBaseConfig;
+        dataSource=DataSource.HBase;
+        return this;
+    }
+
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    public Config withDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
         return this;
     }
 }
