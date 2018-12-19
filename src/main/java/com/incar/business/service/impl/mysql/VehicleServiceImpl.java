@@ -6,7 +6,6 @@ import com.incar.base.handler.dynamicrequest.component.BaseComponent;
 import com.incar.base.page.Page;
 import com.incar.base.page.PageResult;
 import com.incar.business.service.VehicleService;
-import com.incar.business.source.GpsSource;
 import com.incar.business.source.VehicleSource;
 
 import java.sql.Connection;
@@ -19,7 +18,7 @@ import java.util.List;
 public class VehicleServiceImpl extends BaseComponent implements VehicleService{
     @Override
     public List<VehicleSource> listByGprscode(String gprsCode) {
-        try(Connection connection= DBUtil.getConn(config)){
+        try(Connection connection= DBUtil.getConn(config.getMysqlConfig())){
             List<VehicleSource> resultList=new ArrayList<>();
             ResultSet rs;
             if(gprsCode==null){
@@ -44,7 +43,7 @@ public class VehicleServiceImpl extends BaseComponent implements VehicleService{
 
     @Override
     public PageResult<VehicleSource> pageByGprscode(String gprsCode,Page page) {
-        try(Connection connection= DBUtil.getConn(config)){
+        try(Connection connection= DBUtil.getConn(config.getMysqlConfig())){
             if(gprsCode==null){
                 String countSql="select count(*) as num from t_vehicle";
                 ResultSet countRs=connection.prepareStatement(countSql).executeQuery();

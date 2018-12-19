@@ -19,7 +19,7 @@ import java.util.List;
 public class GpsServiceImpl extends BaseComponent implements GpsService{
     @Override
     public List<GpsSource> listByGprscode(String gprsCode) {
-        try(Connection connection= DBUtil.getConn(config)){
+        try(Connection connection= DBUtil.getConn(config.getMysqlConfig())){
             List<GpsSource> resultList=new ArrayList<>();
             ResultSet rs;
             if(gprsCode==null){
@@ -45,7 +45,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService{
 
     @Override
     public PageResult<GpsSource> pageByGprscode(String gprsCode, Page page) {
-        try(Connection connection= DBUtil.getConn(config)){
+        try(Connection connection= DBUtil.getConn(config.getMysqlConfig())){
             if(gprsCode==null){
                 String countSql="select count(*) as num from t_gps";
                 ResultSet countRs=connection.prepareStatement(countSql).executeQuery();
