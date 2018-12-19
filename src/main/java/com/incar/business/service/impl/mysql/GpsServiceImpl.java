@@ -4,20 +4,14 @@ import com.incar.base.config.DataSource;
 import com.incar.base.config.MysqlConfig;
 import com.incar.base.db.mysql.DBUtil;
 import com.incar.base.db.mysql.RowHandler;
-import com.incar.base.handler.dynamicrequest.anno.ICSComponent;
-import com.incar.base.handler.dynamicrequest.anno.ICSDataSource;
+import com.incar.base.anno.ICSComponent;
+import com.incar.base.anno.ICSDataSource;
 import com.incar.base.handler.dynamicrequest.component.BaseComponent;
 import com.incar.base.page.Page;
 import com.incar.base.page.PageResult;
 import com.incar.business.service.GpsService;
 import com.incar.business.source.GpsSource;
-import com.incar.business.source.VehicleSource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @ICSDataSource(DataSource.MYSQL)

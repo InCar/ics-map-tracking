@@ -1,11 +1,8 @@
 package com.incar.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.incar.base.Dispatcher;
+import com.incar.base.Starter;
+import com.incar.base.context.Context;
 import com.incar.base.exception.NoHandlerException;
-import com.incar.business.MapTrackingStarter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,24 +16,17 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings(value = "unchecked")
 @Controller
 public class PrefixController {
-    Dispatcher dispatcher;
+    Context context;
 
     public PrefixController(){
-        dispatcher= MapTrackingStarter.getDispatcher();
-        dispatcher.getConfig().withRequestMappingPre("/ics");
-        dispatcher.getDynamicRequestHandler().withJsonReader(obj->{
-            try {
-                return new ObjectMapper().writeValueAsString(obj);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        });
+        context= Starter.getContext();
+        context.getConfig().withRequestMappingPre("/ics");
     }
 
     @RequestMapping(value = "/ics/**",method = RequestMethod.GET)
     public void request(HttpServletRequest request, HttpServletResponse response){
         try {
-            dispatcher.dispatch(request,response);
+            context.handle(request,response);
         } catch (NoHandlerException e) {
             e.printStackTrace();
         }

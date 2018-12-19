@@ -1,11 +1,11 @@
-package com.incar.base.handler;
+package com.incar.base.context;
 
-import com.incar.base.handler.dynamicrequest.anno.ICSComponent;
-import com.incar.base.handler.dynamicrequest.anno.ICSConditionalOnMissingBean;
-import com.incar.base.handler.dynamicrequest.context.Configurable;
-import com.incar.base.handler.dynamicrequest.context.Context;
-import com.incar.base.handler.dynamicrequest.context.Initialable;
-import com.incar.base.handler.dynamicrequest.context.ResourceHandler;
+import com.incar.base.anno.ICSComponent;
+import com.incar.base.anno.ICSConditionalOnMissingBean;
+import com.incar.base.context.Configurable;
+import com.incar.base.context.Context;
+import com.incar.base.context.Initialable;
+import com.incar.base.context.ResourceHandler;
 import com.incar.base.request.RequestData;
 import com.incar.base.util.FileUtil;
 import com.incar.base.config.Config;
@@ -19,10 +19,9 @@ import java.util.logging.Level;
 
 /**
  * 静态资源处理器
- *
  */
-@ICSComponent
-@ICSConditionalOnMissingBean(ResourceHandler.class)
+@ICSComponent("resourceHandler")
+@ICSConditionalOnMissingBean(name="resourceHandler")
 public class DefaultResourceHandler implements ResourceHandler,Initialable{
 
     private Context context;
@@ -57,7 +56,7 @@ public class DefaultResourceHandler implements ResourceHandler,Initialable{
         //2、读取静态文件内容
         try(InputStream is=ClassLoader.getSystemResourceAsStream(filePath)){
             if(is==null){
-                String msg="StaticResourceHandler dispatch path["+subPath+"] not exists";
+                String msg="ResourceHandler path["+subPath+"] not exists";
                 config.getLogger().log(Level.SEVERE,msg);
                 throw new RuntimeException(msg);
             }
@@ -66,7 +65,7 @@ public class DefaultResourceHandler implements ResourceHandler,Initialable{
             setResponseType(subPath,response);
             FileUtil.write(is,response.getOutputStream());
         } catch (IOException e) {
-            String msg="StaticResourceHandler dispatch path["+subPath+"] not exists";
+            String msg="ResourceHandler path["+subPath+"] not exists";
             config.getLogger().log(Level.SEVERE,msg,e);
             throw new RuntimeException(msg);
         }

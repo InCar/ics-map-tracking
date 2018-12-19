@@ -1,10 +1,9 @@
-package com.incar.base.handler;
+package com.incar.base.context;
 
-import com.incar.base.handler.dynamicrequest.anno.ICSAutowire;
-import com.incar.base.handler.dynamicrequest.anno.ICSComponent;
-import com.incar.base.handler.dynamicrequest.anno.ICSConditionalOnMissingBean;
-import com.incar.base.handler.dynamicrequest.anno.ICSController;
-import com.incar.base.handler.dynamicrequest.context.*;
+import com.incar.base.anno.ICSAutowire;
+import com.incar.base.anno.ICSComponent;
+import com.incar.base.anno.ICSConditionalOnMissingBean;
+import com.incar.base.anno.ICSController;
 import com.incar.base.handler.dynamicrequest.exception.DefaultExceptionHandler;
 import com.incar.base.handler.dynamicrequest.json.JsonReader;
 import com.incar.base.handler.dynamicrequest.request.DynamicRequest;
@@ -18,10 +17,9 @@ import java.util.stream.Collectors;
 
 /**
  * 动态请求处理器
- * 所有请求转发给handlerChain中的处理器,自己不作请求处理
  */
-@ICSComponent
-@ICSConditionalOnMissingBean(RequestHandler.class)
+@ICSComponent("requestHandler")
+@ICSConditionalOnMissingBean(name="requestHandler")
 public class DefaultRequestHandler implements RequestHandler,Initialable{
 
 
@@ -86,6 +84,8 @@ public class DefaultRequestHandler implements RequestHandler,Initialable{
                     }
                 }
             }
+
+            handlerMap.putAll(pathToMethodMap);
         }
     }
 }

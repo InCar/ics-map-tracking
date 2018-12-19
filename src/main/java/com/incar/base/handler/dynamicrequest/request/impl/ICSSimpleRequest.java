@@ -1,7 +1,7 @@
 package com.incar.base.handler.dynamicrequest.request.impl;
 
-import com.incar.base.handler.dynamicrequest.anno.ICSRequestMapping;
-import com.incar.base.handler.dynamicrequest.anno.ICSRequestParam;
+import com.incar.base.anno.ICSRequestMapping;
+import com.incar.base.anno.ICSRequestParam;
 import com.incar.base.handler.dynamicrequest.convert.impl.ArrayParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.DateParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.NumberParamConverter;

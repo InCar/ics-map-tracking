@@ -5,7 +5,8 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ICSComponent {
-    String value() default "";
+public @interface ICSConditionalOnMissingBean {
+    Class[] value() default {};
 
+    String name() default "";
 }
