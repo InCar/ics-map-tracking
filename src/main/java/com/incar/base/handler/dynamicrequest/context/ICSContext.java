@@ -1,10 +1,8 @@
 package com.incar.base.handler.dynamicrequest.context;
 
 import com.incar.base.config.Config;
-import com.incar.base.handler.dynamicrequest.anno.ICSAutowire;
-import com.incar.base.handler.dynamicrequest.anno.ICSComponent;
-import com.incar.base.handler.dynamicrequest.anno.ICSController;
-import com.incar.base.handler.dynamicrequest.anno.ICSPrimary;
+import com.incar.base.config.DataSource;
+import com.incar.base.handler.dynamicrequest.anno.*;
 import com.incar.base.handler.dynamicrequest.component.BaseComponent;
 import com.incar.base.util.ClassUtil;
 
@@ -75,6 +73,14 @@ public class ICSContext {
         //2、遍历每一个,生成对象并填入map
         map.forEach((k,v)->{
             v.forEach(clazz->{
+                //判断当前类是否有ICSDataSource,如果有则检查值是否和配置一致,不一致则跳过此类
+                ICSDataSource icsDataSource=(ICSDataSource) clazz.getAnnotation(ICSDataSource.class);
+                if(icsDataSource!=null){
+                    DataSource classDataSource= icsDataSource.value();
+                    if(config.getDataSource()!=classDataSource){
+                        return;
+                    }
+                }
                 String name="";
                 if(ICSComponent.class.getName().equals(k)){
                     ICSComponent icsComponent= (ICSComponent)clazz.getAnnotation(ICSComponent.class);

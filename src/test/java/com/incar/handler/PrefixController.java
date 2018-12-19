@@ -18,10 +18,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 @SuppressWarnings(value = "unchecked")
 @Controller
-public class Version1Controller {
+public class PrefixController {
     Dispatcher dispatcher;
 
-    public Version1Controller(){
+    public PrefixController(){
         dispatcher= MapTrackingStarter.getDispatcher();
         dispatcher.getConfig().withRequestMappingPre("/ics");
         dispatcher.getDynamicRequestHandler().withJsonReader(obj->{
