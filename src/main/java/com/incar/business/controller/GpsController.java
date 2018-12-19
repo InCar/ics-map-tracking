@@ -1,9 +1,9 @@
 package com.incar.business.controller;
 
-import com.incar.base.handler.dynamicrequest.anno.ICSAutowire;
-import com.incar.base.handler.dynamicrequest.anno.ICSController;
-import com.incar.base.handler.dynamicrequest.anno.ICSRequestMapping;
-import com.incar.base.handler.dynamicrequest.anno.ICSRequestParam;
+import com.incar.base.anno.ICSAutowire;
+import com.incar.base.anno.ICSController;
+import com.incar.base.anno.ICSRequestMapping;
+import com.incar.base.anno.ICSRequestParam;
 import com.incar.base.handler.dynamicrequest.component.BaseComponent;
 import com.incar.base.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
 import com.incar.base.page.Page;
@@ -14,7 +14,7 @@ import com.incar.business.source.GpsSource;
 import java.util.List;
 
 @ICSController
-@ICSRequestMapping(value = "/vehicle")
+@ICSRequestMapping(value = "/gps")
 public class GpsController extends BaseComponent{
     @ICSAutowire
     private GpsService gpsService;

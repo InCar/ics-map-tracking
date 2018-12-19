@@ -1,5 +1,11 @@
-package com.incar.base.handler;
+package com.incar.base.context;
 
+import com.incar.base.anno.ICSComponent;
+import com.incar.base.anno.ICSConditionalOnMissingBean;
+import com.incar.base.context.Configurable;
+import com.incar.base.context.Context;
+import com.incar.base.context.Initialable;
+import com.incar.base.context.ResourceHandler;
 import com.incar.base.request.RequestData;
 import com.incar.base.util.FileUtil;
 import com.incar.base.config.Config;
@@ -13,9 +19,17 @@ import java.util.logging.Level;
 
 /**
  * 静态资源处理器
- *
  */
-public class StaticResourceHandler extends PathStartWithHandler{
+@ICSComponent("resourceHandler")
+@ICSConditionalOnMissingBean(name="resourceHandler")
+public class DefaultResourceHandler implements ResourceHandler,Initialable{
+
+    private Context context;
+
+    public Context getContext() {
+        return context;
+    }
+
     /**
      * 定义文件后缀和响应类型映射
      */
@@ -28,14 +42,10 @@ public class StaticResourceHandler extends PathStartWithHandler{
         put("css","text/css");
     }};
 
-    public StaticResourceHandler(Config config) {
-        super(config,config.getRequestStaticMappingPre());
-    }
-
     @Override
-    public void handle(RequestData requestData) {
+    public void handleResource(RequestData requestData) {
         HttpServletResponse response=requestData.getResponse();
-        Config config= requestData.getConfig();
+        Config config= context.getConfig();
         //1、获取子路径
         String subPath=requestData.getSubPath();
         //1.1、根据子路径和配置的静态文件请求路径、静态文件存放路径来拼装正确的静态文件相对地址
@@ -46,7 +56,7 @@ public class StaticResourceHandler extends PathStartWithHandler{
         //2、读取静态文件内容
         try(InputStream is=ClassLoader.getSystemResourceAsStream(filePath)){
             if(is==null){
-                String msg="StaticResourceHandler dispatch path["+subPath+"] not exists";
+                String msg="ResourceHandler path["+subPath+"] not exists";
                 config.getLogger().log(Level.SEVERE,msg);
                 throw new RuntimeException(msg);
             }
@@ -55,7 +65,7 @@ public class StaticResourceHandler extends PathStartWithHandler{
             setResponseType(subPath,response);
             FileUtil.write(is,response.getOutputStream());
         } catch (IOException e) {
-            String msg="StaticResourceHandler dispatch path["+subPath+"] not exists";
+            String msg="ResourceHandler path["+subPath+"] not exists";
             config.getLogger().log(Level.SEVERE,msg,e);
             throw new RuntimeException(msg);
         }
@@ -80,7 +90,7 @@ public class StaticResourceHandler extends PathStartWithHandler{
     }
 
     @Override
-    public int getOrder() {
-        return -1;
+    public void init(Context context) {
+        this.context=context;
     }
 }
