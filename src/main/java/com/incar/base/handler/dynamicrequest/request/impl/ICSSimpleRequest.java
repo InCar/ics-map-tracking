@@ -1,7 +1,7 @@
 package com.incar.base.handler.dynamicrequest.request.impl;
 
-import com.incar.base.handler.dynamicrequest.anno.ICSRequestMapping;
-import com.incar.base.handler.dynamicrequest.anno.ICSRequestParam;
+import com.incar.base.anno.ICSRequestMapping;
+import com.incar.base.anno.ICSRequestParam;
 import com.incar.base.handler.dynamicrequest.convert.impl.ArrayParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.DateParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.NumberParamConverter;
@@ -156,7 +156,7 @@ public class ICSSimpleRequest implements DynamicRequest {
             String value=controllerRequestMapping.value();
             pre[0]=value;
         }
-        List<Method> methodList= ClassUtil.getMethodListWithAnno(clazz, ICSRequestMapping.class);
+        List<Method> methodList= ClassUtil.getDeclaredMethodListWithAnno(clazz, ICSRequestMapping.class);
         return methodList.stream().map(method->{
             ICSRequestMapping methodRequestMapping= method.getAnnotation(ICSRequestMapping.class);
             String value=methodRequestMapping.value();

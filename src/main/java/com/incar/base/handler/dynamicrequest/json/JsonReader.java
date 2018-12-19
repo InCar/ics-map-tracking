@@ -1,5 +1,5 @@
 package com.incar.base.handler.dynamicrequest.json;
 
-public interface JsonReader {
+public interface JsonReader{
     String toJson(Object obj);
 }

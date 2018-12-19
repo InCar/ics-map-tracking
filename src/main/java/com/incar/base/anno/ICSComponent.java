@@ -1,4 +1,4 @@
-package com.incar.base.handler.dynamicrequest.anno;
+package com.incar.base.anno;
 
 import java.lang.annotation.*;
 
