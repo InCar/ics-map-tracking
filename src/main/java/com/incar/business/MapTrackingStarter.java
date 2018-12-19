@@ -2,6 +2,7 @@ package com.incar.business;
 
 import com.incar.base.config.Config;
 import com.incar.base.Dispatcher;
+import com.incar.base.config.DataSource;
 import com.incar.base.config.MysqlConfig;
 
 
@@ -12,7 +13,7 @@ public class MapTrackingStarter {
                 "root",
                 "maptracking");
 
-        Config config=new Config(mysqlConfig);
+        Config config=new Config().withMysqlConfig(mysqlConfig).withDataSource(DataSource.MYSQL);
         Dispatcher dispatcher=new Dispatcher(config);
         dispatcher.getStaticResourceHandler();
         return dispatcher;

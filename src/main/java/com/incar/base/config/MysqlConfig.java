@@ -11,6 +11,7 @@ public class MysqlConfig {
         this.password = password;
     }
 
+
     public String getUrl() {
         return url;
     }
