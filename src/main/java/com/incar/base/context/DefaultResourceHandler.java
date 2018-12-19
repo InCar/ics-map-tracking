@@ -1,5 +1,11 @@
 package com.incar.base.handler;
 
+import com.incar.base.handler.dynamicrequest.anno.ICSComponent;
+import com.incar.base.handler.dynamicrequest.anno.ICSConditionalOnMissingBean;
+import com.incar.base.handler.dynamicrequest.context.Configurable;
+import com.incar.base.handler.dynamicrequest.context.Context;
+import com.incar.base.handler.dynamicrequest.context.Initialable;
+import com.incar.base.handler.dynamicrequest.context.ResourceHandler;
 import com.incar.base.request.RequestData;
 import com.incar.base.util.FileUtil;
 import com.incar.base.config.Config;
@@ -15,7 +21,16 @@ import java.util.logging.Level;
  * 静态资源处理器
  *
  */
-public class StaticResourceHandler extends PathStartWithHandler{
+@ICSComponent
+@ICSConditionalOnMissingBean(ResourceHandler.class)
+public class DefaultResourceHandler implements ResourceHandler,Initialable{
+
+    private Context context;
+
+    public Context getContext() {
+        return context;
+    }
+
     /**
      * 定义文件后缀和响应类型映射
      */
@@ -28,14 +43,10 @@ public class StaticResourceHandler extends PathStartWithHandler{
         put("css","text/css");
     }};
 
-    public StaticResourceHandler(Config config) {
-        super(config,config.getRequestStaticMappingPre());
-    }
-
     @Override
-    public void handle(RequestData requestData) {
+    public void handleResource(RequestData requestData) {
         HttpServletResponse response=requestData.getResponse();
-        Config config= requestData.getConfig();
+        Config config= context.getConfig();
         //1、获取子路径
         String subPath=requestData.getSubPath();
         //1.1、根据子路径和配置的静态文件请求路径、静态文件存放路径来拼装正确的静态文件相对地址
@@ -80,7 +91,7 @@ public class StaticResourceHandler extends PathStartWithHandler{
     }
 
     @Override
-    public int getOrder() {
-        return -1;
+    public void init(Context context) {
+        this.context=context;
     }
 }
