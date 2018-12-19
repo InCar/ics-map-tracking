@@ -7,7 +7,6 @@ import com.incar.base.handler.dynamicrequest.component.BaseComponent;
 import com.incar.base.util.ClassUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -109,7 +108,7 @@ public class ICSContext {
         });
         //3、为map中的对象注入ICSAutowire
         NAME_TO_COMPONENT_MAP.values().forEach(e->{
-            List<Field> fieldList= ClassUtil.getFieldListWithAnno(e.getClass(), ICSAutowire.class);
+            List<Field> fieldList= ClassUtil.getDeclaredFieldListWithAnno(e.getClass(), ICSAutowire.class);
             fieldList.forEach(field->{
                 ICSAutowire icsAutowire=field.getAnnotation(ICSAutowire.class);
                 String name=icsAutowire.value();

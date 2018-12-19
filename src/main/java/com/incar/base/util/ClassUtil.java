@@ -51,7 +51,7 @@ public class ClassUtil {
         }
     }
 
-    public static List<Method> getMethodListWithAnno(Class clazz,Class annoClass){
+    public static List<Method> getDeclaredMethodListWithAnno(Class clazz, Class annoClass){
         List<Method> resultList=new ArrayList<>();
         Method[] methods= clazz.getDeclaredMethods();
         for (Method method : methods) {
@@ -62,7 +62,7 @@ public class ClassUtil {
         return resultList;
     }
 
-    public static List<Field> getFieldListWithAnno(Class clazz, Class annoClass){
+    public static List<Field> getDeclaredFieldListWithAnno(Class clazz, Class annoClass){
         List<Field> resultList=new ArrayList<>();
         Field[] fields= clazz.getDeclaredFields();
         for (Field field : fields) {

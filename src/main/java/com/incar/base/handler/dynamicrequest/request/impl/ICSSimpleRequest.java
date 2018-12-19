@@ -156,7 +156,7 @@ public class ICSSimpleRequest implements DynamicRequest {
             String value=controllerRequestMapping.value();
             pre[0]=value;
         }
-        List<Method> methodList= ClassUtil.getMethodListWithAnno(clazz, ICSRequestMapping.class);
+        List<Method> methodList= ClassUtil.getDeclaredMethodListWithAnno(clazz, ICSRequestMapping.class);
         return methodList.stream().map(method->{
             ICSRequestMapping methodRequestMapping= method.getAnnotation(ICSRequestMapping.class);
             String value=methodRequestMapping.value();

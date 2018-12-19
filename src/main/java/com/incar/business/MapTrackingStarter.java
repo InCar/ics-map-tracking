@@ -13,7 +13,7 @@ public class MapTrackingStarter {
                 "root",
                 "maptracking");
 
-        Config config=new Config().withMysqlConfig(mysqlConfig).withDataSource(DataSource.MYSQL);
+        Config config=new Config().withMysqlConfig(mysqlConfig);
         Dispatcher dispatcher=new Dispatcher(config);
         dispatcher.getStaticResourceHandler();
         return dispatcher;

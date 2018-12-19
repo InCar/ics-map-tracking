@@ -14,7 +14,7 @@ import com.incar.business.source.GpsSource;
 import java.util.List;
 
 @ICSController
-@ICSRequestMapping(value = "/vehicle")
+@ICSRequestMapping(value = "/gps")
 public class GpsController extends BaseComponent{
     @ICSAutowire
     private GpsService gpsService;

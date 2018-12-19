@@ -103,10 +103,10 @@ public class DynamicRequestHandler implements OrderedHandler{
         ICSContext.init(config,scanPackages);
         //获取所有ICSController注解的对象
         List<Object> objList=ICSContext.getBeanMap().values().stream().filter(e->e.getClass().getAnnotation(ICSController.class)!=null).collect(Collectors.toList());
+        Map<String,ICSSimpleRequest> pathToMethodMap=new HashMap<>();
         for (Object controllerObj : objList) {
             List<ICSSimpleRequest> methodList= ICSSimpleRequest.generateByICSController(controllerObj);
 
-            Map<String,ICSSimpleRequest> pathToMethodMap=new ConcurrentHashMap<>();
             for (ICSSimpleRequest request : methodList) {
                 String key=request.getPath();
                 if(pathToMethodMap.containsKey(key)){
@@ -116,11 +116,10 @@ public class DynamicRequestHandler implements OrderedHandler{
                     pathToMethodMap.put(key,request);
                 }
             }
-
-            //如果其中已经存在映射关系的处理器,则忽略默认的处理器,因为可能是用户重写了此处理器
-            pathToMethodMap.forEach((k,v)->{
-                handlerMap.putIfAbsent(k,v);
-            });
         }
+        //如果其中已经存在映射关系的处理器,则忽略默认的处理器,因为可能是用户重写了此处理器
+        pathToMethodMap.forEach((k,v)->{
+            handlerMap.putIfAbsent(k,v);
+        });
     }
 }
