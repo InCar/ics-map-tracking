@@ -5,16 +5,15 @@
 *.log.*
 *.mf
 
+.project
 .gradle/
 .idea/
 .vscode/
-**/.DS_Store
 
+**/.DS_Store
 **/node_modules/
 build/
 out/
-**/*-dev.yml
-**/*-jl.yml
-/gradle.properties
+application-*.yml
+gradle.properties
 *.js.map
-**/upload/
