@@ -8,6 +8,7 @@
 .gradle/
 .idea/
 .vscode/
+.project
 **/.DS_Store
 
 **/node_modules/
