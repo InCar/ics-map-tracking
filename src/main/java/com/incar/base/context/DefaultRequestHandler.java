@@ -6,8 +6,8 @@ import com.incar.base.anno.ICSConditionalOnMissingBean;
 import com.incar.base.anno.ICSController;
 import com.incar.base.handler.dynamicrequest.exception.DefaultExceptionHandler;
 import com.incar.base.handler.dynamicrequest.json.JsonReader;
-import com.incar.base.handler.dynamicrequest.request.DynamicRequest;
-import com.incar.base.handler.dynamicrequest.request.impl.ICSSimpleRequest;
+import com.incar.base.handler.dynamicrequest.request.DynamicRequestHandler;
+import com.incar.base.handler.dynamicrequest.request.impl.SimpleRequestHandler;
 import com.incar.base.request.RequestData;
 
 import javax.servlet.http.HttpServletResponse;
@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
  */
 @ICSComponent("requestHandler")
 @ICSConditionalOnMissingBean(name="requestHandler")
-public class DefaultRequestHandler implements RequestHandler,Initialable{
+public class DefaultRequestHandler implements RequestHandler,Initializable {
 
 
-    private Map<String,DynamicRequest> handlerMap=new ConcurrentHashMap<>();
+    private Map<String,DynamicRequestHandler> handlerMap=new ConcurrentHashMap<>();
     @ICSAutowire
     private JsonReader jsonReader;
 
     private Context context;
 
-    public Map<String, DynamicRequest> getHandlerMap() {
+    public Map<String, DynamicRequestHandler> getHandlerMap() {
         return handlerMap;
     }
 
@@ -50,7 +50,7 @@ public class DefaultRequestHandler implements RequestHandler,Initialable{
     public void handleRequest(RequestData requestData) {
         try {
             String subPath=requestData.getSubPath();
-            DynamicRequest handler= handlerMap.get(subPath);
+            DynamicRequestHandler handler= handlerMap.get(subPath);
             if(handler==null){
                 throw new RuntimeException("No Mapping Request["+subPath+"]");
             }
@@ -70,14 +70,14 @@ public class DefaultRequestHandler implements RequestHandler,Initialable{
             Map<String,Object> beanMap= ((AutoScanner) context).getBeanMap();
             //获取所有ICSController注解的对象
             List<Object> objList=beanMap.values().stream().filter(e->e.getClass().getAnnotation(ICSController.class)!=null).collect(Collectors.toList());
-            Map<String,ICSSimpleRequest> pathToMethodMap=new HashMap<>();
+            Map<String,SimpleRequestHandler> pathToMethodMap=new HashMap<>();
             for (Object controllerObj : objList) {
-                List<ICSSimpleRequest> methodList= ICSSimpleRequest.generateByICSController(controllerObj);
+                List<SimpleRequestHandler> methodList= SimpleRequestHandler.generateByICSController(controllerObj);
 
-                for (ICSSimpleRequest request : methodList) {
+                for (SimpleRequestHandler request : methodList) {
                     String key=request.getPath();
                     if(pathToMethodMap.containsKey(key)){
-                        ICSSimpleRequest mapMethod= pathToMethodMap.get(key);
+                        SimpleRequestHandler mapMethod= pathToMethodMap.get(key);
                         throw new RuntimeException("["+mapMethod.getControllerObj().getClass().getName()+"."+mapMethod.getMethod().getName()+"] requestMapping same as ["+request.getControllerObj().getClass().getName()+"."+request.getMethod().getName()+"]");
                     }else{
                         pathToMethodMap.put(key,request);
