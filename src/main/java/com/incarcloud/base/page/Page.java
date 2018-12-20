@@ -1,4 +1,4 @@
-package com.incar.base.page;
+package com.incarcloud.base.page;
 
 public class Page {
     private int pageNum;

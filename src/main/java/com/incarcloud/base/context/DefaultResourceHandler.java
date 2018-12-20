@@ -1,10 +1,10 @@
-package com.incar.base.context;
+package com.incarcloud.base.context;
 
-import com.incar.base.anno.ICSComponent;
-import com.incar.base.anno.ICSConditionalOnMissingBean;
-import com.incar.base.request.RequestData;
-import com.incar.base.util.FileUtil;
-import com.incar.base.config.Config;
+import com.incarcloud.base.anno.ICSComponent;
+import com.incarcloud.base.anno.ICSConditionalOnMissingBean;
+import com.incarcloud.base.request.RequestData;
+import com.incarcloud.base.util.FileUtil;
+import com.incarcloud.base.config.Config;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

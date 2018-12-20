@@ -1,18 +1,12 @@
-package com.incar.base.db.mysql;
+package com.incarcloud.base.db.mysql;
 
-import com.incar.base.config.MysqlConfig;
-import com.incar.base.page.Page;
-import com.incar.base.page.PageResult;
-import com.incar.base.util.ClassUtil;
-import com.incar.business.source.VehicleSource;
+import com.incarcloud.base.config.MysqlConfig;
+import com.incarcloud.base.page.Page;
+import com.incarcloud.base.page.PageResult;
 
-import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 public class DBUtil {
     public static Connection getConn(MysqlConfig mysqlConfig) throws SQLException{

@@ -1,7 +1,7 @@
-package com.incar.base.handler.dynamicrequest.json;
+package com.incarcloud.base.handler.dynamicrequest.json;
 
-import com.incar.base.anno.ICSComponent;
-import com.incar.base.anno.ICSConditionalOnMissingBean;
+import com.incarcloud.base.anno.ICSComponent;
+import com.incarcloud.base.anno.ICSConditionalOnMissingBean;
 
 @ICSComponent
 @ICSConditionalOnMissingBean(JsonReader.class)

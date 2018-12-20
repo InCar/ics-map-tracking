@@ -1,4 +1,4 @@
-package com.incar.base.config;
+package com.incarcloud.base.config;
 
 public class MysqlConfig {
     private String url;

@@ -1,4 +1,4 @@
-package com.incar.base.exception;
+package com.incarcloud.base.exception;
 
 public class NoHandlerException extends Exception{
     private String uri;

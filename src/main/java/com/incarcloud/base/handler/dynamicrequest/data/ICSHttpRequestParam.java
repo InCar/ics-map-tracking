@@ -1,4 +1,4 @@
-package com.incar.base.handler.dynamicrequest.data;
+package com.incarcloud.base.handler.dynamicrequest.data;
 
 public class ICSHttpRequestParam {
     private String name;

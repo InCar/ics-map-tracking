@@ -1,7 +1,7 @@
-package com.incar.base.config;
+package com.incarcloud.base.config;
 
 
-import com.incar.base.log.LoggerFactory;
+import com.incarcloud.base.log.LoggerFactory;
 
 import java.util.logging.Logger;
 
@@ -13,7 +13,7 @@ public class Config {
     public final static String DEFAULT_REQUEST_STATIC_MAPPING_PRE="/static/";
     public final static String DEFAULT_FILE_STATIC_MAPPING_PRE ="/ics/static/";
     public final static String DEFAULT_ENCODING="UTF-8";
-    public final static String[] DEFAULT_SCAN_PACKAGES=new String[]{"com.incar"};
+    public final static String[] DEFAULT_SCAN_PACKAGES=new String[]{"com.incarcloud"};
 
     //匹配request路径前缀
     private String requestMappingPre;

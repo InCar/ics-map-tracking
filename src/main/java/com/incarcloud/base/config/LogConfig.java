@@ -1,4 +1,4 @@
-package com.incar.base.config;
+package com.incarcloud.base.config;
 
 import java.util.logging.Level;
 

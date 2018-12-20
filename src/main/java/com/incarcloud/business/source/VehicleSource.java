@@ -1,4 +1,4 @@
-package com.incar.business.source;
+package com.incarcloud.business.source;
 
 public class VehicleSource {
     protected String gprscode;

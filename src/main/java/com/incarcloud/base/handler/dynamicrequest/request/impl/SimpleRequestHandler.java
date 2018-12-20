@@ -1,16 +1,16 @@
-package com.incar.base.handler.dynamicrequest.request.impl;
+package com.incarcloud.base.handler.dynamicrequest.request.impl;
 
-import com.incar.base.anno.ICSRequestMapping;
-import com.incar.base.anno.ICSRequestParam;
-import com.incar.base.handler.dynamicrequest.convert.impl.ArrayParamConverter;
-import com.incar.base.handler.dynamicrequest.convert.impl.DateParamConverter;
-import com.incar.base.handler.dynamicrequest.convert.impl.NumberParamConverter;
-import com.incar.base.handler.dynamicrequest.convert.impl.StringParamConverter;
-import com.incar.base.handler.dynamicrequest.data.ICSHttpRequestParam;
-import com.incar.base.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
-import com.incar.base.handler.dynamicrequest.request.DynamicRequestHandler;
-import com.incar.base.request.RequestData;
-import com.incar.base.util.ClassUtil;
+import com.incarcloud.base.anno.ICSRequestMapping;
+import com.incarcloud.base.anno.ICSRequestParam;
+import com.incarcloud.base.handler.dynamicrequest.convert.impl.ArrayParamConverter;
+import com.incarcloud.base.handler.dynamicrequest.convert.impl.DateParamConverter;
+import com.incarcloud.base.handler.dynamicrequest.convert.impl.NumberParamConverter;
+import com.incarcloud.base.handler.dynamicrequest.convert.impl.StringParamConverter;
+import com.incarcloud.base.handler.dynamicrequest.data.ICSHttpRequestParam;
+import com.incarcloud.base.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
+import com.incarcloud.base.handler.dynamicrequest.request.DynamicRequestHandler;
+import com.incarcloud.base.request.RequestData;
+import com.incarcloud.base.util.ClassUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
