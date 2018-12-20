@@ -4,7 +4,6 @@ import com.incar.base.config.Config;
 import com.incar.base.config.DataSource;
 import com.incar.base.exception.NoHandlerException;
 import com.incar.base.anno.*;
-import com.incar.base.handler.dynamicrequest.component.BaseComponent;
 import com.incar.base.request.RequestData;
 import com.incar.base.util.ClassUtil;
 
@@ -20,6 +19,8 @@ public class DefaultContext implements Context,AutoScanner{
     private Config config;
     private RequestHandler requestHandler;
     private ResourceHandler resourceHandler;
+    private Dispatcher dispatcher;
+    private boolean isInit=false;
 
     /**
      * 所有扫描出来的带
@@ -37,34 +38,42 @@ public class DefaultContext implements Context,AutoScanner{
         this.config = config;
     }
 
-    /**
-     * 1、扫描config.scanPackages下面所有的ICSComponent注解类
-     */
     public DefaultContext init() {
+        isInit=true;
         if(config==null){
             throw new RuntimeException("Param[config] Must Not Be Null");
         }
         //1、根据配置初始化所有组件
-        initComponents(config);
-        //2、初始化处理器
-        initHandlers();
+        scanComponents(config);
+        //2、初始化请求分发器
+        dispatcher=getBeanByName("dispatcher");
+        //3、初始化静态请求处理器
+        resourceHandler=getBeanByName("resourceHandler");
+        //4、初始化动态请求处理器
+        requestHandler=getBeanByName("requestHandler");
+        //5、初始化所有组件
+        initComponents();
         return this;
     }
 
-    protected void initHandlers(){
-        //1、初始化静态请求处理器
-        resourceHandler=getBeanByName("resourceHandler");
-        if(resourceHandler instanceof Initialable){
-            ((Initialable) resourceHandler).init(this);
-        }
-        //2、初始化动态请求处理器
-        requestHandler=getBeanByName("requestHandler");
-        if(requestHandler instanceof Initialable){
-            ((Initialable) requestHandler).init(this);
+
+    /**
+     * 遍历所有bean,如果实现了Initializable接口,则进行初始化
+     */
+    protected void initComponents(){
+        //1、如果实现了Initializable接口,则调用初始化方法
+        for (Object e : beanMap.values()) {
+            if(e instanceof Initializable){
+                ((Initializable)e).init(this);
+            }
         }
     }
 
-    protected void initComponents(Config config){
+    /**
+     * 扫描所有ICSComponents并注入属性
+     * @param config
+     */
+    protected void scanComponents(Config config){
         //1、找出所有ICSComponent及其子注解 标注的类
         Map<String,List<Class>> map= ClassUtil.findWithSub(ICSComponent.class,config.getScanPackages());
         //2、遍历每一个,生成对象并填入map
@@ -127,12 +136,13 @@ public class DefaultContext implements Context,AutoScanner{
         });
         //4、为map中的对象注入ICSAutowire
         beanMap.values().forEach(e->{
+            //4.1、属性注入
             List<Field> fieldList= ClassUtil.getDeclaredFieldListWithAnno(e.getClass(), ICSAutowire.class);
             fieldList.forEach(field->{
                 ICSAutowire icsAutowire=field.getAnnotation(ICSAutowire.class);
                 String name=icsAutowire.value();
                 if("".equals(name)){
-                    //通过类型注入
+                    //4.1.1、通过类型注入
                     Class fieldType=field.getType();
                     Object val= getBeanByType(fieldType);
                     if(val==null){
@@ -146,7 +156,7 @@ public class DefaultContext implements Context,AutoScanner{
                         }
                     }
                 }else{
-                    //通过名称注入
+                    //4.1.2、通过名称注入
                     Object val= getBeanByName(name);
                     if(val==null){
                         throw new RuntimeException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Don't Has Component Name["+name+"]");
@@ -160,12 +170,9 @@ public class DefaultContext implements Context,AutoScanner{
                     }
                 }
             });
-            //如果是继承BaseComponent,设置config属性
-            if(e instanceof BaseComponent){
-                ((BaseComponent)e).setConfig(config);
-            }
+
         });
-        //4、将map变成不可编辑
+        //5、将map变成不可编辑
         Collections.unmodifiableMap(beanMap);
     }
 
@@ -240,6 +247,9 @@ public class DefaultContext implements Context,AutoScanner{
 
 
     public DefaultContext withConfig(Config config) {
+        if(isInit){
+           throw new RuntimeException("Context Has Init,Can't Modify Config");
+        }
         this.config=config;
         return this;
     }
@@ -270,14 +280,43 @@ public class DefaultContext implements Context,AutoScanner{
 
     @Override
     public void dispatch(RequestData requestData) {
-        String staticMappingPre=config.getRequestStaticMappingPre();
-        String subPath=requestData.getSubPath();
-        if(subPath.startsWith(staticMappingPre)){
-            handleResource(requestData);
-        }else{
-            handleRequest(requestData);
-        }
+        dispatcher.dispatch(requestData);
     }
 
+    public RequestHandler getRequestHandler() {
+        return requestHandler;
+    }
+
+    public DefaultContext withRequestHandler(RequestHandler requestHandler) {
+        this.requestHandler = requestHandler;
+        if(requestHandler instanceof Initializable){
+            ((Initializable) requestHandler).init(this);
+        }
+        return this;
+    }
+
+    public ResourceHandler getResourceHandler() {
+        return resourceHandler;
+    }
+
+    public DefaultContext withResourceHandler(ResourceHandler resourceHandler) {
+        this.resourceHandler = resourceHandler;
+        if(resourceHandler instanceof Initializable){
+            ((Initializable) resourceHandler).init(this);
+        }
+        return this;
+    }
+
+    public Dispatcher getDispatcher() {
+        return dispatcher;
+    }
+
+    public DefaultContext withDispatcher(Dispatcher dispatcher) {
+        this.dispatcher = dispatcher;
+        if(dispatcher instanceof Initializable){
+            ((Initializable) dispatcher).init(this);
+        }
+        return this;
+    }
 }
 

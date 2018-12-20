@@ -2,10 +2,6 @@ package com.incar.base.context;
 
 import com.incar.base.anno.ICSComponent;
 import com.incar.base.anno.ICSConditionalOnMissingBean;
-import com.incar.base.context.Configurable;
-import com.incar.base.context.Context;
-import com.incar.base.context.Initialable;
-import com.incar.base.context.ResourceHandler;
 import com.incar.base.request.RequestData;
 import com.incar.base.util.FileUtil;
 import com.incar.base.config.Config;
@@ -22,7 +18,7 @@ import java.util.logging.Level;
  */
 @ICSComponent("resourceHandler")
 @ICSConditionalOnMissingBean(name="resourceHandler")
-public class DefaultResourceHandler implements ResourceHandler,Initialable{
+public class DefaultResourceHandler implements ResourceHandler,Initializable {
 
     private Context context;
 

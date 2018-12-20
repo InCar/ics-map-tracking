@@ -8,7 +8,7 @@ import com.incar.base.handler.dynamicrequest.convert.impl.NumberParamConverter;
 import com.incar.base.handler.dynamicrequest.convert.impl.StringParamConverter;
 import com.incar.base.handler.dynamicrequest.data.ICSHttpRequestParam;
 import com.incar.base.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
-import com.incar.base.handler.dynamicrequest.request.DynamicRequest;
+import com.incar.base.handler.dynamicrequest.request.DynamicRequestHandler;
 import com.incar.base.request.RequestData;
 import com.incar.base.util.ClassUtil;
 
@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public class ICSSimpleRequest implements DynamicRequest {
+public class SimpleRequestHandler implements DynamicRequestHandler {
     private String path;
     private ICSHttpRequestMethodEnum icsHttpRequestMethodEnum;
     private LinkedHashMap<String, ICSHttpRequestParam> paramMap;
@@ -77,7 +77,7 @@ public class ICSSimpleRequest implements DynamicRequest {
     }
 
 
-    public ICSSimpleRequest(String path, ICSHttpRequestMethodEnum icsHttpRequestMethodEnum, LinkedHashMap<String, ICSHttpRequestParam> paramMap, Object controllerObj, Class returnClass, Method method) {
+    public SimpleRequestHandler(String path, ICSHttpRequestMethodEnum icsHttpRequestMethodEnum, LinkedHashMap<String, ICSHttpRequestParam> paramMap, Object controllerObj, Class returnClass, Method method) {
         this.path = path;
         this.icsHttpRequestMethodEnum = icsHttpRequestMethodEnum;
         this.paramMap = paramMap;
@@ -148,7 +148,7 @@ public class ICSSimpleRequest implements DynamicRequest {
      * @param controllerObj
      * @return
      */
-    public static List<ICSSimpleRequest> generateByICSController(Object controllerObj){
+    public static List<SimpleRequestHandler> generateByICSController(Object controllerObj){
         Class clazz=controllerObj.getClass();
         String[] pre={""};
         ICSRequestMapping controllerRequestMapping= (ICSRequestMapping)clazz.getAnnotation(ICSRequestMapping.class);
@@ -168,7 +168,7 @@ public class ICSSimpleRequest implements DynamicRequest {
                 String name=requestParam.value();
                 paramMap.put(name,new ICSHttpRequestParam(name,parameter.getType(),requestParam.required()));
             }
-            return new ICSSimpleRequest(path, httpRequestMethodEnum,paramMap,controllerObj,method.getReturnType(),method);
+            return new SimpleRequestHandler(path, httpRequestMethodEnum,paramMap,controllerObj,method.getReturnType(),method);
         }).collect(Collectors.toList());
     }
 }

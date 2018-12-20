@@ -2,6 +2,6 @@ package com.incar.base.handler.dynamicrequest.request;
 
 import com.incar.base.request.RequestData;
 
-public interface DynamicRequest {
+public interface DynamicRequestHandler {
     Object handle(RequestData requestData) throws Throwable;
 }
