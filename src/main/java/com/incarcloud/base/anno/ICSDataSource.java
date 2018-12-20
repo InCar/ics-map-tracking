@@ -1,6 +1,6 @@
-package com.incar.base.anno;
+package com.incarcloud.base.anno;
 
-import com.incar.base.config.DataSource;
+import com.incarcloud.base.config.DataSource;
 
 import java.lang.annotation.*;
 

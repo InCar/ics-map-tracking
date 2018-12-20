@@ -1,6 +1,6 @@
-package com.incar.base.request;
+package com.incarcloud.base.request;
 
-import com.incar.base.config.Config;
+import com.incarcloud.base.config.Config;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

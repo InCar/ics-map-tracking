@@ -1,8 +1,8 @@
-package com.incar.base.handler.dynamicrequest.component;
+package com.incarcloud.base.handler.dynamicrequest.component;
 
-import com.incar.base.config.Config;
-import com.incar.base.context.Context;
-import com.incar.base.context.Initializable;
+import com.incarcloud.base.config.Config;
+import com.incarcloud.base.context.Context;
+import com.incarcloud.base.context.Initializable;
 
 public class BaseComponent implements Initializable {
     protected Context context;

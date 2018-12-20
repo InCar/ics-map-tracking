@@ -1,22 +1,22 @@
-package com.incar.business.service.impl.mysql;
+package com.incarcloud.business.service.impl.mysql;
 
-import com.incar.base.config.DataSource;
-import com.incar.base.config.MysqlConfig;
-import com.incar.base.db.mysql.DBUtil;
-import com.incar.base.db.mysql.RowHandler;
-import com.incar.base.anno.ICSComponent;
-import com.incar.base.anno.ICSDataSource;
-import com.incar.base.handler.dynamicrequest.component.BaseComponent;
-import com.incar.base.page.Page;
-import com.incar.base.page.PageResult;
-import com.incar.business.service.GpsService;
-import com.incar.business.source.GpsSource;
+import com.incarcloud.base.config.DataSource;
+import com.incarcloud.base.config.MysqlConfig;
+import com.incarcloud.base.db.mysql.DBUtil;
+import com.incarcloud.base.db.mysql.RowHandler;
+import com.incarcloud.base.anno.ICSComponent;
+import com.incarcloud.base.anno.ICSDataSource;
+import com.incarcloud.base.handler.dynamicrequest.component.BaseComponent;
+import com.incarcloud.base.page.Page;
+import com.incarcloud.base.page.PageResult;
+import com.incarcloud.business.service.GpsService;
+import com.incarcloud.business.source.GpsSource;
 
 import java.util.List;
 
 @ICSDataSource(DataSource.MYSQL)
 @ICSComponent
-public class GpsServiceImpl extends BaseComponent implements GpsService{
+public class GpsServiceImpl extends BaseComponent implements GpsService {
     public RowHandler<GpsSource> getGpsSourceRowHandler(){
         return rs->{
             String gprscode=rs.getString("gprscode");

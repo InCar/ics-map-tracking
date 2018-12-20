@@ -1,11 +1,11 @@
-package com.incar.base.context;
+package com.incarcloud.base.context;
 
-import com.incar.base.config.Config;
-import com.incar.base.config.DataSource;
-import com.incar.base.exception.NoHandlerException;
-import com.incar.base.anno.*;
-import com.incar.base.request.RequestData;
-import com.incar.base.util.ClassUtil;
+import com.incarcloud.base.anno.*;
+import com.incarcloud.base.config.Config;
+import com.incarcloud.base.config.DataSource;
+import com.incarcloud.base.exception.NoHandlerException;
+import com.incarcloud.base.request.RequestData;
+import com.incarcloud.base.util.ClassUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +24,7 @@ public class DefaultContext implements Context,AutoScanner{
 
     /**
      * 所有扫描出来的带
-     * @see com.incar.base.anno.ICSComponent
+     * @see ICSComponent
      * 注解的类
      * 以及
      * 被此注解标注的注解的类

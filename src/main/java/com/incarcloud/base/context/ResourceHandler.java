@@ -1,6 +1,6 @@
-package com.incar.base.context;
+package com.incarcloud.base.context;
 
-import com.incar.base.request.RequestData;
+import com.incarcloud.base.request.RequestData;
 
 public interface ResourceHandler {
     void handleResource(RequestData requestData);

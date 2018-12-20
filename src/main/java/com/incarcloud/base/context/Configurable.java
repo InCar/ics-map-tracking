@@ -1,7 +1,7 @@
-package com.incar.base.context;
+package com.incarcloud.base.context;
 
 
-import com.incar.base.config.Config;
+import com.incarcloud.base.config.Config;
 
 public interface Configurable {
     Config getConfig();

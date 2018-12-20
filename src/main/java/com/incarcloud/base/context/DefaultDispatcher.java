@@ -1,9 +1,9 @@
-package com.incar.base.context;
+package com.incarcloud.base.context;
 
-import com.incar.base.anno.ICSComponent;
-import com.incar.base.anno.ICSConditionalOnMissingBean;
-import com.incar.base.config.Config;
-import com.incar.base.request.RequestData;
+import com.incarcloud.base.anno.ICSComponent;
+import com.incarcloud.base.anno.ICSConditionalOnMissingBean;
+import com.incarcloud.base.config.Config;
+import com.incarcloud.base.request.RequestData;
 
 @ICSComponent("dispatcher")
 @ICSConditionalOnMissingBean(name="dispatcher")

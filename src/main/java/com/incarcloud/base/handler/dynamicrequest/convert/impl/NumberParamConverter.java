@@ -1,6 +1,6 @@
-package com.incar.base.handler.dynamicrequest.convert.impl;
+package com.incarcloud.base.handler.dynamicrequest.convert.impl;
 
-import com.incar.base.handler.dynamicrequest.convert.ICSHttpParamConverter;
+import com.incarcloud.base.handler.dynamicrequest.convert.ICSHttpParamConverter;
 
 public class NumberParamConverter implements ICSHttpParamConverter<Number>{
     public final static NumberParamConverter INSTANCE=new NumberParamConverter();
