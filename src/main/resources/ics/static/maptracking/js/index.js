@@ -15,24 +15,40 @@
       return o;
   }
   // window.onload
-function addLoadEvent(func) {
-  let oldonload = window.onload
-  if (typeof window.onload != 'function') {
-    window.onload = func
+// function addLoadEvent(func) {
+//   let oldonload = window.onload
+//   if (typeof window.onload != 'function') {
+//     window.onload = func
+//   } else {
+//     window.onload = function() {
+//       oldonload()
+//       func()
+//     }
+//   }
+// }
+// 动态加载script 
+function loadJScript() {
+  if (!window.BMap) {
+    window.BMap = {}
+    window.BMap._preloader = new Promise((resolve, reject) => {
+      window._initBaiduMap = function () {
+        resolve(window.BMap)
+        window.document.body.removeChild($script)
+        window.BMap._preloader = null
+        window._initBaiduMap = null
+      }
+      const $script = document.createElement('script')
+      window.document.body.appendChild($script)
+      $script.src = `//api.map.baidu.com/api?v=2.0&ak=ehokpezgpQESNRi1ld0fQmRSgAoO6YAG&callback=_initBaiduMap`
+    })
+    return window.BMap._preloader
+  } else if (!window.BMap._preloader) {
+    return Promise.resolve(window.BMap)
   } else {
-    window.onload = function() {
-      oldonload()
-      func()
-    }
+    return window.BMap._preloader
   }
 }
-// 动态加载script
-function loadJScript(url) {
-  var script = document.createElement('script')
-  script.type = 'text/javascript'
-  script.src = url
-  document.head.appendChild(script)
-}
+
   // 通过class查找dom
   if(!('getElementsByClass' in HTMLElement)){
       HTMLElement.prototype.getElementsByClass = function(n){
@@ -59,39 +75,65 @@ function loadJScript(url) {
           var def = {
             mapType: '',
               dom: '',
+              mapconfig: {
+                gps: [116.404, 39.915], // 经纬度
+                zoom: 10,                // 层级
+              },
+              mapTrack: false,
+              trackconfig: {
+                trackApi: '/ics/gps/page',
+                trackParam: {pageNum: 1, pageSize: 10}
+              }
           };
           this.def = extend(def,opt,true);
           this.hasDom = false;
           this.listeners = []; //自定义事件，用于监听插件的用户交互
           this.handlers = {};
       },
-      initBmap: function() {
-        let map = new BMap.Map("apiId");
-        let point = new BMap.Point(113.310815, 23.066644);
-        map.centerAndZoom(point, 9);
-        map.enableScrollWheelZoom();
+      setBmap: function(obj) {
+        let myMap = new BMap.Map(obj.dom)
+        let point = new BMap.Point(obj.mapconfig.gps[0], obj.mapconfig.gps[1])
+        myMap.centerAndZoom(point, obj.mapconfig.zoom)
+        myMap.enableScrollWheelZoom();   
+      },
+      setTrack: function(data) {
+        let map = new BMap.Map(this.def.dom)
+        let point = new BMap.Point(data.lng, data.lat);
+        map.centerAndZoom(point, this.def.mapconfig.zoom)
+        map.enableScrollWheelZoom();  
+        let marker = new BMap.Marker(point); // 创建点
+        map.addOverlay(marker);
       },
       init: function() {
         if (!this.def.dom) return
         if (this.def.mapType) {
-          if (this.def.mapType === 'bmap') {
-            window.initBmap = this.initBmap
-            addLoadEvent(loadJScript(`http://api.map.baidu.com/api?v=2.0&ak=ehokpezgpQESNRi1ld0fQmRSgAoO6YAG&callback=initBmap`))
-            this.Ajax.get('/ics/gps/page?pageNum=1&pageSize=5', function (data) {
-               console.log(JSON.parse(data))
-            })
+          if (this.def.mapType === 'bmap') { 
+            loadJScript().then(() => {
+                 let trackconfig = this.def.trackconfig
+                  if (this.def.mapTrack) {
+                  this.Ajax.get(trackconfig.trackApi, trackconfig.trackParam, (data) => {
+                    this.setTrack(data.dataList[1])
+                  }) 
+                 } else {
+                  this.setBmap(this.def)
+                 }
+                })
           }
         } else throw new Error('maptrack requires a mapType')
       },
       Ajax: {
-        get: function(url, fn) {
-          var xhr = new XMLHttpRequest();            
+        get: function(url, opt, fn) {
+          var xhr = new XMLHttpRequest();
+          url += '?' 
+         for(let key in opt) {
+           url += `${key}=${opt[key]}&`
+         }  
           xhr.open('GET', url, true);
           xhr.onreadystatechange = function() {
             // readyState == 4说明请求已完成
             if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) { 
               // 从服务器获得数据 
-              fn.call(this, xhr.responseText);  
+              fn.call(this, JSON.parse(xhr.responseText));  
             }
           };
           xhr.send();
@@ -104,7 +146,7 @@ function loadJScript(url) {
           xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");  
           xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
-              fn.call(this, xhr.responseText);
+              fn.call(this, JSON.parse(xhr.responseText));
             }
           };
           xhr.send(data);
@@ -120,74 +162,5 @@ function loadJScript(url) {
       define(function(){return Maptrack;});
   } else {
       !('Maptrack' in _global) && (_global.Maptrack = Maptrack);
-  }
-}());
-
-
-// plugin.js
-;(function(undefined) {
-  "use strict"
-  var _global;
-
-  // window.onload
-function addLoadEvent(func) {
-  let oldonload = window.onload
-  if (typeof window.onload != 'function') {
-    window.onload = func
-  } else {
-    window.onload = function() {
-      oldonload()
-      func()
-    }
-  }
-}
-// 动态加载script
-function loadJScript(url) {
-  var script = document.createElement('script')
-  script.type = 'text/javascript'
-  script.src = url
-  document.head.appendChild(script)
-}
-
-  // 构造函数 - 返回数组结构
-  // function maptrack(opt){
-  //     this._initial(opt);
-  // }
-  window.initBmap = function initBmap() {
-          let map = new BMap.Map("apiId");
-          let point = new BMap.Point(113.310815, 23.066644);
-          var marker = new BMap.Marker(point);  // 创建标注
-	        map.addOverlay(marker);              // 将标注添加到地图中
-          map.centerAndZoom(point, 9);
-          map.enableScrollWheelZoom();
-        }
-  // function setBmap(obj) {
-  //   let setMap = new Maptrack(obj)
-  //   setMap.
-  // }      
-  var maptrack = {
-    init: function(obj) {
-      if (!obj.dom) return
-      if (obj.mapType) {
-        if (obj.mapType === 'bmap') {
-          addLoadEvent(loadJScript(`http://api.map.baidu.com/api?v=2.0&ak=ehokpezgpQESNRi1ld0fQmRSgAoO6YAG&callback=initBmap`))
-          // this.Ajax.get('/ics/gps/page?pageNum=1&pageSize=5', function (data) {
-          //    console.log(JSON.parse(data))
-          // })
-          // setBmap(obj)
-          console.log()
-        }
-      } else throw new Error('maptrack requires a mapType')
-    },
-  }
-
-  // 将插件对象暴露给全局对象
-  _global = (function(){ return this || (0, eval)('this'); }());
-  if (typeof module !== "undefined" && module.exports) {
-      module.exports = maptrack;
-  } else if (typeof define === "function" && define.amd) {
-      define(function(){return maptrack;});
-  } else {
-      !('maptrack' in _global) && (_global.maptrack = maptrack);
   }
 }());
