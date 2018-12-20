@@ -38,8 +38,9 @@ test{
 
 
 task startWeb(type: JavaExec) {
+    dependsOn testClasses
     doFirst{
-        main = 'com.incar.TestApp'
+        main = 'com.incarcloud.TestApp'
         classpath = sourceSets.test.runtimeClasspath
     }
 }
