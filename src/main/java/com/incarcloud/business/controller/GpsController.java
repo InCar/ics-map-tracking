@@ -22,7 +22,7 @@ public class GpsController extends BaseComponent{
     public List<GpsSource> list(
             @ICSRequestParam(required = false,value = "gprsCode")
                     String gprsCode){
-        return gpsService.listByGprscode(gprsCode);
+        return gpsService.listByVin(gprsCode);
     }
 
     @ICSRequestMapping(value = "/page",method = ICSHttpRequestMethodEnum.GET)
@@ -30,6 +30,6 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = false,value = "gprsCode") String gprsCode,
             @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
             @ICSRequestParam(required = true, value = "pageSize") Integer pageSize){
-        return gpsService.pageByGprscode(gprsCode,new Page(pageNum,pageSize));
+        return gpsService.pageByVin(gprsCode,new Page(pageNum,pageSize));
     }
 }

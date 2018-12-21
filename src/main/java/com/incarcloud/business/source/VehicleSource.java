@@ -1,21 +1,21 @@
 package com.incarcloud.business.source;
 
 public class VehicleSource {
-    protected String gprscode;
+    protected String vin;
 
     protected String plateNo;
 
-    public VehicleSource(String gprscode, String plateNo) {
-        this.gprscode = gprscode;
+    public VehicleSource(String vin, String plateNo) {
+        this.vin = vin;
         this.plateNo = plateNo;
     }
 
-    public String getGprscode() {
-        return gprscode;
+    public String getVin() {
+        return vin;
     }
 
-    public void setGprscode(String gprscode) {
-        this.gprscode = gprscode;
+    public void setVin(String vin) {
+        this.vin = vin;
     }
 
     public String getPlateNo() {

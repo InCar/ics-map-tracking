@@ -18,37 +18,37 @@ import java.util.List;
 public class VehicleServiceImpl extends BaseComponent implements VehicleService {
     private RowHandler<VehicleSource> getVehicleSourceRowHandler(){
         return rs->{
-            String gprscode=rs.getString("gprscode");
+            String vin=rs.getString("vin");
             String plateNo=rs.getString("plate_no");
-            return new VehicleSource(gprscode,plateNo);
+            return new VehicleSource(vin,plateNo);
         };
     }
 
     @Override
-    public List<VehicleSource> listByGprscode(String gprsCode) {
+    public List<VehicleSource> listByVin(String vin) {
         MysqlConfig mysqlConfig= config.getMysqlConfig();
         RowHandler<VehicleSource> rowHandler=getVehicleSourceRowHandler();
-        if(gprsCode==null){
-            String sql="select gprscode,plate_no from t_vehicle";
+        if(vin==null){
+            String sql="select vin,plate_no from t_vehicle";
             return DBUtil.list(mysqlConfig,sql,rowHandler);
         }else{
-            String sql="select gprscode,plate_no from t_vehicle where gprscode=?";
-            return DBUtil.list(mysqlConfig,sql,rowHandler,gprsCode);
+            String sql="select vin,plate_no from t_vehicle where vin=?";
+            return DBUtil.list(mysqlConfig,sql,rowHandler,vin);
         }
     }
 
     @Override
-    public PageResult<VehicleSource> pageByGprscode(String gprsCode, Page page) {
+    public PageResult<VehicleSource> pageByVin(String vin, Page page) {
         MysqlConfig mysqlConfig= config.getMysqlConfig();
         RowHandler<VehicleSource> rowHandler=getVehicleSourceRowHandler();
-        if(gprsCode==null){
+        if(vin==null){
             String countSql="select count(*) as num from t_vehicle";
-            String sql="select gprscode,plate_no from t_vehicle limit ?,?";
+            String sql="select vin,plate_no from t_vehicle limit ?,?";
             return DBUtil.page(mysqlConfig,countSql,sql,rowHandler,page);
         }else{
-            String countSql="select count(*) as num from t_vehicle where gprscode=?";
-            String sql="select gprscode,plate_no from t_vehicle where gprscode=? limit ?,?";
-            return DBUtil.page(mysqlConfig,countSql,sql,rowHandler,page,gprsCode);
+            String countSql="select count(*) as num from t_vehicle where vin=?";
+            String sql="select vin,plate_no from t_vehicle where vin=? limit ?,?";
+            return DBUtil.page(mysqlConfig,countSql,sql,rowHandler,page,vin);
         }
     }
 }

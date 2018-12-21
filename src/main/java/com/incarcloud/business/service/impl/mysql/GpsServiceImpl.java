@@ -19,38 +19,39 @@ import java.util.List;
 public class GpsServiceImpl extends BaseComponent implements GpsService {
     public RowHandler<GpsSource> getGpsSourceRowHandler(){
         return rs->{
-            String gprscode=rs.getString("gprscode");
-            double lng=rs.getDouble("lng");
-            double lat=rs.getDouble("lat");
-            return new GpsSource(gprscode,lng,lat);
+            String vin=rs.getString("vin");
+            Float direction=rs.getFloat("direction");
+            Double lng=rs.getDouble("lng");
+            Double lat=rs.getDouble("lat");
+            return new GpsSource(vin,lng,lat,direction);
         };
     }
 
     @Override
-    public List<GpsSource> listByGprscode(String gprsCode) {
+    public List<GpsSource> listByVin(String vin) {
         MysqlConfig mysqlConfig= config.getMysqlConfig();
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
-        if(gprsCode==null){
-            String sql="select gprscode,lng,lat from t_gps";
+        if(vin==null){
+            String sql="select vin,lng,lat,direction from t_gps";
             return DBUtil.list(mysqlConfig,sql,rowHandler);
         }else{
-            String sql="select gprscode,lng,lat from t_gps where gprscode=?";
-            return DBUtil.list(mysqlConfig,sql,rowHandler,gprsCode);
+            String sql="select vin,lng,lat,direction from t_gps where vin=?";
+            return DBUtil.list(mysqlConfig,sql,rowHandler,vin);
         }
     }
 
     @Override
-    public PageResult<GpsSource> pageByGprscode(String gprsCode, Page page) {
+    public PageResult<GpsSource> pageByVin(String vin, Page page) {
         MysqlConfig mysqlConfig= config.getMysqlConfig();
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
-        if(gprsCode==null){
+        if(vin==null){
             String countSql="select count(*) as num from t_gps";
-            String sql="select gprscode,lng,lat from t_gps limit ?,?";
+            String sql="select vin,lng,lat,direction from t_gps limit ?,?";
             return DBUtil.page(mysqlConfig,countSql,sql,rowHandler,page);
         }else{
-            String countSql="select count(*) as num from t_gps where gprscode=?";
-            String sql="select gprscode,lng,lat from t_gps where gprscode=? limit ?,?";
-            return DBUtil.page(mysqlConfig,countSql,sql,rowHandler,page,gprsCode);
+            String countSql="select count(*) as num from t_gps where vin=?";
+            String sql="select vin,lng,lat,direction from t_gps where vin=? limit ?,?";
+            return DBUtil.page(mysqlConfig,countSql,sql,rowHandler,page,vin);
         }
     }
 }

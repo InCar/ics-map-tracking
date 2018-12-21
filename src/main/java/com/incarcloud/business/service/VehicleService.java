@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface VehicleService {
-    default List<VehicleSource> listByGprscode(String gprsCode){
+    default List<VehicleSource> listByVin(String vin){
         return new ArrayList<>();
     }
 
-    default PageResult<VehicleSource> pageByGprscode(String gprsCode, Page page){
+    default PageResult<VehicleSource> pageByVin(String vin, Page page){
         return new PageResult<>(new ArrayList<>(),0);
     }
 }

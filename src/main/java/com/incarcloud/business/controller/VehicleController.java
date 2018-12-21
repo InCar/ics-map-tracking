@@ -23,7 +23,7 @@ public class VehicleController extends BaseComponent {
     public List<VehicleSource> list(
             @ICSRequestParam(required = false, value = "gprscode")
                     String gprsCode) {
-        return vehicleService.listByGprscode(gprsCode);
+        return vehicleService.listByVin(gprsCode);
     }
 
     @ICSRequestMapping(value = "/page", method = ICSHttpRequestMethodEnum.GET)
@@ -31,6 +31,6 @@ public class VehicleController extends BaseComponent {
             @ICSRequestParam(required = false, value = "gprscode") String gprscode,
             @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
             @ICSRequestParam(required = true, value = "pageSize") Integer pageSize) {
-        return vehicleService.pageByGprscode(gprscode, new Page(pageNum, pageSize));
+        return vehicleService.pageByVin(gprscode, new Page(pageNum, pageSize));
     }
 }
