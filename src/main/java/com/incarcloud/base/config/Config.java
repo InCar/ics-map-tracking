@@ -26,9 +26,6 @@ public class Config {
     //response编码
     private String encoding;
 
-    //是否启用filter拦截
-    private boolean enableFilter;
-
     //logger
     private LogConfig logConfig;
     private Logger logger;
@@ -68,15 +65,6 @@ public class Config {
 
     public Config withEncoding(String encoding) {
         this.encoding = encoding;
-        return this;
-    }
-
-    public boolean isEnableFilter() {
-        return enableFilter;
-    }
-
-    public Config withEnableFilter(boolean enableFilter) {
-        this.enableFilter = enableFilter;
         return this;
     }
 

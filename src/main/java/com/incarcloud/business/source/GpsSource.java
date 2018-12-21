@@ -1,24 +1,40 @@
 package com.incarcloud.business.source;
 
+import java.util.Date;
+
 public class GpsSource {
-    protected String gprscode;
+    protected String vin;
 
     protected Double lng;
 
     protected Double lat;
 
-    public GpsSource(String gprscode, Double lng, Double lat) {
-        this.gprscode = gprscode;
+    protected Float direction;
+
+    protected Date time;
+
+    public GpsSource(String vin, Double lng, Double lat, Float direction,Date time) {
+        this.vin = vin;
         this.lng = lng;
         this.lat = lat;
+        this.direction = direction;
+        this.time=time;
     }
 
-    public String getGprscode() {
-        return gprscode;
+    public String getVin() {
+        return vin;
     }
 
-    public void setGprscode(String gprscode) {
-        this.gprscode = gprscode;
+    public void setVin(String vin) {
+        this.vin = vin;
+    }
+
+    public Float getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Float direction) {
+        this.direction = direction;
     }
 
     public Double getLng() {
@@ -35,5 +51,13 @@ public class GpsSource {
 
     public void setLat(Double lat) {
         this.lat = lat;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
     }
 }
