@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface GpsService {
-    default List<GpsSource> listByGprscode(String gprsCode){
+    default List<GpsSource> listByVin(String vin){
         return new ArrayList<>();
     }
 
-    default PageResult<GpsSource> pageByGprscode(String gprsCode, Page page){
+    default PageResult<GpsSource> pageByVin(String vin, Page page){
         return new PageResult<>(new ArrayList<>(),0);
     }
 }
