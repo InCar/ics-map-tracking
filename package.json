@@ -1,0 +1,32 @@
+{
+  "name": "ics-map-tracking",
+  "version": "1.0.0",
+  "description": "车辆轨迹",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "ts-loader": "^5.3.2",
+    "typescript": "^3.2.2",
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-parallel-uglify-plugin": "^1.1.0"
+  },
+  "scripts": {
+    "webpack": "webpack",
+    "watch": "webpack --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InCar/ics-map-tracking.git"
+  },
+  "keywords": [
+    "maptrack"
+  ],
+  "author": "incar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/InCar/ics-map-tracking/issues"
+  },
+  "homepage": "https://github.com/InCar/ics-map-tracking#readme"
+}
