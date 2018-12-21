@@ -1,5 +1,7 @@
 package com.incarcloud.business.source;
 
+import java.util.Date;
+
 public class GpsSource {
     protected String vin;
 
@@ -9,11 +11,14 @@ public class GpsSource {
 
     protected Float direction;
 
-    public GpsSource(String vin, Double lng, Double lat, Float direction) {
+    protected Date time;
+
+    public GpsSource(String vin, Double lng, Double lat, Float direction,Date time) {
         this.vin = vin;
         this.lng = lng;
         this.lat = lat;
         this.direction = direction;
+        this.time=time;
     }
 
     public String getVin() {
@@ -46,5 +51,13 @@ public class GpsSource {
 
     public void setLat(Double lat) {
         this.lat = lat;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
     }
 }
