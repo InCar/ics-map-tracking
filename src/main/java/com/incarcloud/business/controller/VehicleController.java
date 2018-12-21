@@ -21,16 +21,16 @@ public class VehicleController extends BaseComponent {
 
     @ICSRequestMapping(value = "/list", method = ICSHttpRequestMethodEnum.GET)
     public List<VehicleSource> list(
-            @ICSRequestParam(required = false, value = "gprscode")
-                    String gprsCode) {
-        return vehicleService.listByVin(gprsCode);
+            @ICSRequestParam(required = false, value = "vin")
+                    String vin) {
+        return vehicleService.listByVin(vin);
     }
 
     @ICSRequestMapping(value = "/page", method = ICSHttpRequestMethodEnum.GET)
     public PageResult<VehicleSource> page(
-            @ICSRequestParam(required = false, value = "gprscode") String gprscode,
+            @ICSRequestParam(required = false, value = "vin") String vin,
             @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
             @ICSRequestParam(required = true, value = "pageSize") Integer pageSize) {
-        return vehicleService.pageByVin(gprscode, new Page(pageNum, pageSize));
+        return vehicleService.pageByVin(vin, new Page(pageNum, pageSize));
     }
 }

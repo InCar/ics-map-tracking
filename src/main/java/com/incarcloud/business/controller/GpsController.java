@@ -20,16 +20,16 @@ public class GpsController extends BaseComponent{
     private GpsService gpsService;
     @ICSRequestMapping(value = "/list",method = ICSHttpRequestMethodEnum.GET)
     public List<GpsSource> list(
-            @ICSRequestParam(required = false,value = "gprsCode")
-                    String gprsCode){
-        return gpsService.listByVin(gprsCode);
+            @ICSRequestParam(required = false,value = "vin")
+                    String vin){
+        return gpsService.listByVin(vin);
     }
 
     @ICSRequestMapping(value = "/page",method = ICSHttpRequestMethodEnum.GET)
     public PageResult<GpsSource> page(
-            @ICSRequestParam(required = false,value = "gprsCode") String gprsCode,
+            @ICSRequestParam(required = false,value = "vin") String vin,
             @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
             @ICSRequestParam(required = true, value = "pageSize") Integer pageSize){
-        return gpsService.pageByVin(gprsCode,new Page(pageNum,pageSize));
+        return gpsService.pageByVin(vin,new Page(pageNum,pageSize));
     }
 }
