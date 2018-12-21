@@ -9,7 +9,8 @@
   function extend(o,n,override) {
       for(var key in n){
           if(n.hasOwnProperty(key) && (!o.hasOwnProperty(key) || override)){
-              o[key]=n[key];
+            if (typeof n[key] !== "object") o[key]=n[key];
+            else Object.assign(o[key], n[key])
           }
       }
       return o;
@@ -81,7 +82,7 @@ function loadJScript() {
               },
               mapTrack: false,
               trackconfig: {
-                trackApi: '/ics/gps/page',
+                trackApi: '',
                 trackParam: {pageNum: 1, pageSize: 10}
               }
           };
@@ -98,7 +99,7 @@ function loadJScript() {
       },
       setTrack: function(data) {
         let map = new BMap.Map(this.def.dom)
-        let point = new BMap.Point(data.lng, data.lat);
+        let point = new BMap.Point(data.mapconfig.gps[0], data.mapconfig.gps[1]);
         map.centerAndZoom(point, this.def.mapconfig.zoom)
         map.enableScrollWheelZoom();  
         let marker = new BMap.Marker(point); // 创建点
@@ -111,8 +112,9 @@ function loadJScript() {
             loadJScript().then(() => {
                  let trackconfig = this.def.trackconfig
                   if (this.def.mapTrack) {
-                  this.Ajax.get(trackconfig.trackApi, trackconfig.trackParam, (data) => {
-                    this.setTrack(data.dataList[1])
+                  this.Ajax.get(`${trackconfig.trackApi}/ics/gps/page`, trackconfig.trackParam, (data) => {
+                    if (data.dataList.length) this.setTrack(data.dataList[1])
+                    else this.setBmap(this.def)
                   }) 
                  } else {
                   this.setBmap(this.def)
