@@ -12,6 +12,7 @@ import com.incarcloud.base.page.PageResult;
 import com.incarcloud.business.service.GpsService;
 import com.incarcloud.business.source.GpsSource;
 
+import java.util.Date;
 import java.util.List;
 
 @ICSDataSource(DataSource.MYSQL)
@@ -23,7 +24,8 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
             Float direction=rs.getFloat("direction");
             Double lng=rs.getDouble("lng");
             Double lat=rs.getDouble("lat");
-            return new GpsSource(vin,lng,lat,direction);
+            Date time=rs.getDate("time");
+            return new GpsSource(vin,lng,lat,direction,time);
         };
     }
 
