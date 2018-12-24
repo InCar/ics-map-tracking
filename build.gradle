@@ -1,5 +1,5 @@
 group 'com.incarcloud.ics'
-version '1.8-SNAPSHOT'
+version '2.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'

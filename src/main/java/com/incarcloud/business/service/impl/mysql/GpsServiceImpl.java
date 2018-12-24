@@ -34,10 +34,10 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
         MysqlConfig mysqlConfig= config.getMysqlConfig();
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         if(vin==null){
-            String sql="select vin,lng,lat,direction from t_gps";
+            String sql="select vin,lng,lat,direction,time from t_gps";
             return DBUtil.list(mysqlConfig,sql,rowHandler);
         }else{
-            String sql="select vin,lng,lat,direction from t_gps where vin=?";
+            String sql="select vin,lng,lat,direction,time from t_gps where vin=?";
             return DBUtil.list(mysqlConfig,sql,rowHandler,vin);
         }
     }
@@ -48,11 +48,11 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         if(vin==null){
             String countSql="select count(*) as num from t_gps";
-            String sql="select vin,lng,lat,direction from t_gps limit ?,?";
+            String sql="select vin,lng,lat,direction,time from t_gps limit ?,?";
             return DBUtil.page(mysqlConfig,countSql,sql,rowHandler,page);
         }else{
             String countSql="select count(*) as num from t_gps where vin=?";
-            String sql="select vin,lng,lat,direction from t_gps where vin=? limit ?,?";
+            String sql="select vin,lng,lat,direction,time from t_gps where vin=? limit ?,?";
             return DBUtil.page(mysqlConfig,countSql,sql,rowHandler,page,vin);
         }
     }
