@@ -48,7 +48,6 @@ public class DefaultResourceHandler implements ResourceHandler,Initializable {
         String subFilePath=subPath.substring(config.getRequestStaticMappingPre().length());
         String filePath=config.getFileStaticMappingPre()+subFilePath;
         filePath=filePath.substring(1);
-        System.err.println(filePath);
         //2、读取静态文件内容
         try(InputStream is=ClassLoader.getSystemResourceAsStream(filePath)){
             if(is==null){
