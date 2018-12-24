@@ -99,7 +99,7 @@ function loadJScript() {
       },
       setTrack: function(data) {
         let map = new BMap.Map(this.def.dom)
-        let point = new BMap.Point(data.mapconfig.gps[0], data.mapconfig.gps[1]);
+        let point = new BMap.Point(data.lng, data.lat);
         map.centerAndZoom(point, this.def.mapconfig.zoom)
         map.enableScrollWheelZoom();  
         let marker = new BMap.Marker(point); // 创建点
