@@ -9,6 +9,7 @@ public class DefaultExceptionHandler implements ExceptionHandler{
     public final static DefaultExceptionHandler INSTANCE=new DefaultExceptionHandler();
     @Override
     public void resolveException(RequestData requestData, Throwable throwable) {
+        throwable.printStackTrace();
         try {
             if(!requestData.getResponse().isCommitted()){
                 Throwable realException= parseRealException(throwable);

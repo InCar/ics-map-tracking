@@ -28,7 +28,7 @@ public class DBUtil {
             PreparedStatement ps=connection.prepareStatement(sql);
             if(params!=null&&params.length>0){
                 for(int i=1;i<=params.length;i++){
-                    ps.setObject(i,params[i]);
+                    ps.setObject(i,params[i-1]);
                 }
             }
             ResultSet rs= ps.executeQuery();
@@ -60,7 +60,7 @@ public class DBUtil {
                 int len=0;
                 if(params!=null&&(len=params.length)>0){
                     for(int i=1;i<=params.length;i++){
-                        ps.setObject(i,params[i]);
+                        ps.setObject(i,params[i-1]);
                     }
                 }
                 ps.setObject(len+1,(page.getPageNum()-1)*page.getPageSize());
