@@ -11,6 +11,7 @@ import com.incarcloud.base.page.PageResult;
 import com.incarcloud.business.service.GpsService;
 import com.incarcloud.business.source.GpsSource;
 
+import java.util.Date;
 import java.util.List;
 
 @ICSController
@@ -31,5 +32,16 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
             @ICSRequestParam(required = true, value = "pageSize") Integer pageSize){
         return gpsService.pageByVin(vin,new Page(pageNum,pageSize));
+    }
+
+    @ICSRequestMapping(value = "/listSplit",method = ICSHttpRequestMethodEnum.GET)
+    public List<List<GpsSource>> listSplit(
+            @ICSRequestParam(required = false,value = "vin") String vin,
+            @ICSRequestParam(required = false,value = "num") Integer num,
+            @ICSRequestParam(required = false,value = "startTime")Date startTime,
+            @ICSRequestParam(required = false,value = "endTime")Date endTime
+            ){
+                num=num==null?5:num;
+        return gpsService.listSplit(vin, num, startTime, endTime);
     }
 }
