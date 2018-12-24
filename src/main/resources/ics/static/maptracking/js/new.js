@@ -1,9 +1,11 @@
-var Maptrack = (function () {
-    function Maptrack() {
+var User = (function () {
+    function User(_name) {
+        this.name = _name;
     }
-    Maptrack.prototype.Maptrack = function (opt) {
-        console.log(opt);
+    User.prototype.sayHello = function () {
+        return "Hello," + this.name + "!";
     };
-    return Maptrack;
+    return User;
 }());
-console.log(new Maptrack());
+var user = new User('John Reese');
+user.sayHello();
