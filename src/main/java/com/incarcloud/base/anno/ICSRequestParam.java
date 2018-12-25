@@ -8,4 +8,5 @@ import java.lang.annotation.*;
 public @interface ICSRequestParam {
     String value();
     boolean required() default true;
+    String defaultValue() default "";
 }

@@ -31,7 +31,10 @@ public class DBUtil {
                     ps.setObject(i,params[i-1]);
                 }
             }
+            long t1=System.currentTimeMillis();
             ResultSet rs= ps.executeQuery();
+            long t2=System.currentTimeMillis();
+            System.out.println("Sql["+sql+"] Take "+(t2-t1));
             while(rs.next()){
                T t= rowHandler.apply(rs);
                resultList.add(t);

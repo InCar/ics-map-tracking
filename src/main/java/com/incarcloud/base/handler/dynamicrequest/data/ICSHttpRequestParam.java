@@ -4,11 +4,13 @@ public class ICSHttpRequestParam {
     private String name;
     private Class clazz;
     private Boolean required;
+    private String defaultValue;
 
-    public ICSHttpRequestParam(String name, Class clazz, Boolean required) {
+    public ICSHttpRequestParam(String name, Class clazz, Boolean required,String defaultValue) {
         this.name = name;
         this.clazz = clazz;
         this.required = required;
+        this.defaultValue=defaultValue;
     }
 
     public String getName() {
@@ -33,5 +35,13 @@ public class ICSHttpRequestParam {
 
     public void setRequired(Boolean required) {
         this.required = required;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }
