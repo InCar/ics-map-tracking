@@ -17,24 +17,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Sql空�?�替换访问器
- * 支持的操作符�? = >  <  >=  <=  <>  like  in(?,?,?)  in(:paramList)
+ * Sql空值替换访问器
+ * 支持的操作符有 = >  <  >=  <=  <>  like  in(?,?,?)  in(:paramList)
  * 支持如下两种替换方式
- * 1、JdbcParameter格式,参数�? ? 方式传�??,使用构�?�方�?
+ * 1、JdbcParameter格式,参数以 ? 方式传递,使用构造方法
  * @see #NullParamSqlReplaceVisitor(String, List)
- * 2、JdbcNamedParameter格式,参数�? :param1 方式传�??
+ * 2、JdbcNamedParameter格式,参数以 :param1 方式传递
  * @see #NullParamSqlReplaceVisitor(String, Map)
- * 参数中val不支持数�?,只支持List
+ * 参数中val不支持数组,只支持List
  *
  * 性能方面:
- * 根据sql的复杂程�?,sql越复�?,性能越低
- * 1�?1条件 10w�? 3.5�?
- * 2�?3条件 10w�? 10s 左右
- * 3�?8条件 10w�? 13s 左右
- * 8�?8条件 10w�? 25s 左右
+ * 根据sql的复杂程度,sql越复杂,性能越低
+ * 1表1条件 10w次 3.5秒
+ * 2表3条件 10w次 10s 左右
+ * 3表8条件 10w次 13s 左右
+ * 8表8条件 10w次 25s 左右
  *
  * 线程安全方面:
- * 非线程安�?
+ * 非线程安全
  *
  */
 @SuppressWarnings("unchecked")
@@ -77,7 +77,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
 
     @Override
     public void visit(Select select) {
-        //定义JdbcParameter模式时�?? paramList 对应的索�?
+        //定义JdbcParameter模式时候 paramList 对应的索引
         int[] paramListIndex=new int[]{0};
         super.visit(select);
         select.getSelectBody().accept(new SelectVisitorAdapter(){
@@ -86,7 +86,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                 super.visit(plainSelect);
                 //获取条件对象
                 Expression where= plainSelect.getWhere();
-                //自定义反解析器解析sql,在解析条件中按照自己的�?�辑重新组装where
+                //自定义反解析器解析sql,在解析条件中按照自己的逻辑重新组装where
                 ExpressionDeParser parser= new ExpressionDeParser(){
                     @Override
                     public void visit(EqualsTo equalsTo) {
@@ -129,7 +129,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                         //重写 in
                         ItemsList itemsList= inExpression.getRightItemsList();
                         if(paramList!=null){
-                            //JdbcParameter参数模式的�?�辑
+                            //JdbcParameter参数模式的逻辑
                             //定义是否是JdbcParameter模式
                             boolean[] isJdbcParam=new boolean[]{true};
                             //定义临时in参数集合
@@ -181,7 +181,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                                 super.visit(inExpression);
                             }
                         }else if(paramMap!=null){
-                            //JdbcNamedParameter参数模式的�?�辑
+                            //JdbcNamedParameter参数模式的逻辑
                             //定义是否是JdbcNamedParameter模式
                             boolean[] isJdbcNamedParam=new boolean[]{true};
                             //定义是否参数为空
@@ -197,14 +197,14 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                                             }
                                             @Override
                                             public void visit(JdbcNamedParameter parameter) {
-                                                //根据参数名称从map中取出参�?,如果为null,则标记参数为�?
+                                                //根据参数名称从map中取出参数,如果为null,则标记参数为空
                                                 if(paramMap!=null){
                                                     String paramName=parameter.getName();
                                                     Object param=paramMap.get(paramName);
                                                     if(param==null){
                                                         isParamEmpty[0]=true;
                                                     }else{
-                                                        //此模式下遇到集合参数,排除掉集合中�?有为Null的参�?,再判断是否为�?
+                                                        //此模式下遇到集合参数,排除掉集合中所有为Null的参数,再判断是否为空
                                                         if(param instanceof List){
                                                             int size=((List) param).size();
                                                             if(size==0){
@@ -217,7 +217,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
 
                                                             }
                                                         }else if(param.getClass().isArray()){
-                                                            //此模式下遇到数组,排除掉数组中�?有为Null的参�?,再判断是否为�?
+                                                            //此模式下遇到数组,排除掉数组中所有为Null的参数,再判断是否为空
                                                             int len= Array.getLength(param);
                                                             if(len==0){
                                                                 isParamEmpty[0]=true;
@@ -263,7 +263,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
                     }
 
                     /**
-                     * �?查每个操作的左右操作�?,如果变量参数为null,则用1=1替代此条�?
+                     * 检查每个操作的左右操作符,如果变量参数为null,则用1=1替代此条件
                      * @param binaryExpression
                      * @param runnable
                      */
