@@ -13,7 +13,11 @@ public class GpsSource {
 
     protected Date time;
 
-    public GpsSource(String vin, Double lng, Double lat, Float direction,Date time) {
+
+    public GpsSource() {
+    }
+
+    public GpsSource(String vin, Double lng, Double lat, Float direction, Date time) {
         this.vin = vin;
         this.lng = lng;
         this.lat = lat;

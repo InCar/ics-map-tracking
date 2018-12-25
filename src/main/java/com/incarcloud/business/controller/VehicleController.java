@@ -33,4 +33,6 @@ public class VehicleController extends BaseComponent {
             @ICSRequestParam(required = true, value = "pageSize") Integer pageSize) {
         return vehicleService.pageByVin(vin, new Page(pageNum, pageSize));
     }
+
+
 }

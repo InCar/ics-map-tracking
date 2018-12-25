@@ -118,9 +118,14 @@ public class SimpleRequestHandler implements DynamicRequestHandler {
             }else {
                 String[] val = passParamMap.get(k);
                 if (val == null) {
-                    paramList.add(null);
+                    String defaultValue=v.getDefaultValue();
+                    if("".equals(defaultValue)){
+                        paramList.add(null);
+                    }else{
+                        paramList.add(convertParam(v,new String[]{v.getDefaultValue()}));
+                    }
                 } else {
-                    paramList.add(convertParam(v, val, v.getClazz()));
+                    paramList.add(convertParam(v, val));
                 }
             }
         });
@@ -128,7 +133,8 @@ public class SimpleRequestHandler implements DynamicRequestHandler {
         return this.method.invoke(controllerObj,paramList.toArray());
     }
 
-    private Object convertParam(ICSHttpRequestParam param,String[] values,Class targetType){
+    private Object convertParam(ICSHttpRequestParam param,String[] values){
+        Class targetType=param.getClazz();
         if(String.class.isAssignableFrom(targetType)){
             return StringParamConverter.INSTANCE.convert(values,targetType);
         }else if(Number.class.isAssignableFrom(targetType)){
@@ -166,7 +172,7 @@ public class SimpleRequestHandler implements DynamicRequestHandler {
             for (Parameter parameter : method.getParameters()) {
                 ICSRequestParam requestParam= parameter.getAnnotation(ICSRequestParam.class);
                 String name=requestParam.value();
-                paramMap.put(name,new ICSHttpRequestParam(name,parameter.getType(),requestParam.required()));
+                paramMap.put(name,new ICSHttpRequestParam(name,parameter.getType(),requestParam.required(),requestParam.defaultValue()));
             }
             return new SimpleRequestHandler(path, httpRequestMethodEnum,paramMap,controllerObj,method.getReturnType(),method);
         }).collect(Collectors.toList());
