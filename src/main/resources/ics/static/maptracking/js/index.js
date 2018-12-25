@@ -26,29 +26,144 @@
 //       func()
 //     }
 //   }
-// }
-// 动态加载script 
-function loadJScript() {
-  if (!window.BMap) {
-    window.BMap = {}
-    window.BMap._preloader = new Promise((resolve, reject) => {
-      window._initBaiduMap = function () {
-        resolve(window.BMap)
-        window.document.body.removeChild($script)
-        window.BMap._preloader = null
-        window._initBaiduMap = null
-      }
-      const $script = document.createElement('script')
-      window.document.body.appendChild($script)
-      $script.src = `//api.map.baidu.com/api?v=2.0&ak=ehokpezgpQESNRi1ld0fQmRSgAoO6YAG&callback=_initBaiduMap`
-    })
-    return window.BMap._preloader
-  } else if (!window.BMap._preloader) {
-    return Promise.resolve(window.BMap)
-  } else {
-    return window.BMap._preloader
+// 先转成中国正常坐标系GCJ02协议的坐标
+  var GPS = {
+    PI : 3.14159265358979324,
+    x_pi : 3.14159265358979324 * 3000.0 / 180.0,
+    delta : function (lat, lon) {
+        // Krasovsky 1940
+        //
+        // a = 6378245.0, 1/f = 298.3
+        // b = a * (1 - f)
+        // ee = (a^2 - b^2) / a^2;
+        var a = 6378245.0; //  a: 卫星椭球坐标投影到平面地图坐标系的投影因子。
+        var ee = 0.00669342162296594323; //  ee: 椭球的偏心率。
+        var dLat = this.transformLat(lon - 105.0, lat - 35.0);
+        var dLon = this.transformLon(lon - 105.0, lat - 35.0);
+        var radLat = lat / 180.0 * this.PI;
+        var magic = Math.sin(radLat);
+        magic = 1 - ee * magic * magic;
+        var sqrtMagic = Math.sqrt(magic);
+        dLat = (dLat * 180.0) / ((a * (1 - ee)) / (magic * sqrtMagic) * this.PI);
+        dLon = (dLon * 180.0) / (a / sqrtMagic * Math.cos(radLat) * this.PI);
+        return {'lat': dLat, 'lon': dLon};
+    },
+
+    //GPS---高德
+    gcj_encrypt : function ( wgsLat , wgsLon ) {
+        if (this.outOfChina(wgsLat, wgsLon))
+            return {'lat': wgsLat, 'lon': wgsLon};
+
+        var d = this.delta(wgsLat, wgsLon);
+        return {'lat' : wgsLat + d.lat,'lon' : wgsLon + d.lon};
+    },
+    outOfChina : function (lat, lon) {
+        if (lon < 72.004 || lon > 137.8347)
+            return true;
+        if (lat < 0.8293 || lat > 55.8271)
+            return true;
+        return false;
+    },
+    transformLat : function (x, y) {
+        var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
+        ret += (20.0 * Math.sin(6.0 * x * this.PI) + 20.0 * Math.sin(2.0 * x * this.PI)) * 2.0 / 3.0;
+        ret += (20.0 * Math.sin(y * this.PI) + 40.0 * Math.sin(y / 3.0 * this.PI)) * 2.0 / 3.0;
+        ret += (160.0 * Math.sin(y / 12.0 * this.PI) + 320 * Math.sin(y * this.PI / 30.0)) * 2.0 / 3.0;
+        return ret;
+    },
+    transformLon : function (x, y) {
+        var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
+        ret += (20.0 * Math.sin(6.0 * x * this.PI) + 20.0 * Math.sin(2.0 * x * this.PI)) * 2.0 / 3.0;
+        ret += (20.0 * Math.sin(x * this.PI) + 40.0 * Math.sin(x / 3.0 * this.PI)) * 2.0 / 3.0;
+        ret += (150.0 * Math.sin(x / 12.0 * this.PI) + 300.0 * Math.sin(x / 30.0 * this.PI)) * 2.0 / 3.0;
+        return ret;
+    }
   }
-}
+  //将 GCJ-02 坐标转换成 BD-09 坐标  
+  function bd_encrypt(point) {
+    let gps = GPS.gcj_encrypt(point.lat, point.lng); // 这里顺序不同
+    const  x_pi = 3.14159265358979324 * 3000.0 / 180.0;  
+    var x = gps.lon, y = gps.lat;
+    var z = Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * x_pi);
+    var theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * x_pi);
+    point.lng = z * Math.cos(theta) + 0.0065;
+    point.lat = z * Math.sin(theta) + 0.006;
+    return point
+  }
+// 动态加载script 
+  function loadJScript() {
+    if (!window.BMap) {
+      window.BMap = {}
+      window.BMap._preloader = new Promise((resolve, reject) => {
+        window._initBaiduMap = function () {
+          resolve(window.BMap)
+          window.document.body.removeChild($script)
+          window.BMap._preloader = null
+          window._initBaiduMap = null
+        }
+        const $script = document.createElement('script')
+        window.document.body.appendChild($script)
+        $script.src = `//api.map.baidu.com/api?v=2.0&ak=Z387qRaNG1dZvs0xrpNDMWTVh2ZhWRkW&callback=_initBaiduMap`
+      })
+      return window.BMap._preloader
+    } else if (!window.BMap._preloader) {
+      return Promise.resolve(window.BMap)
+    } else {
+      return window.BMap._preloader
+    }
+  }
+  // socket
+ const webSocket = (api, params, fnSuccess, fnFail) => {
+    let responseInfo = {type: '', msg: ''};            // 请求信息
+    let apiUrl = api
+    //  + params.vinCode + '&userId=' + params.userId;
+      let ws;
+      // 开启webSocket
+      function doOpen () {
+        responseInfo.type = 'open';
+        responseInfo.msg = 'websocket已开启';
+        // console.log('开启websocket');
+      }
+  
+      // 错误接收
+      function doError () {
+        this.close();
+        responseInfo.type = 'error';
+        responseInfo.msg = '您已经掉线，无法与服务器通信!';
+        fnFail && fnFail(responseInfo);
+      }
+  
+      // 接收新消息
+      function doMessage (message) {
+        var event = message.data;
+        fnSuccess && fnSuccess(event);
+      }
+  
+    // 断开
+    function doClose () {
+      responseInfo.type = 'close';
+      responseInfo.msg = '您已经掉线，无法与服务器通信!';
+      fnFail && fnFail(responseInfo);
+    }
+  
+      // 初始话 WebSocket
+      function initWebSocket (apiUrl) {
+        if (window.WebSocket) {
+          ws = new WebSocket(encodeURI(apiUrl));
+          ws.onopen = doOpen;
+          ws.onerror = doError;
+          ws.onclose = doClose;
+          ws.onmessage = doMessage;
+        } else {
+          responseInfo.type = 'error';
+          responseInfo.msg = '您的设备不支持 webSocket!';
+          fnFail && fnFail(responseInfo);
+        }
+      }
+      // 初始化webSocket
+      initWebSocket(apiUrl);
+      return ws;
+  };
 
   // 通过class查找dom
   if(!('getElementsByClass' in HTMLElement)){
@@ -76,14 +191,14 @@ function loadJScript() {
           var def = {
             mapType: '',
               dom: '',
-              mapconfig: {
-                gps: [116.404, 39.915], // 经纬度
-                zoom: 10,                // 层级
-              },
               mapTrack: false,
-              trackconfig: {
+              mapMointer: false,
+              config: {
+                gps: [116.404, 39.915], // 经纬度
+                zoom: 16,                // 层级
                 trackApi: '',
-                trackParam: {pageNum: 1, pageSize: 10}
+                trackParam: {pageNum: 1, pageSize: 10},
+                soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket'
               }
           };
           this.def = extend(def,opt,true);
@@ -91,33 +206,38 @@ function loadJScript() {
           this.listeners = []; //自定义事件，用于监听插件的用户交互
           this.handlers = {};
       },
-      setBmap: function(obj) {
-        let myMap = new BMap.Map(obj.dom)
-        let point = new BMap.Point(obj.mapconfig.gps[0], obj.mapconfig.gps[1])
-        myMap.centerAndZoom(point, obj.mapconfig.zoom)
-        myMap.enableScrollWheelZoom();   
+     setTrack: function(map, data) {
+         let newData = bd_encrypt(data)
+         let point = new BMap.Point(newData.lng, newData.lat);
+        map.centerAndZoom(point, this.def.config.zoom)
+        let marker = new BMap.Marker(point); // 创建点
+        map.addOverlay(marker);
       },
-      setTrack: function(data) {
-        let map = new BMap.Map(this.def.dom)
-        let point = new BMap.Point(data.lng, data.lat);
-        map.centerAndZoom(point, this.def.mapconfig.zoom)
-        map.enableScrollWheelZoom();  
+      setMoniter: function(map, data) {
+         let newData = bd_encrypt(data)
+         let point = new BMap.Point(newData.lng, newData.lat);
+        map.centerAndZoom(point, this.def.config.zoom)
         let marker = new BMap.Marker(point); // 创建点
         map.addOverlay(marker);
       },
       init: function() {
         if (!this.def.dom) return
         if (this.def.mapType) {
-          if (this.def.mapType === 'bmap') { 
+          if (this.def.mapType === 'bmap') {  
             loadJScript().then(() => {
-                 let trackconfig = this.def.trackconfig
-                  if (this.def.mapTrack) {
-                  this.Ajax.get(`${trackconfig.trackApi}/ics/gps/page`, trackconfig.trackParam, (data) => {
-                    if (data.dataList.length) this.setTrack(data.dataList[1])
-                    else this.setBmap(this.def)
+              let config = this.def.config
+              let map = new BMap.Map(this.def.dom)
+              let point = new BMap.Point(config.gps[0], config.gps[1])
+              map.centerAndZoom(point, config.zoom)
+              map.enableScrollWheelZoom(); 
+                  if (this.def.mapTrack) {  // 轨迹回放
+                  this.Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
+                    if (data.dataList.length)  this.setTrack(map, data.dataList[1])
                   }) 
-                 } else {
-                  this.setBmap(this.def)
+                 } else if (this.def.mapMointer) {  // 监控点
+                  webSocket(config.soketUrl, {}, (data) => {
+                    this.setMoniter(map, data)
+                  }) 
                  }
                 })
           }
