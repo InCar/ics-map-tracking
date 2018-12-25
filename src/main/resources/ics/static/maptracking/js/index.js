@@ -115,8 +115,8 @@
   // socket
  const webSocket = (api, params, fnSuccess, fnFail) => {
     let responseInfo = {type: '', msg: ''};            // 请求信息
-    let apiUrl = api
-    //  + params.vinCode + '&userId=' + params.userId;
+    let apiUrl = api + '?vins=' + params.vinCode
+    //  + '&userId=' + params.userId;
       let ws;
       // 开启webSocket
       function doOpen () {
@@ -135,7 +135,7 @@
   
       // 接收新消息
       function doMessage (message) {
-        var event = message.data;
+        var event = JSON.parse(message.data);
         fnSuccess && fnSuccess(event);
       }
   
@@ -193,12 +193,14 @@
               dom: '',
               mapTrack: false,
               mapMointer: false,
+              points: [], // 监控点
               config: {
                 gps: [116.404, 39.915], // 经纬度
                 zoom: 16,                // 层级
                 trackApi: '',
                 trackParam: {pageNum: 1, pageSize: 10},
-                soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket'
+                soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket',
+                vinCode: ''
               }
           };
           this.def = extend(def,opt,true);
@@ -207,18 +209,33 @@
           this.handlers = {};
       },
      setTrack: function(map, data) {
-         let newData = bd_encrypt(data)
-         let point = new BMap.Point(newData.lng, newData.lat);
-        map.centerAndZoom(point, this.def.config.zoom)
-        let marker = new BMap.Marker(point); // 创建点
-        map.addOverlay(marker);
+       let newData = [];
+        data.map(item => {
+          let a = bd_encrypt(item);
+          newData.push(new BMap.Point(a.lng, a.lat))
+        })
+         this.setPolyline(map, newData)
+        map.centerAndZoom(newData[0], this.def.config.zoom)
       },
+      setPolyline: function(map, lineData) {
+        map.addOverlay(new BMap.Polyline(lineData, {strokeColor:"blue", strokeWeight:5, strokeOpacity:1}));  //增加折线
+      },
+      //根据点信息实时更新地图显示范围，让轨迹完整显示。设置新的中心点和显示级别
+      setZoom: function (map, bPoints) {
+      var view = map.getViewport(eval(bPoints));
+      // var mapZoom = view.zoom;
+      var centerPoint = view.center;
+      map.centerAndZoom(centerPoint, 16);
+    },
       setMoniter: function(map, data) {
          let newData = bd_encrypt(data)
          let point = new BMap.Point(newData.lng, newData.lat);
-        map.centerAndZoom(point, this.def.config.zoom)
-        let marker = new BMap.Marker(point); // 创建点
-        map.addOverlay(marker);
+         let marker = new BMap.Marker(point); // 创建点
+         map.addOverlay(marker);  // 标点
+         this.def.points.push(point);
+         this.setZoom(map, this.def.points)
+         this.setPolyline(map, this.def.points);
+        // map.centerAndZoom(point, this.def.config.zoom)
       },
       init: function() {
         if (!this.def.dom) return
@@ -230,13 +247,14 @@
               let point = new BMap.Point(config.gps[0], config.gps[1])
               map.centerAndZoom(point, config.zoom)
               map.enableScrollWheelZoom(); 
+              map.clearOverlays()
                   if (this.def.mapTrack) {  // 轨迹回放
                   this.Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
-                    if (data.dataList.length)  this.setTrack(map, data.dataList[1])
+                    if (data.dataList.length)  this.setTrack(map, data.dataList)
                   }) 
                  } else if (this.def.mapMointer) {  // 监控点
-                  webSocket(config.soketUrl, {}, (data) => {
-                    this.setMoniter(map, data)
+                  webSocket(config.soketUrl, {vinCode: config.vinCode}, (data) => {
+                   this.setMoniter(map, data)
                   }) 
                  }
                 })
