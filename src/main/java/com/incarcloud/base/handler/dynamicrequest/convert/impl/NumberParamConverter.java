@@ -1,5 +1,6 @@
 package com.incarcloud.base.handler.dynamicrequest.convert.impl;
 
+import com.incarcloud.base.exception.BaseRuntimeException;
 import com.incarcloud.base.handler.dynamicrequest.convert.ICSHttpParamConverter;
 
 public class NumberParamConverter implements ICSHttpParamConverter<Number>{
@@ -19,10 +20,10 @@ public class NumberParamConverter implements ICSHttpParamConverter<Number>{
                 } else if (Byte.class.isAssignableFrom(targetType)) {
                     return Byte.parseByte(source[0]);
                 } else {
-                    throw new RuntimeException("NumberParamConverter Type[" + targetType.getName() + "] Value[" + source[0] + "] Not Support");
+                    throw BaseRuntimeException.getException("NumberParamConverter Type[" + targetType.getName() + "] Value[" + source[0] + "] Not Support");
                 }
             }catch (NumberFormatException e){
-                throw new RuntimeException("NumberParamConverter Type[" + targetType.getName() + "] Value[" + source[0] + "] Not Support,Message["+e.getMessage()+"]");
+                throw BaseRuntimeException.getException("NumberParamConverter Type[" + targetType.getName() + "] Value[" + source[0] + "] Not Support,Message["+e.getMessage()+"]");
             }
         }
     }

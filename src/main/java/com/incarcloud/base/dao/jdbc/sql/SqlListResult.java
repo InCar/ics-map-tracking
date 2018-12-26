@@ -1,4 +1,4 @@
-package com.incarcloud.base.db.sql;
+package com.incarcloud.base.dao.jdbc.sql;
 
 import java.util.List;
 

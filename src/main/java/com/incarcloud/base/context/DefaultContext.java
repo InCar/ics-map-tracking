@@ -3,6 +3,8 @@ package com.incarcloud.base.context;
 import com.incarcloud.base.anno.*;
 import com.incarcloud.base.config.Config;
 import com.incarcloud.base.config.DataSource;
+import com.incarcloud.base.dao.DataAccess;
+import com.incarcloud.base.exception.BaseRuntimeException;
 import com.incarcloud.base.exception.NoHandlerException;
 import com.incarcloud.base.request.RequestData;
 import com.incarcloud.base.util.ClassUtil;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -41,15 +44,15 @@ public class DefaultContext implements Context,AutoScanner{
     public DefaultContext init() {
         isInit=true;
         if(config==null){
-            throw new RuntimeException("Param[config] Must Not Be Null");
+            throw BaseRuntimeException.getException("Param[config] Must Not Be Null");
         }
-        //1、根据配置初始化所有组件
+        //1、根据配置扫描所有组件
         scanComponents(config);
-        //2、初始化请求分发器
+        //2、获取请求分发器
         dispatcher=getBeanByName("dispatcher");
-        //3、初始化静态请求处理器
+        //3、获取静态请求处理器
         resourceHandler=getBeanByName("resourceHandler");
-        //4、初始化动态请求处理器
+        //4、获取动态请求处理器
         requestHandler=getBeanByName("requestHandler");
         //5、初始化所有组件
         initComponents();
@@ -146,26 +149,26 @@ public class DefaultContext implements Context,AutoScanner{
                     Class fieldType=field.getType();
                     Object val= getBeanByType(fieldType);
                     if(val==null){
-                        throw new RuntimeException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Don't Has Component Type["+fieldType.getName()+"]");
+                        throw BaseRuntimeException.getException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Don't Has Component Type["+fieldType.getName()+"]");
                     }else{
                         field.setAccessible(true);
                         try {
                             field.set(e,val);
                         } catch (IllegalAccessException e1) {
-                            throw new RuntimeException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Can't Set");
+                            throw BaseRuntimeException.getException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Can't Set");
                         }
                     }
                 }else{
                     //4.1.2、通过名称注入
                     Object val= getBeanByName(name);
                     if(val==null){
-                        throw new RuntimeException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Don't Has Component Name["+name+"]");
+                        throw BaseRuntimeException.getException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Don't Has Component Name["+name+"]");
                     }else{
                         field.setAccessible(true);
                         try {
                             field.set(e,val);
                         } catch (IllegalAccessException e1) {
-                            throw new RuntimeException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Can't Set");
+                            throw BaseRuntimeException.getException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Can't Set");
                         }
                     }
                 }
@@ -193,13 +196,13 @@ public class DefaultContext implements Context,AutoScanner{
                     int primaryObjCount=primaryObjList.size();
                     switch (primaryObjCount){
                         case 0:{
-                            throw new RuntimeException("Type ["+clazz.getName()+"] Has More Than One Instance And No ICSPrimary");
+                            throw BaseRuntimeException.getException("Type ["+clazz.getName()+"] Has More Than One Instance And No ICSPrimary");
                         }
                         case 1:{
                             return primaryObjList.get(0);
                         }
                         default:{
-                            throw new RuntimeException("Type ["+clazz.getName()+"] Has More Than One ICSPrimary Instance");
+                            throw BaseRuntimeException.getException("Type ["+clazz.getName()+"] Has More Than One ICSPrimary Instance");
                         }
                     }
                 }
@@ -233,13 +236,13 @@ public class DefaultContext implements Context,AutoScanner{
         }
         if(beanMap.containsKey(name)){
             Object mapObj= beanMap.get(name);
-            throw new RuntimeException("ICSContext Init Failed,Component["+mapObj.getClass().getName()+"] Has Same Name as Component["+clazz.getName()+"]");
+            throw BaseRuntimeException.getException("ICSContext Init Failed,Component["+mapObj.getClass().getName()+"] Has Same Name as Component["+clazz.getName()+"]");
         }else{
             try {
                 Object obj= clazz.newInstance();
                 beanMap.put(name,obj);
             } catch (InstantiationException |IllegalAccessException e) {
-                throw new RuntimeException("ICSContext Init Failed,Construct Component["+clazz.getName()+"] Failed");
+                throw BaseRuntimeException.getException("ICSContext Init Failed,Construct Component["+clazz.getName()+"] Failed");
             }
         }
     }
@@ -248,7 +251,7 @@ public class DefaultContext implements Context,AutoScanner{
 
     public DefaultContext withConfig(Config config) {
         if(isInit){
-           throw new RuntimeException("Context Has Init,Can't Modify Config");
+           throw BaseRuntimeException.getException("Context Has Init,Can't Modify Config");
         }
         this.config=config;
         return this;
@@ -318,5 +321,6 @@ public class DefaultContext implements Context,AutoScanner{
         }
         return this;
     }
+
 }
 

@@ -1,4 +1,4 @@
-package com.incarcloud.base.db.mysql;
+package com.incarcloud.base.dao.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
