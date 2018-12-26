@@ -22,7 +22,7 @@ public class LogConfig {
         enableLog=true;
         level=Level.ALL;
         enableConsoleLog=true;
-        enableFileLog=true;
+        enableFileLog=false;
         fileLogDir="log";
     }
 

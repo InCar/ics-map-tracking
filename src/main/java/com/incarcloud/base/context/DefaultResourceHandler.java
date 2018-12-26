@@ -61,9 +61,7 @@ public class DefaultResourceHandler implements ResourceHandler,Initializable {
             setResponseType(subPath,response);
             FileUtil.write(is,response.getOutputStream());
         } catch (IOException e) {
-            String msg="ResourceHandler path["+subPath+"] not exists";
-            config.getLogger().log(Level.SEVERE,msg,e);
-            throw BaseRuntimeException.getException(msg);
+            throw BaseRuntimeException.getException(e);
         }
     }
 

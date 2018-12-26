@@ -16,7 +16,7 @@ public class DateParamConverter implements ICSHttpParamConverter<Date>{
                 long mill = Long.parseLong(source[0]);
                 return new Date(mill);
             }catch (NumberFormatException e){
-                throw BaseRuntimeException.getException("DateParamConverter Type["+targetType.getName()+"] Value["+source[0]+"] Not Support");
+                throw BaseRuntimeException.getException(e);
             }
         }
     }

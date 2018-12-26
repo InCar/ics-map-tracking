@@ -1,6 +1,7 @@
 package com.incarcloud.base.log;
 
 import com.incarcloud.base.config.LogConfig;
+import com.incarcloud.base.exception.BaseRuntimeException;
 import com.incarcloud.base.util.FileUtil;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ public class LoggerFactory {
             FileUtil.createDirectories(path);
             fileHandler = new FileHandler(path+"/ics%u.log",1024000,1);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw BaseRuntimeException.getException(e);
         }
         fileHandler.setFormatter(formatter);
         return fileHandler;

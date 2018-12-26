@@ -49,7 +49,7 @@ public class ClassUtil {
             annoNameToClassListmap.put(annoClass.getName(),classList);
             return annoNameToClassListmap;
         } catch (IOException |ClassNotFoundException e) {
-            throw BaseRuntimeException.getException("Scan ICSComponent Failed");
+            throw BaseRuntimeException.getException(e);
         }
     }
 
