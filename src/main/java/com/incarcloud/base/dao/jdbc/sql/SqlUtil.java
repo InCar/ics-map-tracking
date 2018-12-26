@@ -1,5 +1,6 @@
-package com.incarcloud.base.db.sql;
+package com.incarcloud.base.dao.jdbc.sql;
 
+import com.incarcloud.base.exception.BaseRuntimeException;
 import net.sf.jsqlparser.JSQLParserException;
 
 import java.lang.reflect.Array;
@@ -73,10 +74,10 @@ public class SqlUtil {
      */
     public static SqlMapResult replaceNull(String sql, Map<String,Object> paramMap){
         if(sql==null){
-            throw new RuntimeException("Param[sql] Can Not Be Null");
+            throw BaseRuntimeException.getException("Param[sql] Can Not Be Null");
         }
         if(paramMap==null){
-            throw new RuntimeException("Param[paramMap] Can Not Be Null");
+            throw BaseRuntimeException.getException("Param[paramMap] Can Not Be Null");
         }
         if(paramMap.size()==0){
             return new SqlMapResult(sql,new LinkedHashMap<>());
@@ -127,10 +128,10 @@ public class SqlUtil {
      */
     public static SqlListResult replaceNull(String sql, List<Object> paramList){
         if(sql==null){
-            throw new RuntimeException("Param[sql] Can Not Be Null");
+            throw BaseRuntimeException.getException("Param[sql] Can Not Be Null");
         }
         if(paramList==null){
-            throw new RuntimeException("Param[paramList] Can Not Be Null");
+            throw BaseRuntimeException.getException("Param[paramList] Can Not Be Null");
         }
         if(paramList.size()==0){
             return new SqlListResult(sql,new ArrayList<>());

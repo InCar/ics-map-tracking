@@ -1,5 +1,7 @@
 package com.incarcloud.base.util;
 
+import com.incarcloud.base.exception.BaseRuntimeException;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -47,7 +49,7 @@ public class ClassUtil {
             annoNameToClassListmap.put(annoClass.getName(),classList);
             return annoNameToClassListmap;
         } catch (IOException |ClassNotFoundException e) {
-            throw new RuntimeException("Scan ICSComponent Failed");
+            throw BaseRuntimeException.getException("Scan ICSComponent Failed");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.incarcloud.base.handler.dynamicrequest.convert.impl;
 
+import com.incarcloud.base.exception.BaseRuntimeException;
 import com.incarcloud.base.handler.dynamicrequest.convert.ICSHttpParamConverter;
 
 import java.lang.reflect.Array;
@@ -26,7 +27,7 @@ public class ArrayParamConverter implements ICSHttpParamConverter{
             subConverter=DateParamConverter.INSTANCE;
         }else{
             String arrStr=Arrays.stream(source).reduce((e1,e2)->e1+","+e2).get();
-            throw new RuntimeException("ArrayParamConverter Type["+targetType.getName()+"] Value["+arrStr+"] Not Support");
+            throw BaseRuntimeException.getException("ArrayParamConverter Type["+targetType.getName()+"] Value["+arrStr+"] Not Support");
         }
         Object arr= Array.newInstance(arrayType,source.length);
         for(int i=0;i<=source.length-1;i++){
