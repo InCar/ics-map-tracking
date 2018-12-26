@@ -1,6 +1,7 @@
 package com.incarcloud.base.request;
 
 import com.incarcloud.base.config.Config;
+import com.incarcloud.base.context.Context;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,12 +14,14 @@ public class RequestData {
     private HttpServletResponse response;
     //根据config中的前缀解析出来的子路径
     private String subPath;
+    private Context context;
     private Config config;
 
-    public RequestData(HttpServletRequest request, HttpServletResponse response,Config config) {
+    public RequestData(HttpServletRequest request, HttpServletResponse response,Context context) {
         this.request = request;
         this.response = response;
-        this.config=config;
+        this.context=context;
+        this.config=context.getConfig();
         this.subPath = getSubPath(request);
     }
 
@@ -38,6 +41,10 @@ public class RequestData {
         return config;
     }
 
+    public Context getContext() {
+        return context;
+    }
+
     /**
      * 根据config解析子路径,如果返回null,则说明不支持
      * @param request
@@ -45,8 +52,8 @@ public class RequestData {
      */
     private String getSubPath(HttpServletRequest request){
         String uri=request.getRequestURI();
-        if(uri.startsWith(config.getRequestMappingPre())){
-            return uri.substring(config.getRequestMappingPre().length());
+        if(uri.startsWith(context.getConfig().getRequestMappingPre())){
+            return uri.substring(context.getConfig().getRequestMappingPre().length());
         }else{
             return null;
         }

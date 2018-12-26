@@ -2,6 +2,7 @@ package com.incarcloud.base.handler.dynamicrequest.request.impl;
 
 import com.incarcloud.base.anno.ICSRequestMapping;
 import com.incarcloud.base.anno.ICSRequestParam;
+import com.incarcloud.base.config.Config;
 import com.incarcloud.base.exception.BaseRuntimeException;
 import com.incarcloud.base.handler.dynamicrequest.convert.impl.ArrayParamConverter;
 import com.incarcloud.base.handler.dynamicrequest.convert.impl.DateParamConverter;
@@ -106,7 +107,9 @@ public class SimpleRequestHandler implements DynamicRequestHandler {
         List<ICSHttpRequestParam> missParamList=this.paramMap.values().stream().filter(e->!e.getClazz().isAssignableFrom(HttpServletRequest.class)&&!e.getClazz().isAssignableFrom(HttpServletResponse.class)&&e.getRequired()&&!paramSet.contains(e.getName())).collect(Collectors.toList());
         if(missParamList.size()>0){
             String paramStr=missParamList.stream().map(e->e.getName()).reduce((e1,e2)->e1+","+e2).get();
-            throw BaseRuntimeException.getException("Param["+paramStr+"] Required");
+            String msg="Param["+paramStr+"] Required";
+            requestData.getConfig().getLogger().severe(msg);
+            throw BaseRuntimeException.getException(msg);
         }
         //拼装参数,按照定义的参数顺序设值
         List<Object> paramList=new ArrayList<>();

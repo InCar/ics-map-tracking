@@ -3,6 +3,7 @@ package com.incarcloud.base.exception.handler;
 import com.incarcloud.base.anno.ICSAutowire;
 import com.incarcloud.base.anno.ICSComponent;
 import com.incarcloud.base.anno.ICSConditionalOnMissingBean;
+import com.incarcloud.base.config.Config;
 import com.incarcloud.base.json.JsonReader;
 import com.incarcloud.base.message.JsonMessage;
 import com.incarcloud.base.request.RequestData;
@@ -13,14 +14,12 @@ import java.io.IOException;
 @ICSComponent
 @ICSConditionalOnMissingBean(ExceptionHandler.class)
 public class DefaultExceptionHandler implements ExceptionHandler{
-
     @ICSAutowire
     JsonReader jsonReader;
 
     @Override
     public void resolveException(RequestData requestData, Throwable throwable) {
-        requestData.getResponse().setCharacterEncoding(requestData.getConfig().getEncoding());
-        ExceptionUtil.parseRealException(throwable);
+        requestData.getResponse().setCharacterEncoding(requestData.getContext().getConfig().getEncoding());
         try {
             if(!requestData.getResponse().isCommitted()){
                 JsonMessage result= ExceptionUtil.toJsonMessage(throwable);
@@ -30,7 +29,7 @@ public class DefaultExceptionHandler implements ExceptionHandler{
             }
         } catch (IOException e) {
             requestData.getResponse().setStatus(500);
-            e.printStackTrace();
+            Config.GLOBAL_LOGGER.throwing(DefaultExceptionHandler.class.getName(),"resolveException",throwable);
         }
     }
 }
