@@ -1,5 +1,6 @@
-package com.incarcloud.base.db.sql;
+package com.incarcloud.base.dao.jdbc.sql;
 
+import com.incarcloud.base.exception.BaseRuntimeException;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.relational.*;
@@ -50,7 +51,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
 
     NullParamSqlReplaceVisitor(String sql, Map<String, Object> paramMap) {
         if(sql==null||paramMap==null){
-            throw new RuntimeException("Param Can Not Be Null");
+            throw BaseRuntimeException.getException("Param Can Not Be Null");
         }
         this.sql = sql;
         this.paramMap = paramMap;
@@ -59,7 +60,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
 
     NullParamSqlReplaceVisitor(String sql, List<Object> paramList) {
         if(sql==null||paramList==null){
-            throw new RuntimeException("Param Can Not Be Null");
+            throw BaseRuntimeException.getException("Param Can Not Be Null");
         }
         this.sql=sql;
         this.paramList = paramList;
@@ -70,7 +71,7 @@ public class NullParamSqlReplaceVisitor extends StatementVisitorAdapter{
         try {
             CCJSqlParserUtil.parse(sql).accept(this);
         } catch (JSQLParserException e) {
-            throw new RuntimeException(e);
+            throw BaseRuntimeException.getException(e);
         }
         return newSql;
     }

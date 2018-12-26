@@ -1,4 +1,4 @@
-package com.incarcloud.base.handler.dynamicrequest.json;
+package com.incarcloud.base.json;
 
 import com.incarcloud.base.anno.ICSComponent;
 import com.incarcloud.base.anno.ICSConditionalOnMissingBean;

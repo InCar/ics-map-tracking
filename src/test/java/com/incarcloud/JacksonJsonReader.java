@@ -3,7 +3,8 @@ package com.incarcloud;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.incarcloud.base.anno.ICSComponent;
-import com.incarcloud.base.handler.dynamicrequest.json.JsonReader;
+import com.incarcloud.base.exception.BaseRuntimeException;
+import com.incarcloud.base.json.JsonReader;
 
 @ICSComponent
 public class JacksonJsonReader implements JsonReader{
@@ -12,7 +13,7 @@ public class JacksonJsonReader implements JsonReader{
         try {
             return new ObjectMapper().writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e.getMessage());
+            throw BaseRuntimeException.getException(e);
         }
     }
 }

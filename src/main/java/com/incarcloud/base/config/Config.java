@@ -32,8 +32,7 @@ public class Config {
 
     //mysql连接配置
     private DataSource dataSource;
-    private MysqlConfig mysqlConfig;
-    private HBaseConfig hBaseConfig;
+    private JdbcConfig jdbcConfig;
 
     //扫面ics组件的包路径
     private String[] scanPackages;
@@ -105,23 +104,13 @@ public class Config {
         return this;
     }
 
-    public MysqlConfig getMysqlConfig() {
-        return mysqlConfig;
+    public JdbcConfig getJdbcConfig() {
+        return jdbcConfig;
     }
 
-    public Config withMysqlConfig(MysqlConfig mysqlConfig) {
-        this.mysqlConfig = mysqlConfig;
-        dataSource=DataSource.MYSQL;
-        return this;
-    }
-
-    public HBaseConfig gethBaseConfig() {
-        return hBaseConfig;
-    }
-
-    public Config withhBaseConfig(HBaseConfig hBaseConfig) {
-        this.hBaseConfig = hBaseConfig;
-        dataSource=DataSource.HBase;
+    public Config withJdbcConfig(JdbcConfig jdbcConfig) {
+        this.dataSource=DataSource.JDBC;
+        this.jdbcConfig = jdbcConfig;
         return this;
     }
 

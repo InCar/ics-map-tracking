@@ -1,5 +1,5 @@
 group 'com.incarcloud.ics'
-version '2.3-SNAPSHOT'
+version '2.8-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -22,7 +22,7 @@ repositories {
         // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
         compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
         // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-        compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.13'
+        testCompile group: 'mysql', name: 'mysql-connector-java', version: '8.0.13'
 
         compile group: 'com.github.jsqlparser', name: 'jsqlparser', version: '1.3'
     }

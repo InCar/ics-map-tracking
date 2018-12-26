@@ -2,6 +2,7 @@ package com.incarcloud.base.context;
 
 import com.incarcloud.base.anno.ICSComponent;
 import com.incarcloud.base.anno.ICSConditionalOnMissingBean;
+import com.incarcloud.base.exception.BaseRuntimeException;
 import com.incarcloud.base.request.RequestData;
 import com.incarcloud.base.util.FileUtil;
 import com.incarcloud.base.config.Config;
@@ -53,7 +54,7 @@ public class DefaultResourceHandler implements ResourceHandler,Initializable {
             if(is==null){
                 String msg="ResourceHandler path["+subPath+"] not exists";
                 config.getLogger().log(Level.SEVERE,msg);
-                throw new RuntimeException(msg);
+                throw BaseRuntimeException.getException(msg);
             }
             response.setCharacterEncoding(config.getEncoding());
             response.setContentLength(is.available());
@@ -62,7 +63,7 @@ public class DefaultResourceHandler implements ResourceHandler,Initializable {
         } catch (IOException e) {
             String msg="ResourceHandler path["+subPath+"] not exists";
             config.getLogger().log(Level.SEVERE,msg,e);
-            throw new RuntimeException(msg);
+            throw BaseRuntimeException.getException(msg);
         }
     }
 

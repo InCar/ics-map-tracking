@@ -6,6 +6,7 @@ import com.incarcloud.base.anno.ICSRequestMapping;
 import com.incarcloud.base.anno.ICSRequestParam;
 import com.incarcloud.base.handler.dynamicrequest.component.BaseComponent;
 import com.incarcloud.base.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
+import com.incarcloud.base.message.JsonMessage;
 import com.incarcloud.base.page.Page;
 import com.incarcloud.base.page.PageResult;
 import com.incarcloud.business.service.VehicleService;
@@ -20,18 +21,18 @@ public class VehicleController extends BaseComponent {
     private VehicleService vehicleService;
 
     @ICSRequestMapping(value = "/list", method = ICSHttpRequestMethodEnum.GET)
-    public List<VehicleSource> list(
+    public JsonMessage<List<VehicleSource>> list(
             @ICSRequestParam(required = false, value = "vin")
                     String vin) {
-        return vehicleService.listByVin(vin);
+        return JsonMessage.success(vehicleService.listByVin(vin));
     }
 
     @ICSRequestMapping(value = "/page", method = ICSHttpRequestMethodEnum.GET)
-    public PageResult<VehicleSource> page(
+    public JsonMessage<PageResult<VehicleSource>> page(
             @ICSRequestParam(required = false, value = "vin") String vin,
             @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
             @ICSRequestParam(required = true, value = "pageSize") Integer pageSize) {
-        return vehicleService.pageByVin(vin, new Page(pageNum, pageSize));
+        return JsonMessage.success(vehicleService.pageByVin(vin, new Page(pageNum, pageSize)));
     }
 
 

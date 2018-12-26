@@ -3,6 +3,7 @@ package com.incarcloud.base.handler.dynamicrequest.component;
 import com.incarcloud.base.config.Config;
 import com.incarcloud.base.context.Context;
 import com.incarcloud.base.context.Initializable;
+import com.incarcloud.base.dao.DataAccess;
 
 public class BaseComponent implements Initializable {
     protected Context context;

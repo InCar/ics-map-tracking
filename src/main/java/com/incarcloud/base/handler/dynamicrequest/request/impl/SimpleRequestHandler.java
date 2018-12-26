@@ -2,6 +2,7 @@ package com.incarcloud.base.handler.dynamicrequest.request.impl;
 
 import com.incarcloud.base.anno.ICSRequestMapping;
 import com.incarcloud.base.anno.ICSRequestParam;
+import com.incarcloud.base.exception.BaseRuntimeException;
 import com.incarcloud.base.handler.dynamicrequest.convert.impl.ArrayParamConverter;
 import com.incarcloud.base.handler.dynamicrequest.convert.impl.DateParamConverter;
 import com.incarcloud.base.handler.dynamicrequest.convert.impl.NumberParamConverter;
@@ -95,7 +96,7 @@ public class SimpleRequestHandler implements DynamicRequestHandler {
         String method=requestData.getRequest().getMethod();
         //如果请求方式不匹配,返回异常
         if(!icsHttpRequestMethodEnum.name().equals(method)){
-            throw new RuntimeException("Method["+method+"] Not Support");
+            throw BaseRuntimeException.getException("Method["+method+"] Not Support");
         }
         //验证参数必填
         HttpServletRequest request= requestData.getRequest();
@@ -105,7 +106,7 @@ public class SimpleRequestHandler implements DynamicRequestHandler {
         List<ICSHttpRequestParam> missParamList=this.paramMap.values().stream().filter(e->!e.getClazz().isAssignableFrom(HttpServletRequest.class)&&!e.getClazz().isAssignableFrom(HttpServletResponse.class)&&e.getRequired()&&!paramSet.contains(e.getName())).collect(Collectors.toList());
         if(missParamList.size()>0){
             String paramStr=missParamList.stream().map(e->e.getName()).reduce((e1,e2)->e1+","+e2).get();
-            throw new RuntimeException("Param["+paramStr+"] Required");
+            throw BaseRuntimeException.getException("Param["+paramStr+"] Required");
         }
         //拼装参数,按照定义的参数顺序设值
         List<Object> paramList=new ArrayList<>();
@@ -145,7 +146,7 @@ public class SimpleRequestHandler implements DynamicRequestHandler {
             return ArrayParamConverter.INSTANCE.convert(values,targetType);
         }else{
             String arrStr=Arrays.stream(values).reduce((e1,e2)->e1+","+e2).orElse("");
-            throw new RuntimeException("Param["+param.getName()+"] Type["+param.getClazz().getName()+"] Value["+arrStr+"] Converter Not Support");
+            throw BaseRuntimeException.getException("Param["+param.getName()+"] Type["+param.getClazz().getName()+"] Value["+arrStr+"] Converter Not Support");
         }
     }
 
