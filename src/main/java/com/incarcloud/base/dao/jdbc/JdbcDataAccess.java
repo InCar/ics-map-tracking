@@ -25,6 +25,7 @@ import java.util.function.Function;
 public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
     public final static String MYSQL_DRIVER_CLASS_NAME="com.mysql.jdbc.Driver";
     public final static String MYSQL_DRIVER_CLASS_NAME_8="com.mysql.cj.jdbc.Driver";
+    public final static long WARNING_SQL_TIME_MILLS=1000L;
 
     protected Context context;
     protected LinkedBlockingDeque<Connection> pool;
@@ -35,7 +36,8 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
         try {
             Connection connection= pool.pollLast(jdbcConfig.getMaxWaitSeconds(), TimeUnit.SECONDS);
             if(connection==null){
-                throw BaseRuntimeException.getException("Wait Jdbc Pool More Than ["+jdbcConfig.getMaxWaitSeconds()+"],No Available Connection");
+                String msg="Wait Jdbc Pool More Than ["+jdbcConfig.getMaxWaitSeconds()+"],No Available Connection";
+                throw BaseRuntimeException.getException(msg);
             }else{
                 try {
                     return function.apply(connection);
@@ -44,7 +46,7 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                 }
             }
         } catch (InterruptedException e) {
-            throw BaseRuntimeException.getException("Jdbc Pool Wait Interrupt");
+            throw BaseRuntimeException.getException(e);
         }
     }
 
@@ -65,7 +67,7 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                 }
             }
         } catch (SQLException e) {
-            throw BaseRuntimeException.getException("JdbcDataAccess Init Failed,Message["+e.getMessage()+"]");
+            throw BaseRuntimeException.getException(e);
         }
     }
 
@@ -74,7 +76,7 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
         try {
             Class.forName(jdbcConfig.getDriverClassName());
         } catch (ClassNotFoundException e) {
-            throw BaseRuntimeException.getException("Mysql Driver Class Not Exist");
+            throw BaseRuntimeException.getException(e);
         }
         return DriverManager.getConnection(jdbcConfig.getUrl(),jdbcConfig.getUser(),jdbcConfig.getPassword());
     }
@@ -91,14 +93,17 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                 long t1=System.currentTimeMillis();
                 ResultSet rs= ps.executeQuery();
                 long t2=System.currentTimeMillis();
-                System.out.println("Sql["+sql+"] Take "+(t2-t1));
+                long diff=t2-t1;
+                if(diff>WARNING_SQL_TIME_MILLS){
+                    context.getConfig().getLogger().warning("Sql["+sql+"] Take "+diff);
+                }
                 while(rs.next()){
                     T t= rowHandler.apply(rs);
                     resultList.add(t);
                 }
                 return resultList;
             } catch (SQLException e) {
-                throw BaseRuntimeException.getException(e.getMessage());
+                throw BaseRuntimeException.getException(e);
             }
         });
     }
@@ -116,7 +121,10 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                     long t1=System.currentTimeMillis();
                     ResultSet countRs = countPs.executeQuery();
                     long t2=System.currentTimeMillis();
-                    System.out.println("CountSql["+sql+"] Take "+(t2-t1));
+                    long diff=t2-t1;
+                    if(diff>WARNING_SQL_TIME_MILLS){
+                        context.getConfig().getLogger().warning("CountSql["+countSql+"] Take "+diff);
+                    }
                     countRs.next();
                     count = countRs.getInt(1);
                 }
@@ -135,7 +143,10 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                         long t1=System.currentTimeMillis();
                         ResultSet rs = ps.executeQuery();
                         long t2=System.currentTimeMillis();
-                        System.out.println("Sql["+sql+"] Take "+(t2-t1));
+                        long diff=t2-t1;
+                        if(diff>WARNING_SQL_TIME_MILLS){
+                            context.getConfig().getLogger().warning("Sql["+sql+"] Take "+diff);
+                        }
                         List<T> dataList = new ArrayList<>();
                         while (rs.next()) {
                             T t = rowHandler.apply(rs);
@@ -145,7 +156,7 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                     }
                 }
             }catch (SQLException e) {
-                throw BaseRuntimeException.getException(e.getMessage());
+                throw BaseRuntimeException.getException(e);
             }
         });
     }

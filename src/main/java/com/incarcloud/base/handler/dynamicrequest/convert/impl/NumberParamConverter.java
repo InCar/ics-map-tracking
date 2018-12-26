@@ -23,7 +23,7 @@ public class NumberParamConverter implements ICSHttpParamConverter<Number>{
                     throw BaseRuntimeException.getException("NumberParamConverter Type[" + targetType.getName() + "] Value[" + source[0] + "] Not Support");
                 }
             }catch (NumberFormatException e){
-                throw BaseRuntimeException.getException("NumberParamConverter Type[" + targetType.getName() + "] Value[" + source[0] + "] Not Support,Message["+e.getMessage()+"]");
+                throw BaseRuntimeException.getException(e);
             }
         }
     }

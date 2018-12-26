@@ -14,6 +14,7 @@ public class Config {
     public final static String DEFAULT_FILE_STATIC_MAPPING_PRE ="/ics/static/";
     public final static String DEFAULT_ENCODING="UTF-8";
     public final static String[] DEFAULT_SCAN_PACKAGES=new String[]{"com.incarcloud"};
+    public static Logger GLOBAL_LOGGER;
 
     //匹配request路径前缀
     private String requestMappingPre;
@@ -45,6 +46,7 @@ public class Config {
         this.fileStaticMappingPre=DEFAULT_FILE_STATIC_MAPPING_PRE;
         this.logConfig=new LogConfig();
         this.logger= LoggerFactory.getLogger(logConfig);
+        GLOBAL_LOGGER =this.logger;
         this.dataSource=DataSource.Other;
         this.scanPackages=DEFAULT_SCAN_PACKAGES;
     }
@@ -73,6 +75,7 @@ public class Config {
 
     public Config withLogger(Logger logger) {
         this.logger = logger;
+        GLOBAL_LOGGER =logger;
         return this;
     }
 

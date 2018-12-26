@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -155,7 +156,7 @@ public class DefaultContext implements Context,AutoScanner{
                         try {
                             field.set(e,val);
                         } catch (IllegalAccessException e1) {
-                            throw BaseRuntimeException.getException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Can't Set");
+                            throw BaseRuntimeException.getException(e1);
                         }
                     }
                 }else{
@@ -168,7 +169,7 @@ public class DefaultContext implements Context,AutoScanner{
                         try {
                             field.set(e,val);
                         } catch (IllegalAccessException e1) {
-                            throw BaseRuntimeException.getException("ICSContext Init Failed,Object["+e.toString()+"] Field["+field.getName()+"] Can't Set");
+                            throw BaseRuntimeException.getException(e1);
                         }
                     }
                 }
@@ -242,7 +243,7 @@ public class DefaultContext implements Context,AutoScanner{
                 Object obj= clazz.newInstance();
                 beanMap.put(name,obj);
             } catch (InstantiationException |IllegalAccessException e) {
-                throw BaseRuntimeException.getException("ICSContext Init Failed,Construct Component["+clazz.getName()+"] Failed");
+                throw BaseRuntimeException.getException(e);
             }
         }
     }
@@ -274,7 +275,7 @@ public class DefaultContext implements Context,AutoScanner{
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response) throws NoHandlerException{
-        RequestData requestData=new RequestData(request,response,config);
+        RequestData requestData=new RequestData(request,response,this);
         if(requestData.getSubPath()==null){
             throw new NoHandlerException(request.getRequestURI());
         }
@@ -321,6 +322,7 @@ public class DefaultContext implements Context,AutoScanner{
         }
         return this;
     }
+
 
 }
 

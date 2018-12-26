@@ -1,7 +1,10 @@
 package com.incarcloud.base.exception;
 
+import com.incarcloud.base.config.Config;
 import com.incarcloud.base.message.JsonMessage;
 import com.incarcloud.base.util.ExceptionUtil;
+
+import java.util.logging.Level;
 
 /**
  * 建造此异常类的目的:
@@ -34,15 +37,19 @@ public class BaseRuntimeException extends RuntimeException{
     }
 
     public static BaseRuntimeException getException(String message){
+        Config.GLOBAL_LOGGER.severe(message);
         return new BaseRuntimeException(message);
     }
     public static BaseRuntimeException getException(String message,String code){
+        Config.GLOBAL_LOGGER.severe(message);
         return new BaseRuntimeException(message,code);
     }
     public static BaseRuntimeException getException(Throwable e){
+        Config.GLOBAL_LOGGER.severe(ExceptionUtil.getStackTraceMessage(e));
         return new BaseRuntimeException(e);
     }
     public static BaseRuntimeException getException(Throwable e,String code){
+        Config.GLOBAL_LOGGER.severe(ExceptionUtil.getStackTraceMessage(e));
         return new BaseRuntimeException(e,code);
     }
 
