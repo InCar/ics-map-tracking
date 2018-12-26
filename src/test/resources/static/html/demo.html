@@ -13,16 +13,15 @@
 <script src="../../ics/static/maptracking/js/index.js">
 </script>
 <script>
-   var maptrack = new Maptrack({
+   let maptrack = new Maptrack({
         dom: "apiId",
         mapType: 'bmap',
-        mapTrack: false,
-        mapMointer: true,
+        mapTrack: true,
+        mapMointer: false,
         // config: {
         //     soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket'
         // }
     });
-     maptrack.init();
 
 </script>
 </body>
