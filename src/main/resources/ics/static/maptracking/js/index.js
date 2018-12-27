@@ -164,7 +164,6 @@
       initWebSocket(apiUrl);
       return ws;
   };
-
   // 通过class查找dom
   if(!('getElementsByClass' in HTMLElement)){
       HTMLElement.prototype.getElementsByClass = function(n){
@@ -200,13 +199,18 @@
                 trackApi: '',
                 trackParam: {pageNum: 1, pageSize: 10},
                 soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket',
-                vinCode: ''
+                vinCode: '',
+                iconUrl: '',
+                iconSize: [28, 28]
               }
           };
           this.def = extend(def,opt,true);
           this.hasDom = false;
+          this.Bmap = {},
+          this.Amap = {},
           this.listeners = []; //自定义事件，用于监听插件的用户交互
           this.handlers = {};
+          this.init();
       },
      setTrack: function(map, data) {
        let newData = [];
@@ -214,28 +218,40 @@
           let a = bd_encrypt(item);
           newData.push(new BMap.Point(a.lng, a.lat))
         })
+        // 创建起、终点
+        let startIcon = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/fox.gif", new BMap.Size(300,157));
+        let endIcon = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/fox.gif", new BMap.Size(300,157));
+        // let target = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/fox.gif", new BMap.Size(300,157));
+        map.addOverlay(new BMap.Marker(newData[0],{icon:startIcon})); // 创建点
+        map.addOverlay(new BMap.Marker(newData[newData.length - 1],{icon:endIcon})); // 创建点
+        let target = new BMap.Marker(newData[0])
+        map.addOverlay(target); // 创建点
          this.setPolyline(map, newData)
         map.centerAndZoom(newData[0], this.def.config.zoom)
       },
       setPolyline: function(map, lineData) {
-        map.addOverlay(new BMap.Polyline(lineData, {strokeColor:"blue", strokeWeight:5, strokeOpacity:1}));  //增加折线
+        map.addOverlay(new BMap.Polyline(lineData, {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8}));  //增加折线
       },
       //根据点信息实时更新地图显示范围，让轨迹完整显示。设置新的中心点和显示级别
       setZoom: function (map, bPoints) {
-      var view = map.getViewport(eval(bPoints));
-      // var mapZoom = view.zoom;
-      var centerPoint = view.center;
-      map.centerAndZoom(centerPoint, 16);
-    },
-      setMoniter: function(map, data) {
+        var view = map.getViewport(eval(bPoints));
+        // var mapZoom = view.zoom;
+        var centerPoint = view.center;
+        map.centerAndZoom(centerPoint, 16);
+      },
+      setMoniter: function(map, data, marker) {
          let newData = bd_encrypt(data)
          let point = new BMap.Point(newData.lng, newData.lat);
-         let marker = new BMap.Marker(point); // 创建点
-         map.addOverlay(marker);  // 标点
+         marker.setPosition(point); // 改变点的位置
+         marker.setRotation(data.direction); // 改变点的方向
          this.def.points.push(point);
          this.setZoom(map, this.def.points)
          this.setPolyline(map, this.def.points);
         // map.centerAndZoom(point, this.def.config.zoom)
+      },
+      creatDom () {
+        // let domId = document.getElementById(this.def.dom);
+        // let str = `<div>`
       },
       init: function() {
         if (!this.def.dom) return
@@ -243,55 +259,78 @@
           if (this.def.mapType === 'bmap') {  
             loadJScript().then(() => {
               let config = this.def.config
-              let map = new BMap.Map(this.def.dom)
+              let map = new BMap.Map(this.def.dom, {
+                enableMapClick: false
+              })
+              this.Bmap = map;
               let point = new BMap.Point(config.gps[0], config.gps[1])
               map.centerAndZoom(point, config.zoom)
               map.enableScrollWheelZoom(); 
               map.clearOverlays()
                   if (this.def.mapTrack) {  // 轨迹回放
-                  this.Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
-                    if (data.dataList.length)  this.setTrack(map, data.dataList)
+                  Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
+                    if (data.data.dataList.length)  this.setTrack(map, data.data.dataList)
                   }) 
                  } else if (this.def.mapMointer) {  // 监控点
+                  // let data = [
+                  //   {lat:30.4824,lng:114.397257, direction: 90},
+                  //   {lat:30.482563,lng:114.396676, direction: 30},
+                  //   {lat:30.482374,lng:114.395602, direction: 40},
+                  //   {lat:30.482343,lng:114.394226, direction: 20},
+                  //   {lat:30.482326,lng:114.393722, direction: 120},
+                  //   {lat:30.482331,lng:114.393278, direction: 150}
+                  // ]
+                  // let i = 0;
+                  let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.iconSize[0], config.iconSize[1]));
+                  let marker = null;
+                  if (config.iconUrl) marker = new BMap.Marker(point,{icon:icon}); // 创建点
+                  else marker = new BMap.Marker(point);
+                  map.addOverlay(marker);  // 标点
+                  // let circle = setInterval(() => {
+                  //   this.setMoniter(map, data[i], marker)
+                  //   i++
+                  //   if(i === data.length) clearInterval(circle)
+                  // }, 2000)
                   webSocket(config.soketUrl, {vinCode: config.vinCode}, (data) => {
-                   this.setMoniter(map, data)
+                   this.setMoniter(map, data, marker)
                   }) 
                  }
                 })
           }
         } else throw new Error('maptrack requires a mapType')
       },
-      Ajax: {
-        get: function(url, opt, fn) {
-          var xhr = new XMLHttpRequest();
-          url += '?' 
-         for(let key in opt) {
-           url += `${key}=${opt[key]}&`
-         }  
-          xhr.open('GET', url, true);
-          xhr.onreadystatechange = function() {
-            // readyState == 4说明请求已完成
-            if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) { 
-              // 从服务器获得数据 
-              fn.call(this, JSON.parse(xhr.responseText));  
-            }
-          };
-          xhr.send();
-        },
-        // datat应为'a=a1&b=b1'这种字符串格式，在jq里如果data为对象会自动将对象转成这种字符串格式
-        post: function (url, data, fn) {
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", url, true);
-          // 添加http头，发送信息至服务器时内容编码类型
-          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");  
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
-              fn.call(this, JSON.parse(xhr.responseText));
-            }
-          };
-          xhr.send(data);
+  }
+
+  var Ajax = {
+    get: function(url, opt, fn) {
+      var xhr = new XMLHttpRequest();
+      url += '?' 
+     for(let key in opt) {
+       url += `${key}=${opt[key]}&`
+     }  
+      xhr.open('GET', url, true);
+      xhr.onreadystatechange = function() {
+        // readyState == 4说明请求已完成
+        if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) { 
+          // 从服务器获得数据 
+          fn.call(this, JSON.parse(xhr.responseText));  
         }
-      }
+      };
+      xhr.send();
+    },
+    // datat应为'a=a1&b=b1'这种字符串格式，在jq里如果data为对象会自动将对象转成这种字符串格式
+    post: function (url, data, fn) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", url, true);
+      // 添加http头，发送信息至服务器时内容编码类型
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");  
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+          fn.call(this, JSON.parse(xhr.responseText));
+        }
+      };
+      xhr.send(data);
+    }
   }
 
   // 将插件对象暴露给全局对象

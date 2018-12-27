@@ -10,6 +10,7 @@ import com.incarcloud.base.request.RequestData;
 import com.incarcloud.base.util.ExceptionUtil;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 @ICSComponent
 @ICSConditionalOnMissingBean(ExceptionHandler.class)
@@ -19,6 +20,7 @@ public class DefaultExceptionHandler implements ExceptionHandler{
 
     @Override
     public void resolveException(RequestData requestData, Throwable throwable) {
+        Config.GLOBAL_LOGGER.severe(ExceptionUtil.getStackTraceMessage(throwable));
         requestData.getResponse().setCharacterEncoding(requestData.getContext().getConfig().getEncoding());
         try {
             if(!requestData.getResponse().isCommitted()){
@@ -29,7 +31,7 @@ public class DefaultExceptionHandler implements ExceptionHandler{
             }
         } catch (IOException e) {
             requestData.getResponse().setStatus(500);
-            Config.GLOBAL_LOGGER.throwing(DefaultExceptionHandler.class.getName(),"resolveException",throwable);
+            Config.GLOBAL_LOGGER.severe(ExceptionUtil.getStackTraceMessage(e));
         }
     }
 }
