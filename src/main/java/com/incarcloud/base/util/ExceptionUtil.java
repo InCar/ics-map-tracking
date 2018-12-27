@@ -50,7 +50,7 @@ public class ExceptionUtil {
     public static JsonMessage toJsonMessage(Throwable throwable){
         Throwable realException=parseRealException(throwable);
         if(realException instanceof BaseRuntimeException){
-            return JsonMessage.fail(realException.getMessage(),((BaseRuntimeException)realException).getCode(),getStackTraceMessage(realException));
+            return JsonMessage.fail(realException.getMessage(),((BaseRuntimeException)realException).getCode());
         }else {
             return JsonMessage.fail(realException.getMessage());
         }

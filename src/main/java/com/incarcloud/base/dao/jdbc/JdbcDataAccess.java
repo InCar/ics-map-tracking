@@ -3,6 +3,7 @@ package com.incarcloud.base.dao.jdbc;
 import com.incarcloud.base.anno.ICSComponent;
 import com.incarcloud.base.anno.ICSConditionalOnMissingBean;
 import com.incarcloud.base.anno.ICSDataSource;
+import com.incarcloud.base.config.Config;
 import com.incarcloud.base.config.DataSource;
 import com.incarcloud.base.config.JdbcConfig;
 import com.incarcloud.base.context.Context;
@@ -95,7 +96,9 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                 long t2=System.currentTimeMillis();
                 long diff=t2-t1;
                 if(diff>WARNING_SQL_TIME_MILLS){
-                    context.getConfig().getLogger().warning("Sql["+sql+"] Take "+diff);
+                    Config.GLOBAL_LOGGER.warning("Sql["+sql+"] Take "+diff);
+                }else{
+                    Config.GLOBAL_LOGGER.info("Sql["+sql+"] Take "+diff);
                 }
                 while(rs.next()){
                     T t= rowHandler.apply(rs);
@@ -123,7 +126,9 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                     long t2=System.currentTimeMillis();
                     long diff=t2-t1;
                     if(diff>WARNING_SQL_TIME_MILLS){
-                        context.getConfig().getLogger().warning("CountSql["+countSql+"] Take "+diff);
+                        Config.GLOBAL_LOGGER.warning("CountSql["+countSql+"] Take "+diff);
+                    }else{
+                        Config.GLOBAL_LOGGER.info("CountSql["+countSql+"] Take "+diff);
                     }
                     countRs.next();
                     count = countRs.getInt(1);
@@ -145,7 +150,9 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                         long t2=System.currentTimeMillis();
                         long diff=t2-t1;
                         if(diff>WARNING_SQL_TIME_MILLS){
-                            context.getConfig().getLogger().warning("Sql["+sql+"] Take "+diff);
+                            Config.GLOBAL_LOGGER.warning("Sql["+sql+"] Take "+diff);
+                        }else{
+                            Config.GLOBAL_LOGGER.info("Sql["+sql+"] Take "+diff);
                         }
                         List<T> dataList = new ArrayList<>();
                         while (rs.next()) {
