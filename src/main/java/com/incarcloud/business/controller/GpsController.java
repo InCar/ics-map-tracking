@@ -13,6 +13,7 @@ import com.incarcloud.business.data.GpsSplitSummary;
 import com.incarcloud.business.service.GpsService;
 import com.incarcloud.business.source.GpsSource;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -47,7 +48,12 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = false,value = "endTime")Date endTime,
             @ICSRequestParam(required = false,value = "order",defaultValue = "2")Integer order
             ){
-        return JsonMessage.success(gpsService.listSplit(vin, num, startTime, endTime,order));
+        List<List<GpsSource>> resultList= gpsService.listSplit(vin, num, startTime, endTime,order);
+        //6、如果是逆序,则需要倒转每一个数据集的内容
+        if(order==2){
+            resultList.forEach(e-> Collections.reverse(e));
+        }
+        return JsonMessage.success(resultList);
     }
 
     @ICSRequestMapping(value = "/listSplitSummary",method = ICSHttpRequestMethodEnum.GET)

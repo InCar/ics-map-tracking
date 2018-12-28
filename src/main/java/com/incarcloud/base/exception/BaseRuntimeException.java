@@ -37,12 +37,14 @@ public class BaseRuntimeException extends RuntimeException{
     }
 
     public static BaseRuntimeException getException(String message){
-        Config.GLOBAL_LOGGER.severe(message);
-        return new BaseRuntimeException(message);
+        BaseRuntimeException exception= new BaseRuntimeException(message);
+        Config.GLOBAL_LOGGER.severe(ExceptionUtil.getStackTraceMessage(exception));
+        return exception;
     }
     public static BaseRuntimeException getException(String message,String code){
-        Config.GLOBAL_LOGGER.severe(message);
-        return new BaseRuntimeException(message,code);
+        BaseRuntimeException exception= new BaseRuntimeException(message,code);
+        Config.GLOBAL_LOGGER.severe(ExceptionUtil.getStackTraceMessage(exception));
+        return exception;
     }
     public static BaseRuntimeException getException(Throwable e){
         Config.GLOBAL_LOGGER.severe(ExceptionUtil.getStackTraceMessage(e));
