@@ -10,17 +10,20 @@
 <div id="apiId" style="width:100%;height:100%;">
 </div>
 
-<script src="../../ics/static/maptracking/js/index.js">
+<script src="../../ics/static/maptracking/js/testbundle.js">
 </script>
 <script>
-   let maptrack = new Maptrack({
+   new Maptrack({
         dom: "apiId",
         mapType: 'bmap',
         mapTrack: true,
         mapMointer: false,
-        // config: {
-        //     soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket'
-        // }
+        config: {
+            // soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket'
+            trackControl: {
+                startButton: '开',
+            }
+        }
     });
 
 </script>

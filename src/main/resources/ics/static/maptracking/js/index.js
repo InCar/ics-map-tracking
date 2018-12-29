@@ -1,16 +1,18 @@
+ import "../css/index.scss";
 
 // plugin.js
 ;(function(undefined) {
   "use strict"
   var _global;
-
   // 工具函数
   // 对象合并
   function extend(o,n,override) {
       for(var key in n){
           if(n.hasOwnProperty(key) && (!o.hasOwnProperty(key) || override)){
             if (typeof n[key] !== "object") o[key]=n[key];
-            else Object.assign(o[key], n[key])
+            else {
+              extend(o[key],n[key],override)
+            }
           }
       }
       return o;
@@ -197,11 +199,24 @@
                 gps: [116.404, 39.915], // 经纬度
                 zoom: 16,                // 层级
                 trackApi: '',
-                trackParam: {pageNum: 1, pageSize: 10},
-                soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket',
+                trackParam: {pageNum: 1, pageSize: 100},
+                soketUrl: '',
                 vinCode: '',
                 iconUrl: '',
-                iconSize: [28, 28]
+                startIcon: "",
+                endIcon: "",
+                iconSize: [28, 28],
+                trackControl: {
+                  startButton: '开始',
+                  endButton: '暂停',
+                  stopButton: '停止',
+                  reduceButton: '减速',
+                  addButton: '加速',
+                  currentPoint: 0, // 记录当前坐标点index
+                  isPlay: false,
+                  markerIsStart: false,
+                  speed: '1.0',
+                }
               }
           };
           this.def = extend(def,opt,true);
@@ -210,24 +225,40 @@
           this.Amap = {},
           this.listeners = []; //自定义事件，用于监听插件的用户交互
           this.handlers = {};
+          this.newData = []; // 转换后的轨迹数据
           this.init();
+        //   Object.defineProperty(this.def, 'changeButton',{
+        //     get() {
+        //         console.log('get');
+        //         return this.startButton;
+        //     },
+        //     set(newVal)  {
+        //         console.log('set');
+        //          this.startButton = newVal;
+        //     }
+        //  })
       },
-     setTrack: function(map, data) {
-       let newData = [];
+     setTrack: function(map, data, config) {
         data.map(item => {
           let a = bd_encrypt(item);
-          newData.push(new BMap.Point(a.lng, a.lat))
+          this.newData.push(new BMap.Point(a.lng, a.lat))
         })
         // 创建起、终点
-        let startIcon = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/fox.gif", new BMap.Size(300,157));
-        let endIcon = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/fox.gif", new BMap.Size(300,157));
-        // let target = new BMap.Icon("http://lbsyun.baidu.com/jsdemo/img/fox.gif", new BMap.Size(300,157));
-        map.addOverlay(new BMap.Marker(newData[0],{icon:startIcon})); // 创建点
-        map.addOverlay(new BMap.Marker(newData[newData.length - 1],{icon:endIcon})); // 创建点
-        let target = new BMap.Marker(newData[0])
+        let startIcon = new BMap.Icon(config.startIcon, new BMap.Size(config.iconSize[0],config.iconSize[1]));
+        let endIcon = new BMap.Icon(config.endIcon, new BMap.Size(config.iconSize[0],config.iconSize[1]));
+        if(config.startIcon) map.addOverlay(new BMap.Marker(this.newData[0],{icon:startIcon})); // 创建点
+        else map.addOverlay(new BMap.Marker(this.newData[0]));
+        if(config.endIcon) map.addOverlay(new BMap.Marker(this.newData[this.newData.length - 1],{icon:endIcon}));
+        else map.addOverlay(new BMap.Marker(this.newData[this.newData.length - 1]));
+        // 目标点
+        let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.iconSize[0], config.iconSize[1]));
+        let target = null;
+        if (config.iconUrl) target = new BMap.Marker(this.newData[0],{icon:icon}); // 创建点
+        else target = new BMap.Marker(this.newData[0]);
         map.addOverlay(target); // 创建点
-         this.setPolyline(map, newData)
-        map.centerAndZoom(newData[0], this.def.config.zoom)
+         this.setPolyline(map, this.newData)
+         map.setViewport(this.newData);
+         this.creatDom(config, target)
       },
       setPolyline: function(map, lineData) {
         map.addOverlay(new BMap.Polyline(lineData, {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8}));  //增加折线
@@ -249,9 +280,83 @@
          this.setPolyline(map, this.def.points);
         // map.centerAndZoom(point, this.def.config.zoom)
       },
-      creatDom () {
-        // let domId = document.getElementById(this.def.dom);
-        // let str = `<div>`
+      creatDom (config, target) {
+         let domId = document.getElementById(this.def.dom);
+         let control = config.trackControl;
+         let str = `<ul class="trackControl clearfix">
+           <li>
+               <span class="play"></span>
+               <div class="tooltip">${control.startButton}</div>
+           </li>
+           <li class="stop">
+              <div class="tooltip">${control.stopButton}</div>
+           </li>
+           <li class="reduce">
+              <div class="tooltip">${control.reduceButton}</div>
+           </li>
+         <li class="noClick">
+           x
+           <span>${control.speed}</span>
+         </li>
+           <li class="add">
+               <div class="tooltip">${control.addButton}</div>
+           </li>
+       </ul>`
+       let div = document.createElement('div');
+      //  div.setAttribute('class', 'trackControl');
+       div.innerHTML = str;
+       domId.appendChild(div)
+       let trackControl = document.getElementsByClassName("trackControl")[0].children;
+       this.play(target, trackControl, control);
+        trackControl[1].onclick = function() {
+          control.markerIsStart = true;
+          control.isPlay = false;
+          control.currentPoint = 0;
+          trackControl[0].children[1].innerHTML = control.startButton
+          trackControl[0].children[0].className = 'play';
+        }
+        trackControl[4].onclick = function() {
+          if (control.speed >= 3.0) return;
+          control.speed = (+control.speed + 0.5).toFixed(1);
+          trackControl[3].children[0].innerText = control.speed
+        }
+        trackControl[2].onclick = function() {
+          if (control.speed <= 1.0) return;
+          control.speed = (+control.speed - 0.5).toFixed(1);
+          trackControl[3].children[0].innerText = control.speed
+        }
+      },
+      play: function(target, trackControl, control) {
+        let _this = this;
+        trackControl[0].onclick = function() {
+          control.isPlay = !control.isPlay;
+          if (!control.isPlay) {
+            this.children[1].innerHTML = control.startButton
+            this.children[0].className = 'play';
+          }
+          else {
+            this.children[1].innerHTML = control.endButton;
+            this.children[0].className = 'parse';
+          }
+          _this.resetMkPoint(target, control, control.currentPoint)
+        }
+      },
+      resetMkPoint: function(target, control, i) {
+        if (!control.isPlay) {
+          control.markerIsStart = true;
+          return;
+        }; // 停止播放
+        control.markerIsStart = false;
+        let time = 200 - (50 * control.speed);
+        target.setPosition(this.newData[i]);// 车辆位置
+        target.setRotation(this.newData[i].direction);// 车辆方向
+        if (i < this.newData.length - 1) {
+          setTimeout(() => {
+            i++;
+            this.resetMkPoint(target, control, i);
+          }, time);
+        }
+        control.currentPoint = i;
       },
       init: function() {
         if (!this.def.dom) return
@@ -269,7 +374,8 @@
               map.clearOverlays()
                   if (this.def.mapTrack) {  // 轨迹回放
                   Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
-                    if (data.data.dataList.length)  this.setTrack(map, data.data.dataList)
+                    console.log(data)
+                    if (data.data.dataList.length)  this.setTrack(map, data.data.dataList, config)
                   }) 
                  } else if (this.def.mapMointer) {  // 监控点
                   // let data = [
@@ -332,7 +438,25 @@
       xhr.send(data);
     }
   }
-
+  // 毫秒转年月日
+  const DateFormat = (str, fmt) => {
+    let o = {
+      'M+': str.getMonth() + 1,
+      'd+': str.getDate(),
+      'h+': str.getHours(),
+      'm+': str.getMinutes(),
+      's+': str.getSeconds(),
+      'q+': Math.floor((str.getMonth() + 3) / 3),
+      'S': str.getMilliseconds()
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (str.getFullYear() + '').substr(4 - RegExp.$1.length));
+    for (let k in o) {
+      if (new RegExp('(' + k + ')').test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)));
+      }
+    }
+    return fmt;
+  };
   // 将插件对象暴露给全局对象
   _global = (function(){ return this || (0, eval)('this'); }());
   if (typeof module !== "undefined" && module.exports) {
