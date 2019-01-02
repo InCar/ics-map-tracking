@@ -2,9 +2,9 @@ package com.incarcloud;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.incarcloud.base.anno.ICSComponent;
-import com.incarcloud.base.exception.BaseRuntimeException;
-import com.incarcloud.base.json.JsonReader;
+import com.incarcloud.skeleton.anno.ICSComponent;
+import com.incarcloud.skeleton.exception.BaseRuntimeException;
+import com.incarcloud.skeleton.json.JsonReader;
 
 @ICSComponent
 public class JacksonJsonReader implements JsonReader{
