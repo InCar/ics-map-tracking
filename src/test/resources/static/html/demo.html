@@ -9,14 +9,15 @@
 
 <div id="apiId" style="width:100%;height:100%;">
 </div>
-
+<!-- <div id="api" style="width:100%;height:50%;">
+</div> -->
 <script src="../../ics/static/maptracking/js/testbundle.js">
 </script>
 <script>
    let track = new Maptrack({
         dom: "apiId",
         mapType: 'bmap',
-        mapTrack: false,       // 是否开启轨迹
+        mapTrack: true,       // 是否开启轨迹
         mapMointer: false,   // 是否开启推送
         config: {
             // soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket'
@@ -25,6 +26,7 @@
             }
         }
     });
+    // 轨迹点击事件
     track.on("play", function(){
         console.log('you click play!');
     })
@@ -45,8 +47,9 @@
    // gps转高德坐标
    // track.GPS.translateToAmap({lat: 39.990912172420714, lng: 116.32715863448607})
     // 创建点
-        
-       track.init((BMap, map) => {
+    console.log(track)
+       track.init((BMap, map, data) => {
+           console.log(data)
         let data = {
             lat: 39.990912172420714,
             lng: 116.32715863448607
@@ -56,6 +59,30 @@
         let marker = new BMap.Marker(point);
         map.addOverlay(marker);  // 标点
        })
+
+// 加载多个地图
+    // let api = new Maptrack({
+    //     dom: "api",
+    //     mapType: 'bmap',
+    //     mapTrack: false,       // 是否开启轨迹
+    //     mapMointer: false,   // 是否开启推送
+    //     config: {
+    //         // soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket'
+    //         trackControl: {
+    //             startButton: '开',
+    //         }
+    //     }
+    // });
+    // api.init((BMap, map) => {
+    //     let data = {
+    //         lat: 39.990912172420714,
+    //         lng: 116.32715863448607
+    //     }
+    //      let newData = track.translateToBmap(data)
+    //     let point = new BMap.Point(newData.lng, newData.lat);
+    //     let marker = new BMap.Marker(point);
+    //     map.addOverlay(marker);  // 标点
+    //    })
 </script>
 </body>
 </html>

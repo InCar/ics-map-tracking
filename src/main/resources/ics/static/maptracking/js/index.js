@@ -59,12 +59,13 @@
               }
           };
           this.def = tool.extend(def,opt,true);
-          this.hasDom = false;
           this.Bmap = {},
           this.Amap = {},
           this.listeners = []; //自定义事件，用于监听插件的用户交互
           this.handlers = {};
           this.newData = []; // 转换后的轨迹数据
+          this.trackPoint = {}; // 原始轨迹数据
+          this.domId = document.getElementById(this.def.dom);
           // this.init();
 
         //   Object.defineProperty(this.def, 'changeButton',{
@@ -101,6 +102,7 @@
          this.setPolyline(map, this.newData)
          map.setViewport(this.newData);
          this.creatDom(config, target)
+         this.creatBorder(config, target)
       },
       setPolyline: function(map, lineData) {
         map.addOverlay(new BMap.Polyline(lineData, {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8}));  //增加折线
@@ -123,77 +125,95 @@
         // map.centerAndZoom(point, this.def.config.zoom)
       },
       creatDom: function(config, target) {
-         let domId = document.getElementById(this.def.dom);
-         let control = config.trackControl;
-         let str = `<ul class="trackControl clearfix">
-           <li>
-               <span class="play"></span>
-               <div class="tooltip">${control.startButton}</div>
-           </li>
-           <li class="stop">
-              <div class="tooltip">${control.stopButton}</div>
-           </li>
-           <li class="reduce">
-              <div class="tooltip">${control.reduceButton}</div>
-           </li>
-         <li class="noClick">
-           x
-           <span>${control.speed}</span>
-         </li>
-           <li class="add">
-               <div class="tooltip">${control.addButton}</div>
-           </li>
-       </ul>`
-       let div = document.createElement('div');
-      //  div.setAttribute('class', 'trackControl');
-       div.innerHTML = str;
-       domId.appendChild(div)
-       let trackControl = document.getElementsByClassName("trackControl")[0].children;
-       let _this = this;
-       trackControl[0].onclick = function() {
-         control.isPlay = !control.isPlay;
-         if (!control.isPlay) {
-           this.children[1].innerHTML = control.startButton
-           this.children[0].className = 'play';
-           if(_this.listeners.indexOf('pause') > -1) {
-             _this.emit({type:'pause',target: this})
-         }
-         }
-         else {
-           this.children[1].innerHTML = control.endButton;
-           this.children[0].className = 'parse';
-           if(_this.listeners.indexOf('play') > -1) {
-             _this.emit({type:'play',target: this})
-         }
-         }
-         _this.resetMkPoint(target, control, control.currentPoint)
+        let control = config.trackControl;
+        let str = `<ul class="trackControl clearfix">
+          <li>
+              <span class="play"></span>
+              <div class="tooltip">${control.startButton}</div>
+          </li>
+          <li class="stop">
+             <div class="tooltip">${control.stopButton}</div>
+          </li>
+          <li class="reduce">
+             <div class="tooltip">${control.reduceButton}</div>
+          </li>
+        <li class="noClick">
+          x
+          <span>${control.speed}</span>
+        </li>
+          <li class="add">
+              <div class="tooltip">${control.addButton}</div>
+          </li>
+      </ul>`
+      let div = document.createElement('div');
+     //  div.setAttribute('class', 'trackControl');
+      div.innerHTML = str;
+      this.domId.appendChild(div)
+      let trackControl = document.getElementsByClassName("trackControl")[0].children;
+      let _this = this;
+      trackControl[0].onclick = function() {
+        control.isPlay = !control.isPlay;
+        if (!control.isPlay) {
+          this.children[1].innerHTML = control.startButton
+          this.children[0].className = 'play';
+          if(_this.listeners.indexOf('pause') > -1) {
+            _this.emit({type:'pause',target: this})
+        }
+        }
+        else {
+          this.children[1].innerHTML = control.endButton;
+          this.children[0].className = 'parse';
+          if(_this.listeners.indexOf('play') > -1) {
+            _this.emit({type:'play',target: this})
+        }
+        }
+        _this.resetMkPoint(target, control, control.currentPoint)
+      }
+       trackControl[1].onclick = function() {
+         control.markerIsStart = true;
+         control.isPlay = false;
+         control.currentPoint = 0;
+         trackControl[0].children[1].innerHTML = control.startButton
+         trackControl[0].children[0].className = 'play';
+         if(_this.listeners.indexOf('stop') > -1) {
+           _this.emit({type:'stop',target: this})
        }
-        trackControl[1].onclick = function() {
-          control.markerIsStart = true;
-          control.isPlay = false;
-          control.currentPoint = 0;
-          trackControl[0].children[1].innerHTML = control.startButton
-          trackControl[0].children[0].className = 'play';
-          if(_this.listeners.indexOf('stop') > -1) {
-            _this.emit({type:'stop',target: this})
-        }
-        }
-        trackControl[4].onclick = function() {
-          if (control.speed >= 3.0) return;
-          control.speed = (+control.speed + 0.5).toFixed(1);
-          trackControl[3].children[0].innerText = control.speed
-          if(_this.listeners.indexOf('add') > -1) {
-            _this.emit({type:'add',target: this})
-        }
-        }
-        trackControl[2].onclick = function() {
-          if (control.speed <= 1.0) return;
-          control.speed = (+control.speed - 0.5).toFixed(1);
-          trackControl[3].children[0].innerText = control.speed
-          if(_this.listeners.indexOf('reduce') > -1) {
-            _this.emit({type:'reduce',target: this})
-        }
-        }
+       }
+       trackControl[4].onclick = function() {
+         if (control.speed >= 3.0) return;
+         control.speed = (+control.speed + 0.5).toFixed(1);
+         trackControl[3].children[0].innerText = control.speed
+         if(_this.listeners.indexOf('add') > -1) {
+           _this.emit({type:'add',target: this})
+       }
+       }
+       trackControl[2].onclick = function() {
+         if (control.speed <= 1.0) return;
+         control.speed = (+control.speed - 0.5).toFixed(1);
+         trackControl[3].children[0].innerText = control.speed
+         if(_this.listeners.indexOf('reduce') > -1) {
+           _this.emit({type:'reduce',target: this})
+       }
+       }
+     },
+      creatBorder: function(config, target) {
+         let control = config.trackControl;
+         let str = `
+         <p style="font-size:16px;color:#000000;">轨迹信息</p>
+         <p>VIN码：ewq</p>
+         <p>速度：34 km/h</p>
+         <p>时间：32</p>
+         <div>
+               <span>{{item.first.split(' ')[0]}}</span>
+               <span class="circleSpan" >{{item.first.split(' ')[1]}}</span> -
+               <span>{{item.last}}</span>
+           <span style="margin-top:5px;color:blue;font-size:12px;cursor:pointer">重置</span>
+         </div>
+         `
+       let div = document.createElement('div');
+       div.setAttribute('class', 'trackBorder');
+       div.innerHTML = str;
+       this.domId.appendChild(div)
       },
       on: function(type, handler){
         // type: play, pause, stop, add, reduce
@@ -304,6 +324,7 @@
           if (this.def.mapType === 'bmap') {  
             tool.loadJScript().then(() => {
               let config = this.def.config
+              let trackPoint = null;
               let map = new BMap.Map(this.def.dom, {
                 enableMapClick: false
               })
@@ -315,6 +336,7 @@
               map.clearOverlays()
               if (this.def.mapTrack) {  // 轨迹回放
                 tool.Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
+                  trackPoint = data;
                   if (data.data && data.data.dataList.length)  this.setTrack(map, data.data.dataList, config)
                 }) 
               } else if (this.def.mapMointer) {  // 监控点
@@ -342,7 +364,7 @@
                 this.setMoniter(map, data, marker)
               }) 
               }
-              return fn(BMap, map);
+              return fn(BMap, map, trackPoint);
             })
           }
         } else throw new Error('maptrack requires a mapType')
