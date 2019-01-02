@@ -1,4 +1,4 @@
-package com.incarcloud.business.data;
+package com.incarcloud.maptracking.data;
 
 import java.util.Date;
 

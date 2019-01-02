@@ -1,17 +1,17 @@
-package com.incarcloud.business.controller;
+package com.incarcloud.maptracking.controller;
 
-import com.incarcloud.base.anno.ICSAutowire;
-import com.incarcloud.base.anno.ICSController;
-import com.incarcloud.base.anno.ICSRequestMapping;
-import com.incarcloud.base.anno.ICSRequestParam;
-import com.incarcloud.base.handler.dynamicrequest.component.BaseComponent;
-import com.incarcloud.base.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
-import com.incarcloud.base.message.JsonMessage;
-import com.incarcloud.base.page.Page;
-import com.incarcloud.base.page.PageResult;
-import com.incarcloud.business.data.GpsSplitSummary;
-import com.incarcloud.business.service.GpsService;
-import com.incarcloud.business.source.GpsSource;
+import com.incarcloud.skeleton.anno.ICSAutowire;
+import com.incarcloud.skeleton.anno.ICSController;
+import com.incarcloud.skeleton.anno.ICSRequestMapping;
+import com.incarcloud.skeleton.anno.ICSRequestParam;
+import com.incarcloud.skeleton.handler.dynamicrequest.component.BaseComponent;
+import com.incarcloud.skeleton.handler.dynamicrequest.define.ICSHttpRequestMethodEnum;
+import com.incarcloud.skeleton.message.JsonMessage;
+import com.incarcloud.skeleton.page.Page;
+import com.incarcloud.skeleton.page.PageResult;
+import com.incarcloud.maptracking.data.GpsSplitSummary;
+import com.incarcloud.maptracking.service.GpsService;
+import com.incarcloud.maptracking.source.GpsSource;
 
 import java.util.Collections;
 import java.util.Date;

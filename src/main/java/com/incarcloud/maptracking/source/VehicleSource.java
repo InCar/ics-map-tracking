@@ -1,4 +1,4 @@
-package com.incarcloud.business.source;
+package com.incarcloud.maptracking.source;
 
 public class VehicleSource {
     protected String vin;

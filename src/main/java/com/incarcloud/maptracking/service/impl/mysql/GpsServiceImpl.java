@@ -1,20 +1,21 @@
-package com.incarcloud.business.service.impl.mysql;
+package com.incarcloud.maptracking.service.impl.mysql;
 
-import com.incarcloud.base.anno.ICSAutowire;
-import com.incarcloud.base.config.DataSource;
-import com.incarcloud.base.dao.jdbc.JdbcDataAccess;
-import com.incarcloud.base.dao.jdbc.RowHandler;
-import com.incarcloud.base.anno.ICSComponent;
-import com.incarcloud.base.anno.ICSDataSource;
-import com.incarcloud.base.dao.jdbc.sql.SqlListResult;
-import com.incarcloud.base.dao.jdbc.sql.SqlUtil;
-import com.incarcloud.base.exception.BaseRuntimeException;
-import com.incarcloud.base.handler.dynamicrequest.component.BaseComponent;
-import com.incarcloud.base.page.Page;
-import com.incarcloud.base.page.PageResult;
-import com.incarcloud.business.data.GpsSplitSummary;
-import com.incarcloud.business.service.GpsService;
-import com.incarcloud.business.source.GpsSource;
+import com.incarcloud.skeleton.anno.ICSAutowire;
+import com.incarcloud.skeleton.config.DataSource;
+import com.incarcloud.skeleton.dao.jdbc.JdbcDataAccess;
+import com.incarcloud.skeleton.dao.jdbc.RowHandler;
+import com.incarcloud.skeleton.anno.ICSComponent;
+import com.incarcloud.skeleton.anno.ICSDataSource;
+import com.incarcloud.skeleton.dao.jdbc.sql.SqlListResult;
+import com.incarcloud.skeleton.dao.jdbc.sql.SqlUtil;
+import com.incarcloud.skeleton.exception.BaseRuntimeException;
+import com.incarcloud.skeleton.handler.dynamicrequest.component.BaseComponent;
+import com.incarcloud.skeleton.page.Page;
+import com.incarcloud.skeleton.page.PageResult;
+import com.incarcloud.maptracking.data.GpsSplitSummary;
+import com.incarcloud.maptracking.service.GpsService;
+import com.incarcloud.maptracking.source.GpsSource;
+import com.incarcloud.skeleton.anno.ICSDataSource;
 
 import java.util.*;
 

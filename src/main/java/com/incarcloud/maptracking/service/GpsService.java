@@ -1,9 +1,9 @@
-package com.incarcloud.business.service;
+package com.incarcloud.maptracking.service;
 
-import com.incarcloud.base.page.Page;
-import com.incarcloud.base.page.PageResult;
-import com.incarcloud.business.data.GpsSplitSummary;
-import com.incarcloud.business.source.GpsSource;
+import com.incarcloud.skeleton.page.Page;
+import com.incarcloud.skeleton.page.PageResult;
+import com.incarcloud.maptracking.data.GpsSplitSummary;
+import com.incarcloud.maptracking.source.GpsSource;
 
 import java.util.ArrayList;
 import java.util.Date;
