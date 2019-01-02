@@ -23,7 +23,7 @@ import java.util.*;
 @ICSComponent
 public class GpsServiceImpl extends BaseComponent implements GpsService {
     public static long GPS_SPLIT_TIME_MILLS=1000*60*10;
-    public static long EVERY_FETCH_DATA_NUM=300000;
+    public static long EVERY_FETCH_DATA_NUM=100000;
 
     @ICSAutowire
     JdbcDataAccess dataAccess;
