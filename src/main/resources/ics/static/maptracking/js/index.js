@@ -65,7 +65,6 @@
           this.listeners = []; //自定义事件，用于监听插件的用户交互
           this.handlers = {};
           this.newData = []; // 转换后的轨迹数据
-          // this.creatPoint = function () {};
           // this.init();
 
         //   Object.defineProperty(this.def, 'changeButton',{
@@ -234,25 +233,6 @@
           }, time);
         }
         control.currentPoint = i;
-      },
-      creatPoint: function(fn) {
-        if (!BMap) return
-        let a = Promise.resolve(BMap._preloader)
-        a.then(() => {
-          return fn()
-          // let newData = translateToBmap(data)
-          // let point = new BMap.Point(newData.lng, newData.lat);
-          // let marker = null;
-          // if (data.iconUrl) {
-          //   let icon = new BMap.Icon(data.iconUrl, new BMap.Size(data.iconSize[0], data.iconSize[1]));
-          //   marker = new BMap.Marker(point,{icon:icon}); // 创建点
-          // } else marker = new BMap.Marker(point);
-          // console.log(this.Bmap)
-          // console.log(marker)
-          // console.log(BMap)
-          // this.Bmap.addOverlay(marker);  // 标点
-        })
-         
       },
        //将 GCJ-02 坐标转换成 BD-09 坐标  
        translateToBmap: function (point) {
