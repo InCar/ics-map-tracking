@@ -38,7 +38,7 @@
                 gps: [116.404, 39.915], // 经纬度
                 zoom: 16,                // 层级
                 trackApi: '',
-                trackParam: {pageNum: 1, pageSize: 100},
+                trackParam: {startTime: 1539108841000, endTime: 1539108541000},
                 soketUrl: '',
                 vinCode: '',
                 iconUrl: '',
@@ -109,17 +109,18 @@
       //根据点信息实时更新地图显示范围，让轨迹完整显示。设置新的中心点和显示级别
       setZoom: function (map, bPoints) {
         var view = map.getViewport(eval(bPoints));
-        // var mapZoom = view.zoom;
+        var mapZoom = view.zoom;
         var centerPoint = view.center;
-        map.centerAndZoom(centerPoint, 16);
+        map.centerAndZoom(centerPoint, mapZoom);
       },
       setMoniter: function(map, data, marker) {
          let newData = this.translateToBmap(data)
          let point = new BMap.Point(newData.lng, newData.lat);
          marker.setPosition(point); // 改变点的位置
          marker.setRotation(data.direction); // 改变点的方向
-         this.def.points.push(point);
-         this.setZoom(map, this.def.points)
+          this.def.points.push(point);
+        //  this.setZoom(map, this.def.points)
+        map.setViewport(this.def.points);
          this.setPolyline(map, this.def.points);
         // map.centerAndZoom(point, this.def.config.zoom)
       },
@@ -335,8 +336,9 @@
               map.clearOverlays()
               if (this.def.mapTrack) {  // 轨迹回放
                 tool.Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
-                  this.trackPoint = data;
-                  if (data.data && data.data.dataList.length)  this.setTrack(map, data.data.dataList, config)
+                  if (!data.data || !data.data.dataList.length)  return;
+                    this.trackPoint = data;
+                    this.setTrack(map, data.data.dataList, config)
                 }) 
               } else if (this.def.mapMointer) {  // 监控点
               // let data = [
