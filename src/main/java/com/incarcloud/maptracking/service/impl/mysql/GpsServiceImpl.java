@@ -15,7 +15,6 @@ import com.incarcloud.skeleton.page.PageResult;
 import com.incarcloud.maptracking.data.GpsSplitSummary;
 import com.incarcloud.maptracking.service.GpsService;
 import com.incarcloud.maptracking.source.GpsSource;
-import com.incarcloud.skeleton.anno.ICSDataSource;
 
 import java.util.*;
 
@@ -43,18 +42,15 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
     public List<GpsSource> listByVin(String vin,Date startTime, Date endTime) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         String sql="select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=?";
-        SqlListResult sqlListResult= SqlUtil.replaceNull(sql,Arrays.asList(vin,startTime,endTime));
-        return dataAccess.list(sqlListResult.getSql(),rowHandler,sqlListResult.getParamList().toArray());
+        return dataAccess.list(sql,rowHandler,vin,startTime,endTime);
     }
 
     @Override
     public PageResult<GpsSource> pageByVin(String vin,Date startTime, Date endTime, Page page) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
-        String sql="select vin,lng,lat,direction,time from t_gps where vin=? limit ?,?";
         String countSql="select count(*) as num from t_gps where vin=? and time>=? and time <=?";
-        SqlListResult sqlListResult1= SqlUtil.replaceNull(countSql,Arrays.asList(vin,startTime,endTime));
-        SqlListResult sqlListResult2= SqlUtil.replaceNull(sql,Arrays.asList(vin,startTime,endTime));
-        return dataAccess.page(sqlListResult1.getSql(),sqlListResult2.getSql(),rowHandler,page,sqlListResult1.getParamList().toArray());
+        String sql="select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=? limit ?,?";
+        return dataAccess.page(countSql,sql,rowHandler,page,vin,startTime,endTime);
     }
 
 
@@ -77,9 +73,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
             beginIndex=beginIndex<0?0:beginIndex;
             //2、添加每次查询结果到总结果集中
             SqlListResult sqlListResult= SqlUtil.replaceNull(sql.toString(),Arrays.asList(vin,startTime,endTime));
-            sqlListResult.getParamList().add(count*EVERY_FETCH_DATA_NUM);
-            sqlListResult.getParamList().add(EVERY_FETCH_DATA_NUM);
-            List<GpsSource> curDataList=dataAccess.list(sqlListResult.getSql(),rowHandler,sqlListResult.getParamList().toArray());
+            List<GpsSource> curDataList=dataAccess.list(sqlListResult.getSql(),rowHandler,vin,startTime,endTime,count*EVERY_FETCH_DATA_NUM,EVERY_FETCH_DATA_NUM);
             dataList.addAll(curDataList);
             count++;
             //3、循环合并后的结果集,依次检测相邻的元素的时间差,如果大于设置时间差,则算作一段轨迹
@@ -151,10 +145,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
             int beginIndex=dataList.size()-1;
             beginIndex=beginIndex<0?0:beginIndex;
             //2、添加每次查询结果到总结果集中
-            SqlListResult sqlListResult= SqlUtil.replaceNull(sql.toString(),Arrays.asList(vin,startTime,endTime));
-            sqlListResult.getParamList().add(count*EVERY_FETCH_DATA_NUM);
-            sqlListResult.getParamList().add(EVERY_FETCH_DATA_NUM);
-            List<GpsSource> curDataList=dataAccess.list(sqlListResult.getSql(),rs->{
+            List<GpsSource> curDataList=dataAccess.list(sql.toString(),rs->{
                 GpsSource gpsSource=new GpsSource();
                 Double lng=rs.getDouble("lng");
                 Double lat=rs.getDouble("lat");
@@ -163,7 +154,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
                 gpsSource.setLat(lat);
                 gpsSource.setTime(time);
                 return gpsSource;
-            },sqlListResult.getParamList().toArray());
+            },vin,startTime,endTime,count*EVERY_FETCH_DATA_NUM,EVERY_FETCH_DATA_NUM);
             dataList.addAll(curDataList);
             count++;
             //3、循环合并后的结果集,依次检测相邻的元素的时间差,如果大于设置时间差,则算作一段轨迹
