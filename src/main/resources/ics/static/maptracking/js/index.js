@@ -65,6 +65,7 @@
           this.handlers = {};
           this.newData = []; // 转换后的轨迹数据
           this.trackPoint = {}; // 原始轨迹数据
+          this.currentData = {}; // 当前轨迹数据
           this.domId = document.getElementById(this.def.dom);
           // this.init();
 
@@ -201,7 +202,7 @@
          let str = `
          <p style="font-size:16px;color:#000000;">轨迹信息</p>
          <p>VIN码：ewq</p>
-         <p>速度：34 km/h</p>
+         <p>速度：${this.currentData.direction} km/h</p>
          <p>时间：32</p>
          <div>
                <span>{{item.first.split(' ')[0]}}</span>
@@ -244,12 +245,14 @@
         }; // 停止播放
         control.markerIsStart = false;
         let time = 200 - (50 * control.speed);
+        let dataList = this.trackPoint.data.dataList;
         target.setPosition(this.newData[i]);// 车辆位置
-        target.setRotation(this.newData[i].direction);// 车辆方向
+        target.setRotation(dataList[i].direction);// 车辆方向
         if (i < this.newData.length - 1) {
           setTimeout(() => {
             i++;
             this.resetMkPoint(target, control, i);
+            this.currentData = dataList[i];
           }, time);
         }
         control.currentPoint = i;
@@ -324,7 +327,6 @@
           if (this.def.mapType === 'bmap') {  
             tool.loadJScript().then(() => {
               let config = this.def.config
-              let trackPoint = null;
               let map = new BMap.Map(this.def.dom, {
                 enableMapClick: false
               })
@@ -336,7 +338,7 @@
               map.clearOverlays()
               if (this.def.mapTrack) {  // 轨迹回放
                 tool.Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
-                  trackPoint = data;
+                  this.trackPoint = data;
                   if (data.data && data.data.dataList.length)  this.setTrack(map, data.data.dataList, config)
                 }) 
               } else if (this.def.mapMointer) {  // 监控点
@@ -364,7 +366,7 @@
                 this.setMoniter(map, data, marker)
               }) 
               }
-              return fn(BMap, map, trackPoint);
+              return fn(BMap, map);
             })
           }
         } else throw new Error('maptrack requires a mapType')
