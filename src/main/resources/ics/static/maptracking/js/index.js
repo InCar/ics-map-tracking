@@ -67,8 +67,6 @@
           this.trackPoint = {}; // 原始轨迹数据
           this.currentData = {}; // 当前轨迹数据
           this.domId = document.getElementById(this.def.dom);
-          // this.init();
-
         //   Object.defineProperty(this.def, 'changeButton',{
         //     get() {
         //         console.log('get');
@@ -205,10 +203,9 @@
          <p>速度：${this.currentData.direction} km/h</p>
          <p>时间：32</p>
          <div>
-               <span>{{item.first.split(' ')[0]}}</span>
-               <span class="circleSpan" >{{item.first.split(' ')[1]}}</span> -
-               <span>{{item.last}}</span>
-           <span style="margin-top:5px;color:blue;font-size:12px;cursor:pointer">重置</span>
+               <span>大萨达</span>
+               <span class="circleSpan" >大萨达撒</span>
+               <span>大萨达撒</span>
          </div>
          `
        let div = document.createElement('div');
