@@ -394,7 +394,7 @@
               //   if(i === data.length) clearInterval(circle)
               // }, 2000)
               tool.webSocket(config.soketUrl, {vinCode: config.vinCode}, (data) => {
-                this.setMoniter(map, data, marker)
+                this.setMoniter(data, marker)
               }) 
               }
               return fn(BMap, map);
