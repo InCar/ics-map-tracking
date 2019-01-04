@@ -4,21 +4,6 @@
 ;(function(undefined) {
   "use strict"
   var _global;
- 
-  // 通过class查找dom
-  if(!('getElementsByClass' in HTMLElement)){
-      HTMLElement.prototype.getElementsByClass = function(n){
-          var el = [],
-              _el = this.getElementsByTagName('*');
-          for (var i=0; i<_el.length; i++ ) {
-              if (!!_el[i].className && (typeof _el[i].className == 'string') && _el[i].className.indexOf(n) > -1 ) {
-                  el[el.length] = _el[i];
-              }
-          }
-          return el;
-      };
-      ((typeof HTMLDocument !== 'undefined') ? HTMLDocument : Document).prototype.getElementsByClass = HTMLElement.prototype.getElementsByClass;
-  }
 
   // 构造函数 - 返回数组结构
   function Maptrack(opt){
@@ -31,21 +16,23 @@
           var def = {
             mapType: '',
               dom: '',
-              mapTrack: false,
-              mapMointer: false,
+              mapTrack: false,       // 是否开启轨迹
+              splitTrack: false,       // 是否开启分段轨迹
+              mapMointer: false,   // 是否开启推送
               points: [], // 监控点
               config: {
-                gps: [116.404, 39.915], // 经纬度
-                zoom: 16,                // 层级
-                trackApi: '',
-                trackParam: {startTime: 1539108841000, endTime: 1539108541000},
-                soketUrl: '',
-                vinCode: '',
-                iconUrl: '',
-                startIcon: "",
-                endIcon: "",
-                iconSize: [28, 28],
-                trackControl: {
+                gps: [116.404, 39.915], // 初始化地图经纬度
+                zoom: 16,                // 初始化地图层级
+                trackApi: '',           // 自定义路径
+                trackParam: {startTime: 1539108541000, endTime: 1539109463000, vin: "LVGEN56A4JG247290"},  // 轨迹参数
+                splitTrackParam: {vin: "LVGEN56A4JG247290"},  // 分段轨迹参数
+                soketUrl: '',   // 推送地址
+                vinCode: '',     // 推送vin码
+                iconUrl: '',    // 车辆图标
+                startIcon: "",  // 轨迹开始图标
+                endIcon: "",    // 轨迹结束图标
+                iconSize: [28, 28],  // 图标尺寸，默认28
+                trackControl: {     // 轨迹按钮自定义
                   startButton: '开始',
                   endButton: '暂停',
                   stopButton: '停止',
@@ -78,7 +65,9 @@
         //     }
         //  })
       },
-     setTrack: function(map, data, config) {
+     setTrack: function(data, timeLine, isClicktimeLine) {
+       let config = this.def.config;
+       this.newData = [];   // 重绘轨迹清除之前的轨迹
         data.map(item => {
           let a = this.translateToBmap(item);
           this.newData.push(new BMap.Point(a.lng, a.lat))
@@ -86,45 +75,47 @@
         // 创建起、终点
         let startIcon = new BMap.Icon(config.startIcon, new BMap.Size(config.iconSize[0],config.iconSize[1]));
         let endIcon = new BMap.Icon(config.endIcon, new BMap.Size(config.iconSize[0],config.iconSize[1]));
-        if(config.startIcon) map.addOverlay(new BMap.Marker(this.newData[0],{icon:startIcon})); // 创建点
-        else map.addOverlay(new BMap.Marker(this.newData[0]));
-        if(config.endIcon) map.addOverlay(new BMap.Marker(this.newData[this.newData.length - 1],{icon:endIcon}));
-        else map.addOverlay(new BMap.Marker(this.newData[this.newData.length - 1]));
+        if(config.startIcon) this.Bmap.addOverlay(new BMap.Marker(this.newData[0],{icon:startIcon})); // 创建点
+        else this.Bmap.addOverlay(new BMap.Marker(this.newData[0]));
+        if(config.endIcon) this.Bmap.addOverlay(new BMap.Marker(this.newData[this.newData.length - 1],{icon:endIcon}));
+        else this.Bmap.addOverlay(new BMap.Marker(this.newData[this.newData.length - 1]));
         // 目标点
         let target = null;
         if (config.iconUrl) {
           let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.iconSize[0], config.iconSize[1]));
           target = new BMap.Marker(this.newData[0],{icon:icon}); // 创建点
-        }
-        else target = new BMap.Marker(this.newData[0]);
-        map.addOverlay(target); // 创建点
-         this.setPolyline(map, this.newData)
-         map.setViewport(this.newData);
-         this.creatDom(config, target)
-         this.creatBorder(config, target)
+        } else target = new BMap.Marker(this.newData[0]);
+        this.Bmap.addOverlay(target); // 创建点
+         this.setPolyline(this.newData)
+         this.Bmap.setViewport(this.newData);
+         if (!isClicktimeLine) {  // 点击分段时间线不重绘
+          this.creatDom(config, target)
+          this.creatBorder(data, timeLine)
+         }
+          this.trackControl(target, config.trackControl)
       },
-      setPolyline: function(map, lineData) {
-        map.addOverlay(new BMap.Polyline(lineData, {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8}));  //增加折线
+      setPolyline: function(lineData) {
+        this.Bmap.addOverlay(new BMap.Polyline(lineData, {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8}));  //增加折线
       },
       //根据点信息实时更新地图显示范围，让轨迹完整显示。设置新的中心点和显示级别
-      setZoom: function (map, bPoints) {
-        var view = map.getViewport(eval(bPoints));
+      setZoom: function (bPoints) {
+        var view = this.Bmap.getViewport(eval(bPoints));
         var mapZoom = view.zoom;
         var centerPoint = view.center;
-        map.centerAndZoom(centerPoint, mapZoom);
+        this.Bmap.centerAndZoom(centerPoint, mapZoom);
       },
-      setMoniter: function(map, data, marker) {
+      setMoniter: function(data, marker) {
          let newData = this.translateToBmap(data)
          let point = new BMap.Point(newData.lng, newData.lat);
          marker.setPosition(point); // 改变点的位置
          marker.setRotation(data.direction); // 改变点的方向
           this.def.points.push(point);
         //  this.setZoom(map, this.def.points)
-        map.setViewport(this.def.points);
-         this.setPolyline(map, this.def.points);
+        this.Bmap.setViewport(this.def.points);
+         this.setPolyline(this.def.points);
         // map.centerAndZoom(point, this.def.config.zoom)
       },
-      creatDom: function(config, target) {
+      creatDom: function(config) {
         let control = config.trackControl;
         let str = `<ul class="trackControl clearfix">
           <li>
@@ -148,8 +139,10 @@
       let div = document.createElement('div');
      //  div.setAttribute('class', 'trackControl');
       div.innerHTML = str;
-      this.domId.appendChild(div)
-      let trackControl = document.getElementsByClassName("trackControl")[0].children;
+      this.domId.appendChild(div);
+     },
+     trackControl: function(target, control) {
+      let trackControl = document.querySelectorAll(".trackControl li");
       let _this = this;
       trackControl[0].onclick = function() {
         control.isPlay = !control.isPlay;
@@ -172,7 +165,7 @@
        trackControl[1].onclick = function() {
          control.markerIsStart = true;
          control.isPlay = false;
-         control.currentPoint = 0;
+         control.currentPoint = 0; // 重置点为新轨迹第一个点
          trackControl[0].children[1].innerHTML = control.startButton
          trackControl[0].children[0].className = 'play';
          if(_this.listeners.indexOf('stop') > -1) {
@@ -196,23 +189,46 @@
        }
        }
      },
-      creatBorder: function(config, target) {
-         let control = config.trackControl;
+      creatBorder: function(data, timeLine) {
+      //   console.log(data)    // <p>速度：${data[0].speed} km/h</p>
+        let firstTime = tool.DateFormat(new Date(data[0].time), 'yyyy-MM-dd hh:mm:ss')
          let str = `
-         <p style="font-size:16px;color:#000000;">轨迹信息</p>
-         <p>VIN码：ewq</p>
-         <p>速度：${this.currentData.direction} km/h</p>
-         <p>时间：32</p>
-         <div>
-               <span>大萨达</span>
-               <span class="circleSpan" >大萨达撒</span>
-               <span>大萨达撒</span>
-         </div>
+          <p class="head">轨迹信息</p>
+          <div class="body">
+              <p>VIN码：${data[0].vin}</p>
+              <p >时间：<span class="trackTime">${firstTime}</span></p>
+              <div class="timeLine">
+              </div>
+          </div>
          `
        let div = document.createElement('div');
        div.setAttribute('class', 'trackBorder');
        div.innerHTML = str;
        this.domId.appendChild(div)
+       if (timeLine) {
+         let timeStr = '';
+        timeLine.map(item => {
+          timeStr += `<p>
+          ${tool.DateFormat(new Date(item.startTime), 'hh:mm:ss')} -
+          ${tool.DateFormat(new Date(item.endTime), 'hh:mm:ss')}
+          </p>`
+        })
+          let timeLineDom =  document.querySelectorAll(".trackBorder .timeLine")[0];
+          timeLineDom.innerHTML = timeStr;
+          let childDom = Array.from(timeLineDom.children);
+          childDom[0].className = "active";
+          for(let i = 0; i < childDom.length ;i++)
+          childDom[i].onclick = (e) => {
+            childDom.map(item => {
+              item.className = "";
+            })
+              e.target.className = "active";
+              document.querySelector(".trackTime").innerText = tool.DateFormat(new Date(this.trackPoint.data[0].time), 'yyyy-MM-dd hh:mm:ss'); // 新轨迹段第一个时间
+              this.def.config.trackControl.currentPoint = 0;   // 重置点为新轨迹第一个点
+              let obj = {startTime: timeLine[i].startTime, endTime: timeLine[i].endTime, vin: data[0].vin}
+              this.getSplitData(obj, null, true);
+            }
+       }
       },
       on: function(type, handler){
         // type: play, pause, stop, add, reduce
@@ -243,12 +259,13 @@
         }; // 停止播放
         control.markerIsStart = false;
         let time = 200 - (50 * control.speed);
-        let dataList = this.trackPoint.data.dataList;
+        let dataList = this.trackPoint.data;
         target.setPosition(this.newData[i]);// 车辆位置
         target.setRotation(dataList[i].direction);// 车辆方向
         if (i < this.newData.length - 1) {
           setTimeout(() => {
             i++;
+            document.querySelector(".trackTime").innerText = tool.DateFormat(new Date(dataList[i].time), 'yyyy-MM-dd hh:mm:ss')
             this.resetMkPoint(target, control, i);
             this.currentData = dataList[i];
           }, time);
@@ -319,6 +336,14 @@
             return ret;
         }
       },
+      getSplitData: function(obj, timeLine, isClicktimeLine) {
+        tool.Ajax.get(`${this.def.config.trackApi}/ics/gps/list`, obj, (data) => {
+          if (!data.data || !data.data.length)  return;
+          this.trackPoint = data; // 原始数据，方向会用到
+          if (isClicktimeLine) this.Bmap.clearOverlays();
+          this.setTrack(data.data, timeLine, isClicktimeLine);
+        }) 
+      },
       init: function(fn) {
         if (!this.def.dom) return
         if (this.def.mapType) {
@@ -335,10 +360,17 @@
               map.enableScrollWheelZoom(); 
               map.clearOverlays()
               if (this.def.mapTrack) {  // 轨迹回放
-                tool.Ajax.get(`${config.trackApi}/ics/gps/page`, config.trackParam, (data) => {
-                  if (!data.data || !data.data.dataList.length)  return;
-                    this.trackPoint = data;
-                    this.setTrack(map, data.data.dataList, config)
+                // tool.Ajax.get(`${config.trackApi}/ics/gps/list`, config.trackParam, (data) => {
+                //   if (!data.data || !data.data.length)  return;
+                //     this.trackPoint = data; // 原始数据，方向会用到
+                //     this.setTrack(map, data.data, config)
+                // }) 
+                this.getSplitData(config.trackParam);
+              } else if (this.def.splitTrack) {
+                tool.Ajax.get(`${config.trackApi}/ics/gps/listSplitSummary`, config.splitTrackParam, (data) => {
+                  if (!data.data || !data.data.length)  return;
+                    let obj = {startTime: data.data[0].startTime, endTime: data.data[0].endTime, vin: config.splitTrackParam.vin}
+                    this.getSplitData(obj, data.data);
                 }) 
               } else if (this.def.mapMointer) {  // 监控点
               // let data = [

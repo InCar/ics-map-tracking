@@ -17,14 +17,29 @@
    let track = new Maptrack({
         dom: "apiId",
         mapType: 'bmap',
-        mapTrack: true,       // 是否开启轨迹
+        mapTrack: false,       // 是否开启轨迹
+        splitTrack: true,       // 是否开启分段轨迹
         mapMointer: false,   // 是否开启推送
         config: {
-            // soketUrl: 'ws://192.168.75.1:8889/api/ws/gpsWebSocket'
-            trackControl: {
-                startButton: '开',
-            }
-        }
+                gps: [116.404, 39.915], // 初始化地图经纬度
+                zoom: 16,                // 初始化地图层级
+                trackApi: '',           // 自定义路径
+                trackParam: {startTime: 1539108541000, endTime: 1539109463000, vin: "LVGEN56A4JG247290"},  // 轨迹参数
+                splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290"},  // 分段轨迹参数
+                soketUrl: '',   // 推送地址
+                vinCode: '',     // 推送vin码
+                iconUrl: '',    // 车辆图标
+                startIcon: "",  // 轨迹开始图标
+                endIcon: "",    // 轨迹结束图标
+                iconSize: [28, 28],  // 图标尺寸，默认28
+                trackControl: {    // 轨迹按钮自定义
+                  startButton: '开',
+                  endButton: '暂停',
+                  stopButton: '停止',
+                  reduceButton: '减速',
+                  addButton: '加速'
+                }
+              }
     });
     // 轨迹点击事件
     track.on("play", function(){

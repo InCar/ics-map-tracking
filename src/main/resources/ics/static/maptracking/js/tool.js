@@ -148,10 +148,12 @@ const DateFormat = (str, fmt) => {
   }
   return fmt;
 };
+
 export {
   loadJScript,
   webSocket,
   extend,
   Ajax,
+  getElementsByClassName,
   DateFormat
 }

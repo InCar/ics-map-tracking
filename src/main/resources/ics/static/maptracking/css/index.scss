@@ -154,7 +154,7 @@
   z-index: 999;
   right: 0%;
   top: 20%;
-  width: 220px;
+  width: 260px;
   background: #fff;
   border-radius: 4px;
   font-size: 14px;
@@ -169,13 +169,19 @@
     border-bottom: 1px solid #e8eaec;
     padding: 14px 16px;
     line-height: 1;
+    font-weight: bold;
   }
-  .RadioGroup {
+  .body {
+    padding: 14px 16px;
+    line-height: 2;
+  }
+  .timeLine {
     height:120px;
     width:100%;
     overflow-y:scroll;
-    .circleSpan {
+    p {
       position:relative;
+      cursor: pointer;
       &:before {
         content:'';
         display:inline-block;
@@ -185,19 +191,17 @@
         border:1px solid gray;
         margin: 0 10px;
       }
-      &:after {
+      &:not(:last-child):after {
         position:absolute;
         content:'';
         height:20px;
-        top: 11px;
+        top: 18px;
         left: 15px;
         border-right:1px solid gray;
       }
     }
-    .normal{
-      .circleSpan:before{
+      .active:before{
         background-color:#4A85FF !important
       }
-    }
   }
 }
