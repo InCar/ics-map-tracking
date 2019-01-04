@@ -147,3 +147,61 @@
     border-color: rgba(70,76,91,.9) transparent transparent transparent;
   }
 }
+
+// trackBorder
+.trackBorder {
+  position: absolute;
+  z-index: 999;
+  right: 0%;
+  top: 20%;
+  width: 260px;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all .2s ease-in-out;
+  border: 1px solid #dcdee2;
+    border-color: #e8eaec;
+  &:hover{
+    box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    border-color: #eee;
+  }
+  .head{
+    border-bottom: 1px solid #e8eaec;
+    padding: 14px 16px;
+    line-height: 1;
+    font-weight: bold;
+  }
+  .body {
+    padding: 14px 16px;
+    line-height: 2;
+  }
+  .timeLine {
+    height:120px;
+    width:100%;
+    overflow-y:scroll;
+    p {
+      position:relative;
+      cursor: pointer;
+      &:before {
+        content:'';
+        display:inline-block;
+        width:10px;
+        height:10px;
+        border-radius:50px;
+        border:1px solid gray;
+        margin: 0 10px;
+      }
+      &:not(:last-child):after {
+        position:absolute;
+        content:'';
+        height:20px;
+        top: 18px;
+        left: 15px;
+        border-right:1px solid gray;
+      }
+    }
+      .active:before{
+        background-color:#4A85FF !important
+      }
+  }
+}
