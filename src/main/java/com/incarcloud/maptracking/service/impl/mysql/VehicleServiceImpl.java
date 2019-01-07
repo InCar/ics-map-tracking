@@ -1,6 +1,7 @@
 package com.incarcloud.maptracking.service.impl.mysql;
 
 import com.incarcloud.skeleton.anno.ICSAutowire;
+import com.incarcloud.skeleton.anno.ICSConditionalOnMissingBean;
 import com.incarcloud.skeleton.config.DataSource;
 import com.incarcloud.skeleton.dao.jdbc.JdbcDataAccess;
 import com.incarcloud.skeleton.dao.jdbc.RowHandler;
@@ -15,6 +16,7 @@ import com.incarcloud.maptracking.source.VehicleSource;
 import java.util.List;
 @ICSDataSource(DataSource.JDBC)
 @ICSComponent
+@ICSConditionalOnMissingBean(VehicleService.class)
 public class VehicleServiceImpl extends BaseComponent implements VehicleService {
     @ICSAutowire
     JdbcDataAccess dataAccess;
