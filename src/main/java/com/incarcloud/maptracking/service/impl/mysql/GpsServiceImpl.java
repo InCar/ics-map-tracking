@@ -1,6 +1,7 @@
 package com.incarcloud.maptracking.service.impl.mysql;
 
 import com.incarcloud.skeleton.anno.ICSAutowire;
+import com.incarcloud.skeleton.anno.ICSConditionalOnMissingBean;
 import com.incarcloud.skeleton.config.DataSource;
 import com.incarcloud.skeleton.dao.jdbc.JdbcDataAccess;
 import com.incarcloud.skeleton.dao.jdbc.RowHandler;
@@ -20,6 +21,7 @@ import java.util.*;
 
 @ICSDataSource(DataSource.JDBC)
 @ICSComponent
+@ICSConditionalOnMissingBean(GpsService.class)
 public class GpsServiceImpl extends BaseComponent implements GpsService {
     public static long GPS_SPLIT_TIME_MILLS=1000*60*10;
     public static long EVERY_FETCH_DATA_NUM=100000;
