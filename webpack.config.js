@@ -1,8 +1,8 @@
-const path = require("path");
-const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
+const webpack = require('webpack');
+const miniCssExtractPlugin = require("mini-css-extract-plugin");//用来抽离单独抽离css文件
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');//压缩css插件
 module.exports = {
-  mode: "development",
-  devtool: "source-map",
+  // mode: "production",
   entry: ['@babel/polyfill', "./src/main/resources/ics/static/maptracking/js/index.js"],
   output: {
     path: __dirname + "/src/main/resources/ics/static/maptracking/js",
@@ -13,19 +13,10 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"]
   },
   plugins: [
-    new ParallelUglifyPlugin({
-      uglifyJS:{
-        output: {
-          comments: false,
-          beautify: false
-        },
-        compress: {
-          warnings: false,
-          drop_debugger: true,
-          // drop_console: true
-        }
-      }
-    })
+    new miniCssExtractPlugin({
+      filename: "index.css"
+    }),//抽离出来以后的css文件名称
+    new OptimizeCssAssetsPlugin()//执行压缩抽离出来的css
   ],
   module: {
     rules: [
@@ -37,19 +28,25 @@ module.exports = {
          loader: "babel-loader"
       },
       {
-        test: /\.scss$/,
-        use: [
-         {
-          loader: "style-loader" // 将 JS 字符串生成为 style 节点
-         },
-         {
-          loader: "css-loader" // 将 CSS 转化成 CommonJS 模块
-         },
-         {
-          loader: "sass-loader" // 将 Sass 编译成 CSS
-         }
-        ]
-       },
+        test:/\.css/,
+        exclude: /node_modules/, 
+        use:[miniCssExtractPlugin.loader,"css-loader",{
+            loader: "postcss-loader",
+            options: {
+                plugins: () => [require('autoprefixer')]
+            }
+        }]
+      },
+      {
+        test:/\.scss$/,
+        exclude: /node_modules/, 
+        use:[miniCssExtractPlugin.loader,"css-loader",{
+            loader: "postcss-loader",
+            options: {
+                plugins: () => [require('autoprefixer')]
+            }
+        },"sass-loader"]
+      },
        {
         test: /\.(png|jpg|gif)$/,
         use: [

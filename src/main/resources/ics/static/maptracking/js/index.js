@@ -196,7 +196,7 @@
        }
      },
       creatBorder: function(data, timeLine) {
-      //   console.log(data)    // <p>速度：${data[0].speed} km/h</p>
+         console.log(data)    // <p>速度：${data[0].speed} km/h</p>
         let firstTime = tool.DateFormat(new Date(data[0].time), 'yyyy-MM-dd hh:mm:ss')
          let str = `
           <p class="head">轨迹信息</p>
