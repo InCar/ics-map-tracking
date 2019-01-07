@@ -31,7 +31,9 @@
                 iconUrl: '',    // 车辆图标
                 startIcon: "",  // 轨迹开始图标
                 endIcon: "",    // 轨迹结束图标
-                iconSize: [28, 28],  // 图标尺寸，默认28
+                markerSize: [28, 28],  // 图标尺寸
+                startEndSize: [26, 37],  // 图标尺寸
+                startEndAnchor: [10, 37],  // 图标尺寸
                 trackControl: {     // 轨迹按钮自定义
                   startButton: '开始',
                   endButton: '暂停',
@@ -73,8 +75,12 @@
           this.newData.push(new BMap.Point(a.lng, a.lat))
         })
         // 创建起、终点
-        let startIcon = new BMap.Icon(config.startIcon, new BMap.Size(config.iconSize[0],config.iconSize[1]));
-        let endIcon = new BMap.Icon(config.endIcon, new BMap.Size(config.iconSize[0],config.iconSize[1]));
+        let startIcon = new BMap.Icon(config.startIcon, new BMap.Size(config.startEndSize[0],config.startEndSize[1]), {
+          anchor: new BMap.Size(config.startEndAnchor[0],config.startEndAnchor[1])
+        });
+        let endIcon = new BMap.Icon(config.endIcon, new BMap.Size(config.startEndSize[0],config.startEndSize[1]), {
+          anchor: new BMap.Size(config.startEndAnchor[0],config.startEndAnchor[1])
+        });
         if(config.startIcon) this.Bmap.addOverlay(new BMap.Marker(this.newData[0],{icon:startIcon})); // 创建点
         else this.Bmap.addOverlay(new BMap.Marker(this.newData[0]));
         if(config.endIcon) this.Bmap.addOverlay(new BMap.Marker(this.newData[this.newData.length - 1],{icon:endIcon}));
@@ -82,7 +88,7 @@
         // 目标点
         let target = null;
         if (config.iconUrl) {
-          let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.iconSize[0], config.iconSize[1]));
+          let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.markerSize[0], config.markerSize[1]));
           target = new BMap.Marker(this.newData[0],{icon:icon}); // 创建点
         } else target = new BMap.Marker(this.newData[0]);
         this.Bmap.addOverlay(target); // 创建点
@@ -224,7 +230,13 @@
             })
               e.target.className = "active";
               document.querySelector(".trackTime").innerText = tool.DateFormat(new Date(this.trackPoint.data[0].time), 'yyyy-MM-dd hh:mm:ss'); // 新轨迹段第一个时间
-              this.def.config.trackControl.currentPoint = 0;   // 重置点为新轨迹第一个点
+              // 播放按钮重置
+              let play = document.querySelectorAll(".trackControl li")[0].children;
+              let control = this.def.config.trackControl;
+              control.isPlay = false;
+              play[1].innerHTML = control.startButton;
+              play[0].className = 'play';
+              control.currentPoint = 0;   // 重置点为新轨迹第一个点
               let obj = {startTime: timeLine[i].startTime, endTime: timeLine[i].endTime, vin: data[0].vin}
               this.getSplitData(obj, null, true);
             }
@@ -384,7 +396,7 @@
               // let i = 0;
               let marker = null;
               if (config.iconUrl) {
-                let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.iconSize[0], config.iconSize[1]));
+                let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.markerSize[0], config.markerSize[1]));
                 marker = new BMap.Marker(point,{icon:icon}); // 创建点
               } else marker = new BMap.Marker(point);
               map.addOverlay(marker);  // 标点
