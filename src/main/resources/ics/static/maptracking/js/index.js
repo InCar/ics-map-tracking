@@ -196,7 +196,7 @@
        }
      },
       creatBorder: function(data, timeLine) {
-         console.log(data)    // <p>速度：${data[0].speed} km/h</p>
+        // console.log(data)    // <p>速度：${data[0].speed} km/h</p>
         let firstTime = tool.DateFormat(new Date(data[0].time), 'yyyy-MM-dd hh:mm:ss')
          let str = `
           <p class="head">轨迹信息</p>
@@ -350,10 +350,11 @@
       },
       getSplitData: function(obj, timeLine, isClicktimeLine) {
         tool.Ajax.get(`${this.def.config.trackApi}/ics/gps/list`, obj, (data) => {
-          if (!data.data || !data.data.length)  return;
-          this.trackPoint = data; // 原始数据，方向会用到
+          let da = JSON.parse(data);
+          if (!da.data || !da.data.length)  return;
+          this.trackPoint = da; // 原始数据，方向会用到
           if (isClicktimeLine) this.Bmap.clearOverlays();
-          this.setTrack(data.data, timeLine, isClicktimeLine);
+          this.setTrack(da.data, timeLine, isClicktimeLine);
         }) 
       },
       init: function(fn) {
@@ -380,9 +381,10 @@
                 this.getSplitData(config.trackParam);
               } else if (this.def.splitTrack) {
                 tool.Ajax.get(`${config.trackApi}/ics/gps/listSplitSummary`, config.splitTrackParam, (data) => {
-                  if (!data.data || !data.data.length)  return;
-                    let obj = {startTime: data.data[0].startTime, endTime: data.data[0].endTime, vin: config.splitTrackParam.vin}
-                    this.getSplitData(obj, data.data);
+                  let da = JSON.parse(data);
+                  if (!da.data || !da.data.length)  return;
+                    let obj = {startTime: da.data[0].startTime, endTime: da.data[0].endTime, vin: config.splitTrackParam.vin}
+                    this.getSplitData(obj, da.data);
                 }) 
               } else if (this.def.mapMointer) {  // 监控点
               // let data = [
