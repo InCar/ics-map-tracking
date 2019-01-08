@@ -110,7 +110,7 @@ const Ajax = {
       // readyState == 4说明请求已完成
       if (xhr.readyState == 4 && xhr.status == 200 || xhr.status == 304) { 
         // 从服务器获得数据 
-        fn.call(this, JSON.parse(xhr.responseText));  
+        fn.call(this, xhr.responseText);  
       }
     };
     xhr.send();
@@ -123,7 +123,7 @@ const Ajax = {
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");  
     xhr.onreadystatechange = function() {
       if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
-        fn.call(this, JSON.parse(xhr.responseText));
+        fn.call(this, xhr.responseText);
       }
     };
     xhr.send(data);
