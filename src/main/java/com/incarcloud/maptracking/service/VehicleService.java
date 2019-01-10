@@ -8,11 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface VehicleService {
-    default List<VehicleSource> listByVin(String vin){
-        return new ArrayList<>();
-    }
+    /**
+     * 查询
+     * @param vin
+     * @return
+     */
+    List<VehicleSource> list(String vin);
 
-    default PageResult<VehicleSource> pageByVin(String vin, Page page){
-        return new PageResult<>(new ArrayList<>(),0);
-    }
+    /**
+     * 查询(分页)
+     * @param vin
+     * @param page
+     * @return
+     */
+    PageResult<VehicleSource> page(String vin, Page page);
 }

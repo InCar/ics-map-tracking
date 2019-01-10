@@ -41,14 +41,14 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
     }
 
     @Override
-    public List<GpsSource> listByVin(String vin,Date startTime, Date endTime) {
+    public List<GpsSource> list(String vin, Date startTime, Date endTime) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         String sql="select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=?";
         return dataAccess.list(sql,rowHandler,vin,startTime,endTime);
     }
 
     @Override
-    public PageResult<GpsSource> pageByVin(String vin,Date startTime, Date endTime, Page page) {
+    public PageResult<GpsSource> page(String vin, Date startTime, Date endTime, Page page) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         String countSql="select count(*) as num from t_gps where vin=? and time>=? and time <=?";
         String sql="select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=? limit ?,?";

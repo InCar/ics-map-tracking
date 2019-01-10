@@ -29,7 +29,7 @@ public class VehicleServiceImpl extends BaseComponent implements VehicleService 
     }
 
     @Override
-    public List<VehicleSource> listByVin(String vin) {
+    public List<VehicleSource> list(String vin) {
         RowHandler<VehicleSource> rowHandler=getVehicleSourceRowHandler();
         if(vin==null){
             String sql="select vin,plate_no from t_vehicle";
@@ -41,7 +41,7 @@ public class VehicleServiceImpl extends BaseComponent implements VehicleService 
     }
 
     @Override
-    public PageResult<VehicleSource> pageByVin(String vin, Page page) {
+    public PageResult<VehicleSource> page(String vin, Page page) {
         RowHandler<VehicleSource> rowHandler=getVehicleSourceRowHandler();
         if(vin==null){
             String countSql="select count(*) as num from t_vehicle";

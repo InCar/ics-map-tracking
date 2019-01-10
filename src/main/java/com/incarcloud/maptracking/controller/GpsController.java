@@ -27,7 +27,7 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = false,value = "vin") String vin,
             @ICSRequestParam(required = false,value = "startTime")Date startTime,
             @ICSRequestParam(required = false,value = "endTime")Date endTime){
-        return JsonMessage.success(gpsService.listByVin(vin,startTime,endTime));
+        return JsonMessage.success(gpsService.list(vin,startTime,endTime));
     }
 
     @ICSRequestMapping(value = "/page",method = ICSHttpRequestMethodEnum.GET)
@@ -37,7 +37,7 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = false,value = "endTime")Date endTime,
             @ICSRequestParam(required = false, value = "pageNum",defaultValue = "1") Integer pageNum,
             @ICSRequestParam(required = false, value = "pageSize",defaultValue = "10") Integer pageSize){
-        return JsonMessage.success(gpsService.pageByVin(vin,startTime,endTime,new Page(pageNum,pageSize)));
+        return JsonMessage.success(gpsService.page(vin,startTime,endTime,new Page(pageNum,pageSize)));
     }
 
     @ICSRequestMapping(value = "/listSplit",method = ICSHttpRequestMethodEnum.GET)
