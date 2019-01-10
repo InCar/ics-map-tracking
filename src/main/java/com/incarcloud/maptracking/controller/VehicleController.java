@@ -24,7 +24,7 @@ public class VehicleController extends BaseComponent {
     public JsonMessage<List<VehicleSource>> list(
             @ICSRequestParam(required = false, value = "vin")
                     String vin) {
-        return JsonMessage.success(vehicleService.listByVin(vin));
+        return JsonMessage.success(vehicleService.list(vin));
     }
 
     @ICSRequestMapping(value = "/page", method = ICSHttpRequestMethodEnum.GET)
@@ -32,7 +32,7 @@ public class VehicleController extends BaseComponent {
             @ICSRequestParam(required = false, value = "vin") String vin,
             @ICSRequestParam(required = false, value = "pageNum",defaultValue = "1") Integer pageNum,
             @ICSRequestParam(required = false, value = "pageSize",defaultValue = "10") Integer pageSize) {
-        return JsonMessage.success(vehicleService.pageByVin(vin, new Page(pageNum, pageSize)));
+        return JsonMessage.success(vehicleService.page(vin, new Page(pageNum, pageSize)));
     }
 
 

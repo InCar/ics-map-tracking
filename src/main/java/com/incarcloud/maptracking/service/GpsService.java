@@ -10,19 +10,44 @@ import java.util.Date;
 import java.util.List;
 
 public interface GpsService {
-    default List<GpsSource> listByVin(String vin,Date startTime, Date endTime){
-        return new ArrayList<>();
-    }
+    /**
+     * 查询
+     * @param vin
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<GpsSource> list(String vin, Date startTime, Date endTime);
 
-    default PageResult<GpsSource> pageByVin(String vin,Date startTime, Date endTime, Page page){
-        return new PageResult<>(new ArrayList<>(),0);
-    }
+    /**
+     * 查询(分页)
+     * @param vin
+     * @param startTime
+     * @param endTime
+     * @param page
+     * @return
+     */
+    PageResult<GpsSource> page(String vin, Date startTime, Date endTime, Page page);
 
-    default List<List<GpsSource>> listSplit(String vin,Integer num,Date startTime,Date endTime,Integer order){
-        return new ArrayList<>();
-    }
+    /**
+     * 查询Gps分段信息明细
+     * @param vin
+     * @param num
+     * @param startTime
+     * @param endTime
+     * @param order
+     * @return
+     */
+    List<List<GpsSource>> listSplit(String vin,Integer num,Date startTime,Date endTime,Integer order);
 
-    default List<GpsSplitSummary> listSplitSummary(String vin, Integer num, Date startTime, Date endTime, Integer order){
-        return new ArrayList<>();
-    }
+    /**
+     * 查询Gps分段信息摘要
+     * @param vin
+     * @param num
+     * @param startTime
+     * @param endTime
+     * @param order
+     * @return
+     */
+    List<GpsSplitSummary> listSplitSummary(String vin, Integer num, Date startTime, Date endTime, Integer order);
 }
