@@ -30,8 +30,8 @@ public class VehicleController extends BaseComponent {
     @ICSRequestMapping(value = "/page", method = ICSHttpRequestMethodEnum.GET)
     public JsonMessage<PageResult<VehicleSource>> page(
             @ICSRequestParam(required = false, value = "vin") String vin,
-            @ICSRequestParam(required = true, value = "pageNum") Integer pageNum,
-            @ICSRequestParam(required = true, value = "pageSize") Integer pageSize) {
+            @ICSRequestParam(required = false, value = "pageNum",defaultValue = "1") Integer pageNum,
+            @ICSRequestParam(required = false, value = "pageSize",defaultValue = "10") Integer pageSize) {
         return JsonMessage.success(vehicleService.pageByVin(vin, new Page(pageNum, pageSize)));
     }
 
