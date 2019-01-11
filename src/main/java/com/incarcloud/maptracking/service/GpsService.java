@@ -12,42 +12,44 @@ import java.util.List;
 public interface GpsService {
     /**
      * 查询
-     * @param vin
-     * @param startTime
-     * @param endTime
+     * @param vin vin码
+     * @param startTime 开始时间
+     * @param endTime 结束时间
      * @return
      */
     List<GpsSource> list(String vin, Date startTime, Date endTime);
 
     /**
      * 查询(分页)
-     * @param vin
-     * @param startTime
-     * @param endTime
-     * @param page
+     * @param vin vin码
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param page 分页参数
      * @return
      */
     PageResult<GpsSource> page(String vin, Date startTime, Date endTime, Page page);
 
     /**
      * 查询Gps分段信息明细
-     * @param vin
-     * @param num
-     * @param startTime
-     * @param endTime
-     * @param order
+     * @param vin vin码
+     * @param num 查询轨迹段数量
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param gpsSplitTimeMills gps分段时间(毫秒)
+     * @param order 排序(1:正序;2:逆序)
      * @return
      */
-    List<List<GpsSource>> listSplit(String vin,Integer num,Date startTime,Date endTime,Integer order);
+    List<List<GpsSource>> listSplit(String vin,Integer num,Date startTime,Date endTime,Long gpsSplitTimeMills,Integer order);
 
     /**
      * 查询Gps分段信息摘要
-     * @param vin
-     * @param num
-     * @param startTime
-     * @param endTime
-     * @param order
+     * @param vin vin码
+     * @param num 查询轨迹段数量
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param gpsSplitTimeMills gps分段时间(毫秒)
+     * @param order 排序(1:正序;2:逆序)
      * @return
      */
-    List<GpsSplitSummary> listSplitSummary(String vin, Integer num, Date startTime, Date endTime, Integer order);
+    List<GpsSplitSummary> listSplitSummary(String vin, Integer num, Date startTime, Date endTime,Long gpsSplitTimeMills, Integer order);
 }
