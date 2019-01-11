@@ -21,6 +21,7 @@ public class PrefixController {
     public PrefixController(){
         context= Starter.getContext();
         context.getConfig().withRequestMappingPre("/ics");
+        context.init();
     }
 
     @RequestMapping(value = "/ics/**",method = RequestMethod.GET)
