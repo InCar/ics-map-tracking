@@ -20,6 +20,7 @@ import java.util.List;
 @ICSController
 @ICSRequestMapping(value = "/gps")
 public class GpsController extends BaseComponent{
+    public final static long GPS_SPLIT_TIME_MILLS=1000*60*10L;
     @ICSAutowire
     private GpsService gpsService;
     @ICSRequestMapping(value = "/list",method = ICSHttpRequestMethodEnum.GET)
@@ -27,7 +28,7 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = false,value = "vin") String vin,
             @ICSRequestParam(required = false,value = "startTime")Date startTime,
             @ICSRequestParam(required = false,value = "endTime")Date endTime){
-        return JsonMessage.success(gpsService.listByVin(vin,startTime,endTime));
+        return JsonMessage.success(gpsService.list(vin,startTime,endTime));
     }
 
     @ICSRequestMapping(value = "/page",method = ICSHttpRequestMethodEnum.GET)
@@ -37,7 +38,7 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = false,value = "endTime")Date endTime,
             @ICSRequestParam(required = false, value = "pageNum",defaultValue = "1") Integer pageNum,
             @ICSRequestParam(required = false, value = "pageSize",defaultValue = "10") Integer pageSize){
-        return JsonMessage.success(gpsService.pageByVin(vin,startTime,endTime,new Page(pageNum,pageSize)));
+        return JsonMessage.success(gpsService.page(vin,startTime,endTime,new Page(pageNum,pageSize)));
     }
 
     @ICSRequestMapping(value = "/listSplit",method = ICSHttpRequestMethodEnum.GET)
@@ -46,12 +47,13 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = false,value = "num",defaultValue = Integer.MAX_VALUE+"") Integer num,
             @ICSRequestParam(required = false,value = "startTime")Date startTime,
             @ICSRequestParam(required = false,value = "endTime")Date endTime,
+            @ICSRequestParam(required = false,value = "gpsSplitTimeMills",defaultValue = GPS_SPLIT_TIME_MILLS+"")Long gpsSplitTimeMills,
             @ICSRequestParam(required = false,value = "order",defaultValue = "2")Integer order
             ){
-        List<List<GpsSource>> resultList= gpsService.listSplit(vin, num, startTime, endTime,order);
+        List<List<GpsSource>> resultList= gpsService.listSplit(vin, num, startTime, endTime,gpsSplitTimeMills,order);
         //6、如果是逆序,则需要倒转每一个数据集的内容
         if(order==2){
-            resultList.forEach(e-> Collections.reverse(e));
+            resultList.forEach(Collections::reverse);
         }
         return JsonMessage.success(resultList);
     }
@@ -62,9 +64,10 @@ public class GpsController extends BaseComponent{
             @ICSRequestParam(required = false,value = "num",defaultValue = Integer.MAX_VALUE+"") Integer num,
             @ICSRequestParam(required = false,value = "startTime")Date startTime,
             @ICSRequestParam(required = false,value = "endTime")Date endTime,
+            @ICSRequestParam(required = false,value = "gpsSplitTimeMills",defaultValue = GPS_SPLIT_TIME_MILLS+"")Long gpsSplitTimeMills,
             @ICSRequestParam(required = false,value = "order",defaultValue = "2")Integer order
     ){
-        List<GpsSplitSummary> dataList= gpsService.listSplitSummary(vin, num, startTime, endTime,order);
+        List<GpsSplitSummary> dataList= gpsService.listSplitSummary(vin, num, startTime, endTime,gpsSplitTimeMills,order);
         return JsonMessage.success(dataList);
     }
 }

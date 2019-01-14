@@ -23,7 +23,6 @@ import java.util.*;
 @ICSComponent
 @ICSConditionalOnMissingBean(GpsService.class)
 public class GpsServiceImpl extends BaseComponent implements GpsService {
-    public static long GPS_SPLIT_TIME_MILLS=1000*60*10;
     public static long EVERY_FETCH_DATA_NUM=100000;
 
     @ICSAutowire
@@ -41,14 +40,14 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
     }
 
     @Override
-    public List<GpsSource> listByVin(String vin,Date startTime, Date endTime) {
+    public List<GpsSource> list(String vin, Date startTime, Date endTime) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         String sql="select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=?";
         return dataAccess.list(sql,rowHandler,vin,startTime,endTime);
     }
 
     @Override
-    public PageResult<GpsSource> pageByVin(String vin,Date startTime, Date endTime, Page page) {
+    public PageResult<GpsSource> page(String vin, Date startTime, Date endTime, Page page) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         String countSql="select count(*) as num from t_gps where vin=? and time>=? and time <=?";
         String sql="select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=? limit ?,?";
@@ -57,7 +56,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
 
 
     @Override
-    public List<List<GpsSource>> listSplit(String vin, Integer num, Date startTime, Date endTime,Integer order) {
+    public List<List<GpsSource>> listSplit(String vin, Integer num, Date startTime, Date endTime,Long gpsSplitTimeMills,Integer order) {
         List<List<GpsSource>> resultList=new ArrayList<>();
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         List<GpsSource> dataList=new ArrayList<>();
@@ -104,7 +103,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
                     }else{
                         throw BaseRuntimeException.getException("Param[order] Must Be 1(ASC) Or 2(DESC)");
                     }
-                    if (diff > GPS_SPLIT_TIME_MILLS) {
+                    if (diff > gpsSplitTimeMills) {
                         //3.1、如果大于时间差,则添加到结果集中
                         resultList.add(new ArrayList<>(dataList.subList(index1,index2+1)));
                         index1=index2+1;
@@ -131,7 +130,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
     }
 
     @Override
-    public List<GpsSplitSummary> listSplitSummary(String vin, Integer num, Date startTime, Date endTime, Integer order) {
+    public List<GpsSplitSummary> listSplitSummary(String vin, Integer num, Date startTime, Date endTime,Long gpsSplitTimeMills, Integer order) {
         List<GpsSplitSummary> resultList=new ArrayList<>();
         List<GpsSource> dataList=new ArrayList<>();
         StringBuilder sql=new StringBuilder("select lng,lat,time from t_gps where vin=? and time>=? and time <=?");
@@ -186,7 +185,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
                     }else{
                         throw BaseRuntimeException.getException("Param[order] Must Be 1(ASC) Or 2(DESC)");
                     }
-                    if (diff > GPS_SPLIT_TIME_MILLS) {
+                    if (diff > gpsSplitTimeMills) {
                         //3.1、如果大于时间差,则添加到结果集中
                         GpsSource startData=null;
                         GpsSource endData=null;
