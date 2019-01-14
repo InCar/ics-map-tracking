@@ -62,9 +62,11 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
         List<GpsSource> dataList=new ArrayList<>();
         StringBuilder sql=new StringBuilder("select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=?");
         if(order==1){
-            sql.append(" order by time asc,id asc");
+            sql.append(" order by time asc");
         }else if(order ==2){
-            sql.append(" order by time desc,id desc");
+            sql.append(" order by time desc");
+        }else{
+            throw BaseRuntimeException.getException("Param[order] Must Be 1(ASC) Or 2(DESC)");
         }
         sql.append(" limit ?,?");
         int count=0;
@@ -98,10 +100,8 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
                     long diff ;
                     if(order==1){
                         diff=data2.getTime().getTime() - data1.getTime().getTime();
-                    }else if(order==2){
-                        diff=data1.getTime().getTime() - data2.getTime().getTime();
                     }else{
-                        throw BaseRuntimeException.getException("Param[order] Must Be 1(ASC) Or 2(DESC)");
+                        diff=data1.getTime().getTime() - data2.getTime().getTime();
                     }
                     if (diff > gpsSplitTimeMills) {
                         //3.1、如果大于时间差,则添加到结果集中
@@ -135,9 +135,11 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
         List<GpsSource> dataList=new ArrayList<>();
         StringBuilder sql=new StringBuilder("select lng,lat,time from t_gps where vin=? and time>=? and time <=?");
         if(order==1){
-            sql.append(" order by time asc,id asc ");
+            sql.append(" order by time asc");
         }else if(order ==2){
-            sql.append(" order by time desc,id desc");
+            sql.append(" order by time desc");
+        }else{
+            throw BaseRuntimeException.getException("Param[order] Must Be 1(ASC) Or 2(DESC)");
         }
         sql.append(" limit ?,?");
         int count=0;
@@ -180,19 +182,17 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
                     long diff;
                     if(order==1){
                         diff=data2.getTime().getTime() - data1.getTime().getTime();
-                    }else if(order==2){
+                    }else {
                         diff = data1.getTime().getTime() - data2.getTime().getTime();
-                    }else{
-                        throw BaseRuntimeException.getException("Param[order] Must Be 1(ASC) Or 2(DESC)");
                     }
                     if (diff > gpsSplitTimeMills) {
                         //3.1、如果大于时间差,则添加到结果集中
-                        GpsSource startData=null;
-                        GpsSource endData=null;
+                        GpsSource startData;
+                        GpsSource endData;
                         if(order==1){
                             startData=dataList.get(index1);
                             endData=dataList.get(index2);
-                        }else if(order==2){
+                        }else{
                             startData=dataList.get(index2);
                             endData=dataList.get(index1);
                         }
@@ -209,12 +209,12 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
                 }
                 //4、如果循环完了,还是没有收集到传入参数的数量,检查是否还有数据,有则继续查,无则余下算做最后一段
                 if (curDataList.size() < EVERY_FETCH_DATA_NUM) {
-                    GpsSource startData=null;
-                    GpsSource endData=null;
+                    GpsSource startData;
+                    GpsSource endData;
                     if(order==1){
                         startData=dataList.get(index1);
                         endData=dataList.get(index2);
-                    }else if(order==2){
+                    }else{
                         startData=dataList.get(index2);
                         endData=dataList.get(index1);
                     }
