@@ -3,7 +3,7 @@
   const extend = (o,n,override) => {
     for(var key in n){
         if(n.hasOwnProperty(key) && (!o.hasOwnProperty(key) || override)){
-          if (typeof n[key] !== "object") o[key]=n[key];
+          if (typeof n[key] !== "object" || n[key] instanceof Array) o[key]=n[key];
           else {
             extend(o[key],n[key],override)
           }
