@@ -17,6 +17,22 @@
             color: white;
             z-index: 999999
         }
+        #search{
+            position: absolute;
+            right: 0;
+            top: 10%;
+            padding: 20px;
+            background: red;
+            cursor:pointer;
+        }
+        #change{
+            position: absolute;
+            right: 0;
+            top: 15%;
+            padding: 20px;
+            background: green;
+            cursor:pointer;
+        }
     </style>
 </head>
 <body>
@@ -24,6 +40,8 @@
 <div id="apiId" style="width:50%;height:100%;">
 </div>
 <div id="button">点我</div>
+<div id="search">搜索</div>
+<div id="change">重载</div>
 <!-- <div id="api" style="width:100%;height:50%;">
 </div> -->
 <script src="../../ics/static/maptracking/js/testbundle.js">
@@ -38,17 +56,21 @@
    let track = new Maptrack({
         dom: "apiId",
         mapType: 'bmap',
-        mapTrack: false,       // 是否开启轨迹
-        splitTrack: true,       // 是否开启分段轨迹
+        mapTrack: true,       // 是否开启轨迹         都开启只会执行一个，按顺序
+        splitTrack: false,       // 是否开启分段轨迹
         mapMointer: false,   // 是否开启推送
+        currentData: function(data) { // 获取运动当前点数据，和showBorder配合使用
+            // console.log(data)
+        },
         config: {
+                showBorder: true, // 是否展示面板
                 gps: [116.404, 39.915], // 初始化地图经纬度
                 zoom: 16,                // 初始化地图层级
                 trackApi: '',           // 自定义路径
-                trackParam: {startTime: 1539108541000, endTime: 1539109463000, vin: "LVGEN56A4JG247290"},  // 轨迹参数
-                splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290"},  // 分段轨迹参数
+                trackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290"},  // 轨迹参数
+                splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290", gpsSplitTimeMills: 60000},  // 分段轨迹参数
                 soketUrl: '',   // 推送地址
-                vinCode: '',     // 推送vin码
+                moniterParam: {vin: "LVGEN56A4JG247290"}, // 推送参数
                 iconUrl: '../img/driving.png',    // 车辆图标
                 startIcon: "../img/start.png",  // 轨迹开始图标
                 endIcon: "../img/end.png",    // 轨迹结束图标
@@ -64,22 +86,6 @@
                 }
               }
     });
-    // 轨迹点击事件
-    track.on("play", function(){
-        console.log('you click play!');
-    })
-    track.on("pause", function(){
-        console.log('you click pause!');
-    })
-    track.on("stop", function(){
-        console.log('you click stop!');
-    })
-    track.on("add", function(){
-        console.log('you click add!');
-    })
-    track.on("reduce", function(){
-        console.log('you click reduce!');
-    })
   // gps转成百度坐标
    // track.translateToBmap({lat: 39.990912172420714, lng: 116.32715863448607})
    // gps转高德坐标
@@ -95,7 +101,37 @@
         let marker = new BMap.Marker(point);
         map.addOverlay(marker);  // 标点
        })
-
+      
+       // 轨迹点击事件
+    track.on("play", function(a){
+        console.log('you click play!');
+    })
+    track.on("pause", function(){
+        console.log('you click pause!');
+    })
+    track.on("stop", function(){
+        console.log('you click stop!');
+    })
+    track.on("add", function(){
+        console.log('you click add!');
+    })
+    track.on("reduce", function(){
+        console.log('you click reduce!');
+    })
+    search.onclick = function () {
+        track.search({startTime: 1541779200000, endTime: 1541951999000, vin: "LB37752Z3JL587321"})
+    }
+    change.onclick = function () {
+        track.reload({
+            dom: "apiId",
+            mapType: 'bmap',
+            splitTrack: true, 
+            config: {
+                trackApi: '',           // 自定义路径
+                splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290", gpsSplitTimeMills: 60000},
+            }
+        })
+    }
 // 加载多个地图
     // let api = new Maptrack({
     //     dom: "api",
