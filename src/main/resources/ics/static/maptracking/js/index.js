@@ -30,6 +30,7 @@
                 trackParam: {vin: "LVGEN56A4JG247290"},  // 轨迹参数
                 splitTrackParam: {vin: "LVGEN56A4JG247290"},  // 分段轨迹参数
                 moniterParam: {vin: "LVGEN56A4JG247290"}, // 推送参数
+                lineStyle: {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8},
                 soketUrl: '',   // 推送地址
                 iconUrl: '',    // 车辆图标
                 startIcon: "",  // 轨迹开始图标
@@ -95,7 +96,7 @@
           this.trackControl(this.target, config.trackControl);
       },
       setPolyline: function(lineData) {
-        this.Bmap.addOverlay(new BMap.Polyline(lineData, {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8}));  //增加折线
+        this.Bmap.addOverlay(new BMap.Polyline(lineData, this.def.config.lineStyle));  //增加折线
       },
       //根据点信息实时更新地图显示范围，让轨迹完整显示。设置新的中心点和显示级别
       setZoom: function (bPoints) {
@@ -196,6 +197,8 @@
               <div class="body">
                   <p>VIN码：<span class="vin"></span></p>
                   <p >时间：<span class="trackTime"></span></p>
+                  <p >起点：<span class="start"></span></p>
+                  <p >终点：<span class="end"></span></p>
                   <div class="timeLine">
                     <div></div>
                   </div>
@@ -219,7 +222,37 @@
         // vin和时间初始化
         document.querySelector(".trackBorder .trackTime").innerText = data[0] ? tool.DateFormat(new Date(data[0].time), 'yyyy-MM-dd hh:mm:ss') : "";
         document.querySelector(".trackBorder .vin").innerText = this.vinCode;
-        
+        let geoc = new BMap.Geocoder();
+        Promise.all([new Promise( (resolve) => {
+          geoc.getLocation(this.newData[0], (lo) => {
+            resolve(lo);
+          });
+        }),
+        new Promise( (resolve) => {
+          geoc.getLocation(this.newData[this.newData.length - 1], (lo) => {
+            resolve(lo);
+          });
+        })
+      ]).then((value) => {
+        let [startad, endad, startC, startS, endC, endS] = [
+          document.querySelector(".trackBorder .start"),
+          document.querySelector(".trackBorder .end"),
+          value[0].addressComponents, value[0].surroundingPois, value[1].addressComponents, value[1].surroundingPois]
+        if (startC.province === endC.province && startC.city === endC.city && startC.district === endC.district) {
+            startad.innerText = startC.street + startS[0].title;
+            endad.innerText = endC.street + endS[0].title;
+          } else if (startC.province === endC.province && startC.city === endC.city && startC.district !== endC.district){
+            startad.innerText = startC.district + startC.street + startS[0].title;
+            endad.innerText = endC.district + endC.street + endS[0].title;
+          } else if (startC.province === endC.province && startC.city !== endC.city){
+            startad.innerText = startC.city;
+            endad.innerText = endC.city;
+          } else if (startC.province !== endC.province){
+            startad.innerText = startC.province;
+            endad.innerText = endC.province;
+          }
+          
+      })
       },
       creatTimeDom: function (data, timeLine, timeLineDom) {
         let trackTime = document.querySelector(".trackBorder .trackTime");
@@ -280,9 +313,9 @@
         target.setPosition(this.newData[i]);// 车辆位置
         target.setRotation(dataList[i].direction);// 车辆方向
         if (i < this.newData.length - 1) {
-          setTimeout(() => {
+          this.moveInter = setTimeout(() => {
             i++;
-            document.querySelector(".trackTime").innerText = tool.DateFormat(new Date(dataList[i].time), 'yyyy-MM-dd hh:mm:ss')
+            document.querySelector(".trackBorder .trackTime").innerText = tool.DateFormat(new Date(dataList[i].time), 'yyyy-MM-dd hh:mm:ss')
              this.def.currentData(dataList[i]);
             this.resetMkPoint(target, control, i);
           }, time);
@@ -363,27 +396,26 @@
         }) 
       },
       init: function(fn) {
-        if (!this.def.dom) return
-        if (this.def.mapType) {
+        if (!this.def.dom) return;
+        if (!this.def.mapType) throw new Error('maptrack requires a mapType');
           if (this.def.mapType === 'bmap') {  
             tool.loadJScript().then(() => {
-              let config = this.def.config
-              let map = new BMap.Map(this.def.dom, {
-                enableMapClick: false
-              })
-              this.Bmap = map;
-              this.BMap = BMap;
-              let point = new BMap.Point(config.gps[0], config.gps[1])
-              map.centerAndZoom(point, config.zoom)
-              map.enableScrollWheelZoom(); 
-              map.clearOverlays();
+              let config = this.def.config;
+              if (!Object.keys(this.Bmap).length) {
+                console.log(123);
+                let map = new BMap.Map(this.def.dom, {
+                  enableMapClick: false
+                })
+                this.Bmap = map;
+                this.BMap = BMap;
+                map.enableScrollWheelZoom(); 
+              }
               if (this.def.mapTrack) this.getTrack(config.trackParam);  // 最近5分钟轨迹回放
               else if (this.def.splitTrack) this.getSplitTime(config.splitTrackParam); // 分段轨迹
               else if (this.def.mapMointer) this.getSocket(config.moniterParam);   // 监控点
-              if(fn) fn(BMap, map);
+              if(fn) fn(BMap, this.Bmap);
             })
           }
-        } else throw new Error('maptrack requires a mapType')
       },
       // 分段轨迹时间段api
       getSplitTime: function(obj) {
@@ -400,6 +432,8 @@
       getSocket: function (obj) {
         this.vinCode = obj.vin; // 存储vin
         let config = this.def.config
+        let point = new BMap.Point(config.gps[0], config.gps[1])
+        this.Bmap.centerAndZoom(point, config.zoom)
         let marker = null;
         if (config.iconUrl) {
           let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.markerSize[0], config.markerSize[1]));
@@ -438,14 +472,15 @@
       },
       // 重载参数
       reload: function(obj) {
-         this.Bmap.clearOverlays()
-         this.def = tool.extend(this.originDef,obj,true);
+         this.Bmap.clearOverlays();
+         origin = tool.deepCopy(this.originDef);
          if (this.def.splitTrack) {
           this.removeTools();
          } else if (this.def.mapTrack) {
           this.removeTools();
          } else if (this.def.mapMointer) {
          }
+          this.def = tool.extend(origin,obj,true);
          this.init();
       },
       // 重设轨迹一些状态
@@ -465,8 +500,17 @@
       },
       // 重载清除面板工具
       removeTools: function() {
-        document.querySelector(".trackBorder").innerText="";
-        document.querySelector(".trackControl").innerText="";
+        if (this.moveInter) clearTimeout(this.moveInter)
+        let trackBorder = document.querySelector(".trackBorder");
+        let trackControl = document.querySelector(".trackControl");
+        if (trackBorder) {
+          trackBorder.innerText="";
+          trackBorder.parentNode.removeChild(trackBorder);
+        }
+        if (trackControl) {
+          trackControl.innerText="";
+          trackControl.parentNode.removeChild(trackControl);
+        }
       }
   }
   // 将插件对象暴露给全局对象
