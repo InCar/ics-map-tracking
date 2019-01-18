@@ -3,7 +3,7 @@
   const extend = (o,n,override) => {
     for(var key in n){
         if(n.hasOwnProperty(key) && (!o.hasOwnProperty(key) || override)){
-          if (typeof n[key] !== "object") o[key]=n[key];
+          if (typeof n[key] !== "object" || n[key] instanceof Array) o[key]=n[key];
           else {
             extend(o[key],n[key],override)
           }
@@ -11,6 +11,30 @@
     }
     return o;
 }
+
+ // deepCopy
+ const deepCopy = (obj, cache = []) => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  const hit = find(cache, c => c.original === obj);
+  if (hit) {
+    return hit.copy;
+  }
+
+  const copy = Array.isArray(obj)
+    ? []
+    : {};
+  cache.push({
+    original: obj,
+    copy
+  });
+
+  Object.keys(obj).forEach(key => {
+    copy[key] = deepCopy(obj[key], cache);
+  });
+  return copy;
+};
 // window.onload
 // function addLoadEvent(func) {
 //   let oldonload = window.onload
@@ -153,6 +177,7 @@ export {
   loadJScript,
   webSocket,
   extend,
+  deepCopy,
   Ajax,
   getElementsByClassName,
   DateFormat
