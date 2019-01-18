@@ -20,17 +20,33 @@
         #search{
             position: absolute;
             right: 0;
-            top: 10%;
+            top: 5%;
             padding: 20px;
             background: red;
             cursor:pointer;
         }
-        #change{
+        #splitTrack{
             position: absolute;
             right: 0;
             top: 15%;
             padding: 20px;
             background: green;
+            cursor:pointer;
+        }
+        #moniter{
+            position: absolute;
+            right: 0;
+            top: 30%;
+            padding: 20px;
+            background: pink;
+            cursor:pointer;
+        }
+        #mapTrack{
+            position: absolute;
+            right: 0;
+            top: 40%;
+            padding: 20px;
+            background: orange;
             cursor:pointer;
         }
     </style>
@@ -41,7 +57,9 @@
 </div>
 <div id="button">点我</div>
 <div id="search">搜索</div>
-<div id="change">重载</div>
+<div id="splitTrack">分段轨迹</div>
+<div id="moniter">推送</div>
+<div id="mapTrack">5分钟轨迹</div>
 <!-- <div id="api" style="width:100%;height:50%;">
 </div> -->
 <script src="../../ics/static/maptracking/js/testbundle.js">
@@ -71,6 +89,7 @@
                 splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290", gpsSplitTimeMills: 60000},  // 分段轨迹参数
                 soketUrl: '',   // 推送地址
                 moniterParam: {vin: "LVGEN56A4JG247290"}, // 推送参数
+                lineStyle: {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8},  // 轨迹线样式
                 iconUrl: '../img/driving.png',    // 车辆图标
                 startIcon: "../img/start.png",  // 轨迹开始图标
                 endIcon: "../img/end.png",    // 轨迹结束图标
@@ -121,7 +140,7 @@
     search.onclick = function () {
         track.search({startTime: 1541779200000, endTime: 1541951999000, vin: "LB37752Z3JL587321"})
     }
-    change.onclick = function () {
+    splitTrack.onclick = function () {
         track.reload({
             dom: "apiId",
             mapType: 'bmap',
@@ -129,6 +148,28 @@
             config: {
                 trackApi: '',           // 自定义路径
                 splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290", gpsSplitTimeMills: 60000},
+            }
+        })
+    }
+    moniter.onclick = function () {
+        track.reload({
+            dom: "apiId",
+            mapType: 'bmap',
+            mapMointer: true, 
+            config: {
+                soketUrl: "ws://127.0.0.1:8889/api/ws/gpsWebSocket",
+                moniterParam: {vin: "LVGEN56A4JG247290"}
+            }
+        })
+    }
+    mapTrack.onclick = function () {
+        track.reload({
+            dom: "apiId",
+            mapType: 'bmap',
+            mapTrack: true, 
+            config: {
+                soketUrl: "",
+                trackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290"}
             }
         })
     }
