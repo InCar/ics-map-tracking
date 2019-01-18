@@ -1,6 +1,7 @@
 package com.incarcloud.handler;
 
 import com.incarcloud.skeleton.Starter;
+import com.incarcloud.skeleton.config.HBaseConfig;
 import com.incarcloud.skeleton.context.Context;
 import com.incarcloud.skeleton.exception.NoHandlerException;
 import org.springframework.stereotype.Controller;
