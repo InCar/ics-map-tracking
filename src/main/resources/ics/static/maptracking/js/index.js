@@ -212,7 +212,6 @@
         } else {
           if (timeLine) {// 时间线区别5分钟轨迹和分段轨迹
             let newLine = document.querySelector(".trackBorder .height");
-            console.log(nweLine);
             newLine.innerHTML = "";
             this.creatTimeDom(data, timeLine, newLine);
          }
