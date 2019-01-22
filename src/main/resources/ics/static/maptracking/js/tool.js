@@ -172,11 +172,59 @@ const DateFormat = (str, fmt) => {
   }
   return fmt;
 };
+// 转具体时间
+const MillisecondToDate = (msd) => {
+  var time = parseFloat(msd) / 1000;
+  if (time !== null && time !== '') {
+      if (time > 60 && time < 60 * 60) {
+          let m = parseInt(time / 60.0);
+          let s = parseInt((parseFloat(time / 60.0) - parseInt(time / 60.0)) * 60);
+          if (s === 0) {
+             time = m + '分';
+          } else {
+            time = m + '分';
+          }
+      } else if (time >= 60 * 60 && time < 60 * 60 * 24) {
+          let h = parseInt(time / 3600.0);
+          let s = parseInt((parseFloat((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60) -
+                  parseInt((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60)) * 60);
+          let m = parseInt((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60);
+          if (s === 0 && m === 0) {
+             time = h + '时';
+          } else if (s === 0) {
+             time = h + '时' + m + '分';
+          } else {
+            time = h + '时' + m + '分';
+          }
+      } else if (time >= 60 * 60 * 24) {
+         let d = parseInt(time / 3600.0 / 24);
+         let h = parseInt((parseFloat(time / 3600.0 / 24) - parseInt(time / 3600.0 / 24)) * 24);
+         let m = parseInt((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60);
+         let s = parseInt((parseFloat((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60) -
+                 parseInt((parseFloat(time / 3600.0) - parseInt(time / 3600.0)) * 60)) * 60);
+        if (s === 0 && m === 0 && h === 0) {
+             time = d + '天';
+          } else if (s === 0 && m === 0) {
+             time = d + '天' + h + '时';
+          } else if (s === 0) {
+            time = d + '天' + h + '时' + m + '分';
+          } else {
+            time = d + '天' + h + '时' + m + '分';
+          }
+      } else {
+          time = parseInt(time);
+      };
+  } else {
+      time = '0 时 0 分';
+  };
+  return time;
+};
 
 export {
   loadJScript,
   webSocket,
   extend,
+  MillisecondToDate,
   deepCopy,
   Ajax,
   getElementsByClassName,

@@ -49,6 +49,14 @@
             background: orange;
             cursor:pointer;
         }
+        #clearTrack{
+            position: absolute;
+            right: 0;
+            top: 60%;
+            padding: 20px;
+            background: blueviolet;
+            cursor:pointer;
+        }
     </style>
 </head>
 <body>
@@ -60,6 +68,7 @@
 <div id="splitTrack">分段轨迹</div>
 <div id="moniter">推送</div>
 <div id="mapTrack">5分钟轨迹</div>
+<div id="clearTrack">清除5分钟轨迹</div>
 <!-- <div id="api" style="width:100%;height:50%;">
 </div> -->
 <script src="../../ics/static/maptracking/js/testbundle.js">
@@ -74,52 +83,41 @@
    let track = new Maptrack({
         dom: "apiId",
         mapType: 'bmap',
-        mapTrack: true,       // 是否开启轨迹         都开启只会执行一个，按顺序
-        splitTrack: false,       // 是否开启分段轨迹
-        mapMointer: false,   // 是否开启推送
+        // splitTrack: true,       // 是否开启分段轨迹
+        // mapMointer: false,   // 是否开启推送
+        trackApi: '',           // 自定义路径
         currentData: function(data) { // 获取运动当前点数据，和showBorder配合使用
             // console.log(data)
         },
-        config: {
-                showBorder: true, // 是否展示面板
-                gps: [116.404, 39.915], // 初始化地图经纬度
-                zoom: 16,                // 初始化地图层级
-                trackApi: '',           // 自定义路径
-                trackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290"},  // 轨迹参数
-                splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290", gpsSplitTimeMills: 60000},  // 分段轨迹参数
-                soketUrl: '',   // 推送地址
-                moniterParam: {vin: "LVGEN56A4JG247290"}, // 推送参数
-                lineStyle: {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8},  // 轨迹线样式
-                iconUrl: '../img/driving.png',    // 车辆图标
-                startIcon: "../img/start.png",  // 轨迹开始图标
-                endIcon: "../img/end.png",    // 轨迹结束图标
-                markerSize: [20, 43],  // 图标尺寸
-                startEndSize: [26, 37],  // 开始结束图标尺寸
-                startEndAnchor: [10, 37],  // 开始结束图标偏移量
-                trackControl: {    // 轨迹按钮自定义
-                  startButton: '开',
-                  endButton: '暂停',
-                  stopButton: '停止',
-                  reduceButton: '减速',
-                  addButton: '加速'
-                }
-              }
+        //  config: {
+        //         showBorder: true, // 是否展示面板
+        //         gps: [116.404, 39.915], // 初始化地图经纬度
+        //         zoom: 16,                // 初始化地图层级
+        //         trackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290"},  // 轨迹参数
+        //         splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290", gpsSplitTimeMills: 60000},  // 分段轨迹参数
+        //         soketUrl: '',   // 推送地址
+        //         moniterParam: {vin: "LVGEN56A4JG247290"}, // 推送参数
+        //         lineStyle: {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.8},  // 轨迹线样式
+        //         iconUrl: '../img/driving.png',    // 车辆图标
+        //         startIcon: "../img/start.png",  // 轨迹开始图标
+        //         endIcon: "../img/end.png",    // 轨迹结束图标
+        //         markerSize: [20, 43],  // 图标尺寸
+        //         startEndSize: [26, 37],  // 开始结束图标尺寸
+        //         startEndAnchor: [10, 37],  // 开始结束图标偏移量
+        //         trackControl: {    // 轨迹按钮自定义
+        //           startButton: '开',
+        //           endButton: '暂停',
+        //           stopButton: '停止',
+        //           reduceButton: '减速',
+        //           addButton: '加速'
+        //         }
+        // }
     });
   // gps转成百度坐标
    // track.translateToBmap({lat: 39.990912172420714, lng: 116.32715863448607})
    // gps转高德坐标
    // track.GPS.translateToAmap({lat: 39.990912172420714, lng: 116.32715863448607})
     // 创建点
-       track.init((BMap, map) => {
-        let data = {
-            lat: 39.990912172420714,
-            lng: 116.32715863448607
-        }
-         let newData = track.translateToBmap(data)
-        let point = new BMap.Point(newData.lng, newData.lat);
-        let marker = new BMap.Marker(point);
-        map.addOverlay(marker);  // 标点
-       })
       
        // 轨迹点击事件
     track.on("play", function(a){
@@ -138,40 +136,32 @@
         console.log('you click reduce!');
     })
     search.onclick = function () {
-        track.search({startTime: 1541779200000, endTime: 1541951999000, vin: "LB37752Z3JL587321"})
+        // track.search({startTime: 1541779200000, endTime: 1541951999000, vin: "LB37752Z3JL587321"})
+        track.search({vin: "LB37752Z3JL587321"})
     }
     splitTrack.onclick = function () {
         track.reload({
-            dom: "apiId",
-            mapType: 'bmap',
             splitTrack: true, 
             config: {
                 trackApi: '',           // 自定义路径
-                splitTrackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290", gpsSplitTimeMills: 60000},
+                splitTrackParam: {startTime: 1541779200000, endTime: 1541951999000, vin: "LVGEN56A4JG247290"},
             }
         })
     }
     moniter.onclick = function () {
         track.reload({
-            dom: "apiId",
-            mapType: 'bmap',
             mapMointer: true, 
             config: {
-                soketUrl: "ws://127.0.0.1:8889/api/ws/gpsWebSocket",
-                moniterParam: {vin: "LVGEN56A4JG247290"}
+                // soketUrl: "ws://127.0.0.1:8889/api/ws/gpsWebSocket",
+                // moniterParam: {vin: "LVGEN56A4JG247290"}
             }
         })
     }
     mapTrack.onclick = function () {
-        track.reload({
-            dom: "apiId",
-            mapType: 'bmap',
-            mapTrack: true, 
-            config: {
-                soketUrl: "",
-                trackParam: {startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290"}
-            }
-        })
+        track.addTrack({startTime: 1543785649000, endTime: 1543856950000, vin: "LVGEN56A4JG247290"})
+    }
+    clearTrack.onclick = function () {
+        track.clearTrack()
     }
 // 加载多个地图
     // let api = new Maptrack({
