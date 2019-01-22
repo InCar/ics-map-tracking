@@ -480,16 +480,16 @@
         let marker = null;
         if (config.iconUrl) {
           let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.markerSize[0], config.markerSize[1]));
-          target = new BMap.Marker(point,{icon:icon}); // 创建点
-        } else target = new BMap.Marker(point);
+          marker = new BMap.Marker(point,{icon:icon}); // 创建点
+        } else marker = new BMap.Marker(point);
           // this.circle = setInterval(() => {
           //       this.setMoniter(data[i], marker)
           //       i++
           //       if(i === data.length) clearInterval(this.circle)
           //     }, 2000)
-        this.def.getSoket(target);
+        this.def.getSoket(marker);
         this.soket = tool.webSocket(config.soketUrl, {vinCode: obj.vin}, (data) => {
-          this.setMoniter(data, target);
+          this.setMoniter(data, marker);
           this.def.currentSoket(data);
         }) 
       },
