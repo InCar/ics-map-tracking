@@ -23,6 +23,10 @@
               },
               getBmap: function(a, b) { // 获取Map和当前地图对象做外部拓展，且只加载一次
               },
+              currentSoket: function(data) { //推送数据
+              },
+              getSoket: function(target) {
+              },
               points: [], // 监控点
               config: {
                 showBorder: true, // 是否展示面板
@@ -476,15 +480,17 @@
         let marker = null;
         if (config.iconUrl) {
           let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.markerSize[0], config.markerSize[1]));
-          marker = new BMap.Marker(point,{icon:icon}); // 创建点
-        } else marker = new BMap.Marker(point);
+          target = new BMap.Marker(point,{icon:icon}); // 创建点
+        } else target = new BMap.Marker(point);
           // this.circle = setInterval(() => {
           //       this.setMoniter(data[i], marker)
           //       i++
           //       if(i === data.length) clearInterval(this.circle)
           //     }, 2000)
+        this.def.getSoket(target);
         this.soket = tool.webSocket(config.soketUrl, {vinCode: obj.vin}, (data) => {
-          this.setMoniter(data, marker);
+          this.setMoniter(data, target);
+          this.def.currentSoket(data);
         }) 
       },
       // 5分钟轨迹

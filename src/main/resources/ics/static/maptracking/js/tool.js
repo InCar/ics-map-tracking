@@ -212,7 +212,7 @@ const MillisecondToDate = (msd) => {
             time = d + '天' + h + '时' + m + '分';
           }
       } else {
-          time = parseInt(time);
+        time = parseInt(time) + '秒';
       };
   } else {
       time = '0 时 0 分';

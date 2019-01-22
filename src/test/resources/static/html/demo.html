@@ -86,8 +86,11 @@
         // splitTrack: true,       // 是否开启分段轨迹
         // mapMointer: false,   // 是否开启推送
         trackApi: '',           // 自定义路径
-        currentData: function(data) { // 获取运动当前点数据，和showBorder配合使用
-            // console.log(data)
+        currentSoket: function(data) { // 获取运动当前点数据，和showBorder配合使用
+         console.log(track)
+        },
+        getSoket: function(data) { // 获取运动当前点数据，和showBorder配合使用
+         console.log(data)
         },
         //  config: {
         //         showBorder: true, // 是否展示面板
@@ -118,10 +121,10 @@
    // gps转高德坐标
    // track.GPS.translateToAmap({lat: 39.990912172420714, lng: 116.32715863448607})
     // 创建点
-      
        // 轨迹点击事件
     track.on("play", function(a){
         console.log('you click play!');
+        console.log(track);
     })
     track.on("pause", function(){
         console.log('you click pause!');
