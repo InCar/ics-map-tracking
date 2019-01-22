@@ -23,6 +23,8 @@
               },
               getBmap: function(a, b) { // 获取Map和当前地图对象做外部拓展，且只加载一次
               },
+              currentSoket: function() {
+              },
               points: [], // 监控点
               config: {
                 showBorder: true, // 是否展示面板
@@ -485,6 +487,7 @@
           //     }, 2000)
         this.soket = tool.webSocket(config.soketUrl, {vinCode: obj.vin}, (data) => {
           this.setMoniter(data, marker);
+          this.def.currentSoket(data, marker);
         }) 
       },
       // 5分钟轨迹
