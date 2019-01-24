@@ -13,16 +13,27 @@ public class GpsSource {
 
     protected Date time;
 
+    protected Integer speed;
+
 
     public GpsSource() {
     }
 
-    public GpsSource(String vin, Double lng, Double lat, Float direction, Date time) {
+    public GpsSource(String vin, Double lng, Double lat, Float direction, Date time,Integer speed) {
         this.vin = vin;
         this.lng = lng;
         this.lat = lat;
         this.direction = direction;
         this.time=time;
+        this.speed=speed;
+    }
+
+    public Integer getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(Integer speed) {
+        this.speed = speed;
     }
 
     public String getVin() {
