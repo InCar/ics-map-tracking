@@ -47,7 +47,7 @@
 //     }
 //   }
 // 动态加载script 
-const loadJScript = () => {
+const loadJScript = (obj) => {
   if (!window.BMap) {
     window.BMap = {}
     window.BMap._preloader = new Promise((resolve, reject) => {
@@ -59,7 +59,7 @@ const loadJScript = () => {
       }
       const $script = document.createElement('script')
       window.document.head.appendChild($script)
-      $script.src = `//api.map.baidu.com/api?v=2.0&ak=Z387qRaNG1dZvs0xrpNDMWTVh2ZhWRkW&callback=_initBaiduMap`
+      $script.src = `//api.map.baidu.com/api?v=2.0&ak=${obj.mapKey}&callback=_initBaiduMap`
     })
     return window.BMap._preloader
   } else if (!window.BMap._preloader) {
@@ -219,11 +219,87 @@ const MillisecondToDate = (msd) => {
   };
   return time;
 };
+//移动车辆，count两点间要移动的次数，timer，每次移动的时间，毫秒
+const moveCar = (map, prvePoint, newPoint, timer, marker, count) => {
+  var _prvePoint = new BMap.Pixel(0,0);
+  var _newPoint = new BMap.Pixel(0,0);
+  //当前帧数
+  var currentCount = 0;
+  //初始坐标
+  _prvePoint = map.getMapType().getProjection().lngLatToPoint(prvePoint);
+  //获取结束点的(x,y)坐标
+  _newPoint = map.getMapType().getProjection().lngLatToPoint(newPoint);
+  
+  //两点之间匀速移动
+  var intervalFlag = setInterval(function() {
+    //两点之间当前帧数大于总帧数的时候，则说明已经完成移动
+    if (currentCount >= count) {
+      clearInterval(intervalFlag);
+    } else {
+      //动画移动
+      currentCount++;//计数
+      //console.log(currentCount);
+      var x = linear(_prvePoint.x, _newPoint.x, currentCount,
+          count);
+      var y = linear(_prvePoint.y, _newPoint.y, currentCount,
+          count);
+      //根据平面坐标转化为球面坐标
+      var pos = map.getMapType().getProjection().pointToLngLat(new BMap.Pixel(x, y));
+      //console.log(pos);
+      
+      marker.setPosition(pos);
+      //调整方向
+      setRotation(map, prvePoint, newPoint, marker);
+    }
+  }, timer);
+  //marker.removeOverlay(marker);
+}
+//
+function linear(initPos, targetPos, currentCount, count) {
+  var b = initPos, c = targetPos - initPos, t = currentCount, d = count;
+  return c * t / d + b;
+}
+//设置方向
+function setRotation(map, curPos, targetPos, marker) {
+  var deg = 0;
+  curPos = map.pointToPixel(curPos);
+  targetPos = map.pointToPixel(targetPos);
+
+
+  if (targetPos.x != curPos.x) {
+    var tan = (targetPos.y - curPos.y) / (targetPos.x - curPos.x), atan = Math
+        .atan(tan);
+    deg = atan * 360 / (2 * Math.PI);
+    if (targetPos.x < curPos.x) {
+      deg = -deg + 90 + 90;
+    } else {
+      deg = -deg;
+    }
+    marker.setRotation(-deg);
+  } else {
+    
+    var disy = targetPos.y - curPos.y;
+    var bias = 0;
+    if (disy > 0){
+    bias = -1;
+    }
+    else{
+    bias = 1;
+    }
+    marker.setRotation(-bias * 90);
+  }
+  return;
+}
+
+
+
 
 export {
   loadJScript,
   webSocket,
   extend,
+  moveCar,
+  run,
   MillisecondToDate,
   deepCopy,
   Ajax,
