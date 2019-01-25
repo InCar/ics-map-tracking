@@ -39,6 +39,7 @@
                 splitTrackParam: {vin: "LVGEN56A4JG247290"},  // 分段轨迹参数
                 moniterParam: {vin: "LVGEN56A4JG247290"}, // 推送参数
                 lineStyle: {strokeColor:"green", strokeWeight:6, strokeOpacity:0.8, enableClicking: false},
+                isSequence: false,  // 开启轨迹线箭头
                 iconSequence: {
                   scale: 0.6,//图标缩放大小
                   strokeColor:'#fff',//设置矢量图标的线填充颜色
@@ -130,14 +131,14 @@
       },
       setPolyline: function(lineData) {
         let c = this.def.config;
-        if (Object.keys(c.iconSequence).length) {
+        if (Object.keys(c.iconSequence).length && c.isSequence) {
           let icons = null;
           icons = new BMap.IconSequence(
             new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, c.iconSequence), '10', '30');
             c.lineStyle.icons = [icons];
         }
-        let t = this.trackPoint;
-        if (t.length <= 1) this.Bmap.addOverlay(new BMap.Polyline(lineData, c.lineStyle));
+        let t = this.trackPoint.data
+        if (t.length <= 1) this.Bmap.addOverlay(new BMap.Polyline(lineData, c.lineStyle))
         else {
           for (let i = 1; i < t.length; i++) {
             let averSpeed = (t[i].speed + t[i - 1].speed) / 2;
@@ -145,19 +146,19 @@
               if (j === 0) {
                 if (averSpeed <= c.speedSplit[j] && averSpeed >= 0) {
                   c.lineStyle.strokeColor = c.speedColor[j];
-                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i], lineData[i - 1]], c.lineStyle));  //增加折线
+                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
                   break;
                 }
-              } else if (j === c.speedSplit.length) {
+              } else if (j === c.speedSplit.length - 1) {
                 if (averSpeed > c.speedSplit[j] || (averSpeed <= c.speedSplit[j] && averSpeed > c.speedSplit[j - 1])) {
                   c.lineStyle.strokeColor = c.speedColor[j];
-                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i], lineData[i - 1]], c.lineStyle));  //增加折线
+                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
                   break;
                 }
               } else {
                 if (averSpeed <= c.speedSplit[j] && averSpeed > c.speedSplit[j - 1]) {
                   c.lineStyle.strokeColor = c.speedColor[j];
-                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i], lineData[i - 1]], c.lineStyle));  //增加折线
+                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
                   break;
                 }
               }
