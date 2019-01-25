@@ -35,14 +35,15 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
             Double lng=rs.getDouble("lng");
             Double lat=rs.getDouble("lat");
             Date time=new Date(rs.getTimestamp("time").getTime());
-            return new GpsSource(vin,lng,lat,direction,time);
+            Integer speed = rs.getInt("speed");
+            return new GpsSource(vin,lng,lat,direction,time,speed);
         };
     }
 
     @Override
     public List<GpsSource> list(String vin, Date startTime, Date endTime) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
-        String sql="select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=?";
+        String sql="select vin,lng,lat,direction,time,speed from t_gps where vin=? and time>=? and time <=?";
         return dataAccess.list(sql,rowHandler,vin,startTime,endTime);
     }
 
@@ -50,7 +51,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
     public PageResult<GpsSource> page(String vin, Date startTime, Date endTime, Page page) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         String countSql="select count(*) as num from t_gps where vin=? and time>=? and time <=?";
-        String sql="select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=? limit ?,?";
+        String sql="select vin,lng,lat,direction,time,speed from t_gps where vin=? and time>=? and time <=? limit ?,?";
         return dataAccess.page(countSql,sql,rowHandler,page,vin,startTime,endTime);
     }
 
@@ -60,7 +61,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
         List<List<GpsSource>> resultList=new ArrayList<>();
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         List<GpsSource> dataList=new ArrayList<>();
-        StringBuilder sql=new StringBuilder("select vin,lng,lat,direction,time from t_gps where vin=? and time>=? and time <=?");
+        StringBuilder sql=new StringBuilder("select vin,lng,lat,direction,speed,time from t_gps where vin=? and time>=? and time <=?");
         if(order==1){
             sql.append(" order by time asc");
         }else if(order ==2){
