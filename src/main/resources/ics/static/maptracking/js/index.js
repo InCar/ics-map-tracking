@@ -301,12 +301,12 @@
               $(".trackModel").style.display = "block";
               let childDom = Array.from(timeLineDom.children);
               // childDom[0].className = "active";
-              for(let i = 0; i < childDom.length ;i++)
-              childDom[i].onclick = (e) => {
+              for(let i = 0; i < childDom.length ;i++) {
+              childDom[i].onclick = () => {
                 childDom.map(item => {
                   item.className = "";
                 })
-                  e.target.parentElement.className = "active";
+                childDom[i].className = "active";
                   // 播放按钮重置
                   $(".trackModel .slot").onclick = (e) => {
                     $(".trackModel").style.display = "none";
@@ -318,9 +318,10 @@
                     if ($(".trackControl")) this.resetData();
                     let obj = {startTime: timeLine[i].startTime, endTime: timeLine[i].endTime, vin: this.vinCode}
                     this.Bmap.clearOverlays();
-                    this.getSplitData(obj)
+                    this.getSplitData(obj);
                   }
                 }
+              }
           })
       },
       // 转化起点终点
