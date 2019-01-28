@@ -28,6 +28,14 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
     @ICSAutowire
     JdbcDataAccess dataAccess;
 
+    /**
+     * 如果集成此类必须重写此方法
+     * @return
+     */
+    public JdbcDataAccess getDataAccess(){
+        return dataAccess;
+    }
+
     public RowHandler<GpsSource> getGpsSourceRowHandler(){
         return rs->{
             String vin=rs.getString("vin");
@@ -44,7 +52,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
     public List<GpsSource> list(String vin, Date startTime, Date endTime) {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         String sql="select vin,lng,lat,direction,time,speed from t_gps where vin=? and time>=? and time <=?";
-        return dataAccess.list(sql,rowHandler,vin,startTime,endTime);
+        return getDataAccess().list(sql,rowHandler,vin,startTime,endTime);
     }
 
     @Override
@@ -52,7 +60,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
         RowHandler<GpsSource> rowHandler=getGpsSourceRowHandler();
         String countSql="select count(*) as num from t_gps where vin=? and time>=? and time <=?";
         String sql="select vin,lng,lat,direction,time,speed from t_gps where vin=? and time>=? and time <=? limit ?,?";
-        return dataAccess.page(countSql,sql,rowHandler,page,vin,startTime,endTime);
+        return getDataAccess().page(countSql,sql,rowHandler,page,vin,startTime,endTime);
     }
 
 
@@ -77,7 +85,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
             beginIndex=beginIndex<0?0:beginIndex;
             //2、添加每次查询结果到总结果集中
             SqlListResult sqlListResult= SqlUtil.replaceNull(sql.toString(),Arrays.asList(vin,startTime,endTime));
-            List<GpsSource> curDataList=dataAccess.list(sqlListResult.getSql(),rowHandler,vin,startTime,endTime,count*EVERY_FETCH_DATA_NUM,EVERY_FETCH_DATA_NUM);
+            List<GpsSource> curDataList=getDataAccess().list(sqlListResult.getSql(),rowHandler,vin,startTime,endTime,count*EVERY_FETCH_DATA_NUM,EVERY_FETCH_DATA_NUM);
             dataList.addAll(curDataList);
             count++;
             //3、循环合并后的结果集,依次检测相邻的元素的时间差,如果大于设置时间差,则算作一段轨迹
@@ -149,7 +157,7 @@ public class GpsServiceImpl extends BaseComponent implements GpsService {
             int beginIndex=dataList.size()-1;
             beginIndex=beginIndex<0?0:beginIndex;
             //2、添加每次查询结果到总结果集中
-            List<GpsSource> curDataList=dataAccess.list(sql.toString(),rs->{
+            List<GpsSource> curDataList=getDataAccess().list(sql.toString(),rs->{
                 GpsSource gpsSource=new GpsSource();
                 Double lng=rs.getDouble("lng");
                 Double lat=rs.getDouble("lat");
