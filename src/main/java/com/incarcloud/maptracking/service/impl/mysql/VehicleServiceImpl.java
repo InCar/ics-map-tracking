@@ -20,6 +20,15 @@ import java.util.List;
 public class VehicleServiceImpl extends BaseComponent implements VehicleService {
     @ICSAutowire
     JdbcDataAccess dataAccess;
+
+    /**
+     * 如果集成此类必须重写此方法
+     * @return
+     */
+    public JdbcDataAccess getDataAccess() {
+        return dataAccess;
+    }
+
     private RowHandler<VehicleSource> getVehicleSourceRowHandler(){
         return rs->{
             String vin=rs.getString("vin");
@@ -33,10 +42,10 @@ public class VehicleServiceImpl extends BaseComponent implements VehicleService 
         RowHandler<VehicleSource> rowHandler=getVehicleSourceRowHandler();
         if(vin==null){
             String sql="select vin,plate_no from t_vehicle";
-            return dataAccess.list(sql,rowHandler);
+            return getDataAccess().list(sql,rowHandler);
         }else{
             String sql="select vin,plate_no from t_vehicle where vin=?";
-            return dataAccess.list(sql,rowHandler,vin);
+            return getDataAccess().list(sql,rowHandler,vin);
         }
     }
 
@@ -46,11 +55,11 @@ public class VehicleServiceImpl extends BaseComponent implements VehicleService 
         if(vin==null){
             String countSql="select count(*) as num from t_vehicle";
             String sql="select vin,plate_no from t_vehicle limit ?,?";
-            return dataAccess.page(countSql,sql,rowHandler,page);
+            return getDataAccess().page(countSql,sql,rowHandler,page);
         }else{
             String countSql="select count(*) as num from t_vehicle where vin=?";
             String sql="select vin,plate_no from t_vehicle where vin=? limit ?,?";
-            return dataAccess.page(countSql,sql,rowHandler,page,vin);
+            return getDataAccess().page(countSql,sql,rowHandler,page,vin);
         }
     }
 }
