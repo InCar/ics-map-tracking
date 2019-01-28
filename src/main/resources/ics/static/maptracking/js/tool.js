@@ -59,7 +59,7 @@ const loadJScript = (obj) => {
       }
       const $script = document.createElement('script')
       window.document.head.appendChild($script)
-      $script.src = `//api.map.baidu.com/api?v=2.0&ak=${obj.mapKey}&callback=_initBaiduMap`
+      $script.src = `//api.map.baidu.com/api?v=3.0&ak=${obj.mapKey}&callback=_initBaiduMap`
     })
     return window.BMap._preloader
   } else if (!window.BMap._preloader) {
@@ -252,6 +252,7 @@ const moveCar = (map, prvePoint, newPoint, timer, marker, count) => {
       setRotation(map, prvePoint, newPoint, marker);
     }
   }, timer);
+  return intervalFlag;
   //marker.removeOverlay(marker);
 }
 //

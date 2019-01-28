@@ -1,7 +1,8 @@
  import "../css/index.scss";
  import * as tool from './tool'
 // plugin.js
-;(function(undefined) {
+;import { isAbsolute } from "path";
+(function(undefined) {
   "use strict"
   var _global;
   function $(dom){
@@ -28,7 +29,7 @@
               },
               currentSoket: function(data) { //推送数据
               },
-              getSoket: function(target) {
+              getSoket: function(target) { // 在推送前marker拓展
               },
               points: [], // 监控点
               config: {
@@ -39,14 +40,20 @@
                 splitTrackParam: {vin: "LVGEN56A4JG247290"},  // 分段轨迹参数
                 moniterParam: {vin: "LVGEN56A4JG247290"}, // 推送参数
                 lineStyle: {strokeColor:"green", strokeWeight:6, strokeOpacity:0.8, enableClicking: false},
-                isSequence: false,  // 开启轨迹线箭头
+                isSequence: false,  // 开启轨迹线箭头,官方bug太多，reload可能会报错
                 iconSequence: {
-                  scale: 0.6,//图标缩放大小
-                  strokeColor:'#fff',//设置矢量图标的线填充颜色
-                  strokeWeight: '2',//设置线宽
+                  fillColor : 'green', //设置矢量图标的填充颜色。支持颜色常量字符串、十六进制、RGB、RGBA等格式
+                  fillOpacity : 1, //设置矢量图标填充透明度,范围0~1
+                  scale : 0.5, //设置矢量图标的缩放比例
+                  rotation : 90, //设置矢量图标的旋转角度,参数为角度
+                  strokeColor : '#FFF', //设置矢量图标的线填充颜色,支持颜色常量字符串、十六进制、RGB、RGBA等格式
+                  strokeOpacity : 1, //设置矢量图标线的透明度,opacity范围0~1
+                  strokeWeight : 2, //旋设置线宽。如果此属性没有指定，则线宽跟scale数值相
                 },
-                speedColor: ["red", "yellow", "green"],
-                speedSplit: [5, 15, 20],
+                setSequence: {offset: '5%', repeat: '30', fixedRotation: false}, //offset符号相对于线起点的位置,repeat线上重复显示的距离,fixedRotation图标的旋转角度是否与线走向一致
+                isTrackColor: false, // 开启按速度展示轨迹颜色
+                speedColor: ["red", "yellow", "green"], // 颜色默认选项
+                speedSplit: [5, 15, 20],  // 平均速度分割选项，务必对应颜色
                 soketUrl: '',   // 推送地址
                 iconUrl: '',    // 车辆图标
                 startIcon: "",  // 轨迹开始图标
@@ -112,8 +119,9 @@
           $(".trackInfo .trackTime").innerText = data[0] ? tool.DateFormat(new Date(data[0].time), 'yyyy-MM-dd hh:mm:ss') : "";
           $(".trackInfo .vin").innerText = this.vinCode;
           $(".trackInfo .slot").onclick = () => {
-            $(".trackModel").style.display = "block"
-            if (this.moveInter) clearTimeout(this.moveInter)
+            $(".trackModel").style.display = "block";
+            if (this.moveInter) clearTimeout(this.moveInter);
+            if (this.movecar) clearInterval(this.movecar);
             this.resetData();
           };
       //   }
@@ -133,33 +141,39 @@
         let c = this.def.config;
         if (Object.keys(c.iconSequence).length && c.isSequence) {
           let icons = null;
-          icons = new BMap.IconSequence(
-            new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, c.iconSequence), '10', '30');
+          let sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, c.iconSequence);
+          // 颜色线和箭头不能同时开启，间距太短.若开启注意将repeat设为1
+          if (c.isTrackColor) icons = new BMap.IconSequence(sy, c.setSequence.offset, c.setSequence.repeat, c.setSequence.fixedRotation);
+          else icons = new BMap.IconSequence(sy, c.setSequence.offset, c.setSequence.repeat, c.setSequence.fixedRotation);
             c.lineStyle.icons = [icons];
         }
-        let t = this.trackPoint.data
-        if (t.length <= 1) this.Bmap.addOverlay(new BMap.Polyline(lineData, c.lineStyle))
+        // 开启轨迹线颜色
+        if(!c.isTrackColor)  this.Bmap.addOverlay(new BMap.Polyline(lineData, c.lineStyle));
         else {
-          for (let i = 1; i < t.length; i++) {
-            let averSpeed = (t[i].speed + t[i - 1].speed) / 2;
-            for (let j = 0; j < c.speedSplit.length;j++) { 
-              if (j === 0) {
-                if (averSpeed <= c.speedSplit[j] && averSpeed >= 0) {
-                  c.lineStyle.strokeColor = c.speedColor[j];
-                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
-                  break;
-                }
-              } else if (j === c.speedSplit.length - 1) {
-                if (averSpeed > c.speedSplit[j] || (averSpeed <= c.speedSplit[j] && averSpeed > c.speedSplit[j - 1])) {
-                  c.lineStyle.strokeColor = c.speedColor[j];
-                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
-                  break;
-                }
-              } else {
-                if (averSpeed <= c.speedSplit[j] && averSpeed > c.speedSplit[j - 1]) {
-                  c.lineStyle.strokeColor = c.speedColor[j];
-                  this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
-                  break;
+          let t = this.trackPoint.data
+          if (t.length <= 1) this.Bmap.addOverlay(new BMap.Polyline(lineData, c.lineStyle));
+          else {
+            for (let i = 1; i < t.length; i++) {
+              let averSpeed = (t[i].speed + t[i - 1].speed) / 2;
+              for (let j = 0; j < c.speedSplit.length;j++) { 
+                if (j === 0) {
+                  if (averSpeed <= c.speedSplit[j] && averSpeed >= 0) {
+                    c.lineStyle.strokeColor = c.speedColor[j];
+                    this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
+                    break;
+                  }
+                } else if (j === c.speedSplit.length - 1) {
+                  if (averSpeed > c.speedSplit[j] || (averSpeed <= c.speedSplit[j] && averSpeed > c.speedSplit[j - 1])) {
+                    c.lineStyle.strokeColor = c.speedColor[j];
+                    this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
+                    break;
+                  }
+                } else {
+                  if (averSpeed <= c.speedSplit[j] && averSpeed > c.speedSplit[j - 1]) {
+                    c.lineStyle.strokeColor = c.speedColor[j];
+                    this.Bmap.addOverlay(new BMap.Polyline([lineData[i - 1], lineData[i]], c.lineStyle));  //增加折线
+                    break;
+                  }
                 }
               }
             }
@@ -180,7 +194,7 @@
          this.def.points.push(newPoint);
           // marker.setPosition(newPoint); // 改变点的位置
           // marker.setRotation(data.direction); // 改变点的方向
-         if (this.prvePoint) tool.moveCar(this.Bmap, this.prvePoint, newPoint, 30, marker, 50);
+         if (this.prvePoint) tool.moveCar(this.Bmap, this.prvePoint, newPoint, 30, marker, 50)
          this.prvePoint = newPoint;
          this.Bmap.setViewport(this.def.points);
          // 只绘制最后两个点的线
@@ -265,7 +279,8 @@
       creatTimeDom: function (timeLine) {
         let timeLineDom = $(".trackModel .timeLine");
         if (!timeLine || !timeLine.length) {
-          timeLineDom.innerText = "暂无轨迹数据";
+          timeLineDom.innerHTML = "<span class='nodata'>暂无轨迹数据</span>";
+          timeLineDom.style.position = "relative";
           return;
         }
         let [timeStr, promiseArray, geoc] = ['', [], new BMap.Geocoder()];
@@ -277,13 +292,12 @@
          })
          Promise.all(promiseArray).then((data) => {
               data.map((item, i) => {
-                timeStr += `<div>
-                  ${tool.DateFormat(new Date(timeLine[i].startTime), 'MM-dd hh:mm')}
-                  <span>(${tool.MillisecondToDate(timeLine[i].endTime - timeLine[i].startTime)})<span>
-                  <p><span class="start">${item.start}</span> - <span class="end">${item.end}</span>
-                  </p></div>`
+                timeStr += `<div><span>${i + 1}</span>
+                <span>${tool.DateFormat(new Date(timeLine[i].startTime), 'MM-dd hh:mm')}</span>
+                  <span>${tool.MillisecondToDate(timeLine[i].endTime - timeLine[i].startTime)}</span>
+                  <span class="start">${item.start}</span><span class="end">${item.end}</span></div>`
               })
-              timeLineDom.innerHTML = timeStr
+              timeLineDom.innerHTML = timeStr;
               $(".trackModel").style.display = "block";
               let childDom = Array.from(timeLineDom.children);
               // childDom[0].className = "active";
@@ -292,8 +306,7 @@
                 childDom.map(item => {
                   item.className = "";
                 })
-                  e.target.className = "active";
-                  // trackTime.innerText = tool.DateFormat(new Date(this.trackPoint.data[0].time), 'yyyy-MM-dd hh:mm:ss'); // 新轨迹段第一个时间
+                  e.target.parentElement.className = "active";
                   // 播放按钮重置
                   $(".trackModel .slot").onclick = (e) => {
                     $(".trackModel").style.display = "none";
@@ -301,6 +314,7 @@
                     $(".trackInfo .start").innerText = data[i].start;
                     $(".trackInfo .end").innerText = data[i].end;
                     if (this.moveInter) clearTimeout(this.moveInter);
+                    if (this.movecar) clearInterval(this.movecar);
                     if ($(".trackControl")) this.resetData();
                     let obj = {startTime: timeLine[i].startTime, endTime: timeLine[i].endTime, vin: this.vinCode}
                     this.Bmap.clearOverlays();
@@ -371,14 +385,15 @@
         control.markerIsStart = false;
         let time = 200 - (50 * control.speed);
         let dataList = this.trackPoint.data;
-        target.setPosition(this.newData[i]);// 车辆位置
-        target.setRotation(dataList[i].direction);// 车辆方向
+        // target.setPosition(this.newData[i]);// 车辆位置
+        // target.setRotation(dataList[i].direction);// 车辆方向
         if (i < this.newData.length - 1) {
           this.moveInter = setTimeout(() => {
             i++;
             $(".trackInfo .trackTime").innerText = tool.DateFormat(new Date(dataList[i].time), 'yyyy-MM-dd hh:mm:ss')
              this.def.currentData(dataList[i]);
-            this.resetMkPoint(target, control, i);
+            this.movecar = tool.moveCar(this.Bmap, this.newData[i - 1], this.newData[i], (time / 10), target, 10);
+            this.resetMkPoint(target, control, i)
           }, time);
         }
         control.currentPoint = i;
@@ -491,7 +506,8 @@
       // 分段轨迹弹层
       creatModel: function (){
         let str = `<div class="content">
-          <p class="head">轨迹分段信息<span class="slot">收起</span></p>
+          <p class="head">轨迹分段信息<span class="slot">✖</span></p>
+          <p class="title"><span>序号</span><span>开始时间</span><span>时长</span><span>起点</span><span>终点</span></p>
           <div class="timeLine"></div>
         </div>`
         let topStr = `<div class="content">
@@ -499,8 +515,8 @@
                   <span>时间：<span class="trackTime"></span></span>
                   <span>起点：<span class="start"></span></span>
                   <span>终点：<span class="end"></span></span>
-        </div>
-        <span class="slot">展开</span>`
+                  <span class="slot">>></span>
+        </div>`
         let div = document.createElement('div');
         div.setAttribute('class', 'trackModel');
         let topDiv = document.createElement('div');
@@ -512,17 +528,17 @@
       },
       // 推送监控点
       getSocket: function (obj) {   
-        let data = [
-          {lat:30.4824,lng:114.397257, direction: 90},
-          {lat:30.482563,lng:114.396676, direction: 30},
-          {lat:30.482374,lng:114.395602, direction: 40},
-          {lat:30.482343,lng:114.394226, direction: 20},
-          {lat:30.482326,lng:114.393722, direction: 120},
-          {lat:30.482331,lng:114.393278, direction: 150}
-        ]
+        // let data = [
+        //   {lat:30.4824,lng:114.397257, direction: 90},
+        //   {lat:30.482563,lng:114.396676, direction: 30},
+        //   {lat:30.482374,lng:114.395602, direction: 40},
+        //   {lat:30.482343,lng:114.394226, direction: 20},
+        //   {lat:30.482326,lng:114.393722, direction: 120},
+        //   {lat:30.482331,lng:114.393278, direction: 150}
+        // ]
         this.vinCode = obj.vin; // 存储vin
         this.def.points = []; //搜索清空先
-        let i = 0;
+        // let i = 0;
         let config = this.def.config
         let point = new BMap.Point(config.gps[0], config.gps[1])
         this.Bmap.centerAndZoom(point, config.zoom)
@@ -531,16 +547,16 @@
           let icon = new BMap.Icon(config.iconUrl, new BMap.Size(config.markerSize[0], config.markerSize[1]));
           marker = new BMap.Marker(point,{icon:icon}); // 创建点
         } else marker = new BMap.Marker(point);
-          this.circle = setInterval(() => {
-                this.setMoniter(data[i], marker)
-                i++
-                if(i === data.length) clearInterval(this.circle);
-              }, 3000);
-        // this.def.getSoket(marker);
-        // this.soket = tool.webSocket(config.soketUrl, {vinCode: obj.vin}, (data) => {
-        //   this.setMoniter(data, marker);
-        //   this.def.currentSoket(data);
-        // }) 
+          // this.circle = setInterval(() => {
+          //       this.setMoniter(data[i], marker)
+          //       i++
+          //       if(i === data.length) clearInterval(this.circle);
+          //     }, 3000);
+        this.def.getSoket(marker);
+        this.soket = tool.webSocket(config.soketUrl, {vinCode: obj.vin}, (data) => {
+          this.setMoniter(data, marker);
+          this.def.currentSoket(data);
+        }) 
       },
       // 5分钟轨迹
       getTrack: function (obj) {
@@ -607,6 +623,7 @@
       // 重载清除面板工具
       removeTools: function() {
         if (this.moveInter) clearTimeout(this.moveInter)
+        if (this.movecar) clearInterval(this.movecar)
         let trackInfo = $(".trackInfo");
         let trackControl = $(".trackControl");
         let trackModel = $(".trackModel");

@@ -139,15 +139,17 @@
         console.log('you click reduce!');
     })
     search.onclick = function () {
-        // track.search({startTime: 1541779200000, endTime: 1541951999000, vin: "LB37752Z3JL587321"})
-        track.search({vin: "LB37752Z3JL587321"})
+         track.search({startTime: 1541779200000, endTime: 1541951999000, vin: "LB37752Z3JL587321"})
+        // track.search({vin: "LB37752Z3JL587321"})
     }
     splitTrack.onclick = function () {
         track.reload({
             splitTrack: true, 
             config: {
-                trackApi: '',           // 自定义路径
-                splitTrackParam: {startTime: 1541764082000, endTime: 1541765627000, vin: "LB37752Z3JL587321"},
+                isTrackColor: false,
+                isSequence: true,
+                setSequence: {offset: '5%', repeat: '30', fixedRotation: false},
+                splitTrackParam: {startTime: 1541779200000, endTime: 1541951999000, vin: "LB37752Z3JL587321"},
             }
         })
     }
